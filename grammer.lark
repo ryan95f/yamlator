@@ -1,0 +1,26 @@
+?start: instructions+
+
+?instructions: enum
+            | ruleset
+
+primitives: ESCAPED_STRING
+          | INT -> number
+
+?rule: required_rule
+     | optional_rule
+
+required_rule: /[a-zA-Z0-9]+/ "required"
+optional_rule: /[a-zA-Z0-9]+/ "optional"
+
+ruleset: "ruleset" /[a-z]+/ "{" rule+ "}"
+
+list: "[" primitives [("," primitives)+] "]"
+enum: "enum" /[a-z]+/ "=" list
+
+NEW_LINES: "\n"+
+
+%import common.INT
+%import common.ESCAPED_STRING
+%import common.WS
+%ignore WS
+%ignore NEW_LINES
