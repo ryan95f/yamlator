@@ -1,0 +1,6 @@
+ruleset myset {
+    hello required
+    name required
+    surname required
+    age required
+}
