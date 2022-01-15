@@ -11,8 +11,7 @@ class YamlerParser:
 
     def parse(self, text):
         tokens = self._parser.parse(text)
-        return tokens.pretty()
-        # return self._transfomer.transform(tokens)
+        return self._transfomer.transform(tokens)
 
 
 class YamlerTransformer(Transformer):
@@ -24,12 +23,12 @@ class YamlerTransformer(Transformer):
         return int(n)
 
     def required_rule(self, tokens):
-        (name, ) = tokens
-        return YamlerRule(name.value, True)
+        (name, rtype) = tokens
+        return YamlerRule(name.value, rtype, True)
 
     def optional_rule(self, tokens):
-        (name, ) = tokens
-        return YamlerRule(name.value, False)
+        (name, rtype) = tokens
+        return YamlerRule(name.value, rtype, False)
         
     def ruleset(self, tokens):
         name = tokens[0]
@@ -52,8 +51,9 @@ class YamlerEnum:
 
 
 class YamlerRule:
-    def __init__(self, name, required=False):
+    def __init__(self, name, rtype, required=False):
         self.name = name
+        self.rtype = rtype
         self.required = required
 
     def __str__(self):
