@@ -1,6 +1,7 @@
 ?start: instructions+
 
 ?instructions: enum
+            | main_ruleset
             | ruleset
 
 type: "int"
@@ -16,6 +17,7 @@ primitives: ESCAPED_STRING
 required_rule: /[a-zA-Z0-9]+/ type "required"
 optional_rule: /[a-zA-Z0-9]+/ type "optional"
 
+main_ruleset: "ruleset" "main" "{" rule+ "}"
 ruleset: "ruleset" /[a-z]+/ "{" rule+ "}"
 
 list: "[" primitives [("," primitives)+] "]"
