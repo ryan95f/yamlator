@@ -12,11 +12,13 @@ def main():
     parser = YamlerParser()
     tokens = parser.parse(ruleset)
 
-    wrangler = YamlerWrangler(tokens.rules)
-    violations = wrangler.wrangle(yaml_data)
+    print(tokens)
 
-    for idx, (key, message) in enumerate(violations.items()):
-        print(message)
+    # wrangler = YamlerWrangler(tokens.rules)
+    # violations = wrangler.wrangle(yaml_data)
+
+    # for idx, (key, message) in enumerate(violations.items()):
+    #     print(message)
 
 
 if __name__ == '__main__':

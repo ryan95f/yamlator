@@ -11,7 +11,8 @@ class YamlerParser:
 
     def parse(self, text):
         tokens = self._parser.parse(text)
-        return self._transfomer.transform(tokens)
+        return tokens.pretty()
+        # return self._transfomer.transform(tokens)
 
 
 class YamlerTransformer(Transformer):

@@ -3,14 +3,18 @@
 ?instructions: enum
             | ruleset
 
+type: "int"
+     | "str"
+     | "ruleset" /[a-zA-Z0-9]+/
+
 primitives: ESCAPED_STRING
           | INT -> number
 
 ?rule: required_rule
      | optional_rule
 
-required_rule: /[a-zA-Z0-9]+/ "required"
-optional_rule: /[a-zA-Z0-9]+/ "optional"
+required_rule: /[a-zA-Z0-9]+/ type "required"
+optional_rule: /[a-zA-Z0-9]+/ type "optional"
 
 ruleset: "ruleset" /[a-z]+/ "{" rule+ "}"
 

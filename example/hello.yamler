@@ -1,6 +1,15 @@
-ruleset myset {
-    hello required
-    name required
-    surname required
-    age required
+ruleset person {
+    hello str required
+    name str required
+    surname str required
+    age int required
+}
+
+ruleset coords {
+    x int required
+    y int optional
+}
+
+ruleset main {
+    root ruleset person required
 }
