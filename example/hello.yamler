@@ -12,4 +12,5 @@ ruleset coords {
 
 ruleset main {
     root ruleset person required
+    item str required
 }

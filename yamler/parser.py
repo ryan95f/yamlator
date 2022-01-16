@@ -42,7 +42,49 @@ class YamlerTransformer(Transformer):
     def start(self, instructions):
         return list(instructions)
 
+    def str_type(self, tokens):
+        return YamlerStr()
+
+    def int_type(self, tokens):
+        return YamlerInt()
+
+    def ruleset_type(self, tokens):
+        (name, ) = tokens
+        return YamlerRulesetType(name)
+
+    def type(self, tokens):
+        (t, ) = tokens
+        return t
+
+
     list = list
+
+
+class YamlerType:
+    def __init__(self, rtype, ptype):
+        self.rtype = rtype
+        self.ptype = ptype
+
+    def __str__(self):
+        return self.rtype
+
+class YamlerInt(YamlerType):
+    def __init__(self):
+        super(YamlerInt, self).__init__("int", int)
+    
+
+class YamlerStr(YamlerType):
+    def __init__(self):
+        super(YamlerStr, self).__init__("str", int)
+
+
+class YamlerRulesetType(YamlerType):
+    def __init__(self, name):
+        self.ruleset_name = name
+        super(YamlerRulesetType, self).__init__("ruleset", object)
+
+    def __str__(self):
+        return f"ruleset {self.ruleset_name}"
 
 
 class YamlerEnum:
@@ -73,7 +115,8 @@ class YamlerRuleset:
         rule_lookup = {}
         for rule in rules:
             rule_lookup[rule.name] = {
-                'required': rule.required
+                'required': rule.required,
+                'type': rule.rtype
             }
         return rule_lookup
 

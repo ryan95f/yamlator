@@ -4,9 +4,13 @@
             | main_ruleset
             | ruleset
 
-type: "int"
-     | "str"
-     | "ruleset" /[a-zA-Z0-9]+/
+type: int_type
+     | str_type
+     | ruleset_type
+
+str_type: "str"
+int_type: "int"
+ruleset_type: "ruleset" /[a-zA-Z0-9]+/
 
 primitives: ESCAPED_STRING
           | INT -> number

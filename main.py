@@ -14,7 +14,7 @@ def main():
 
     builder = RuleBuilder(tokens)
 
-    wrangler = YamlerWrangler(builder.rules)
+    wrangler = YamlerWrangler(builder.rules, builder.rulesets)
     violations = wrangler.wrangle(yaml_data)
 
     print("=================================")

@@ -1,14 +1,23 @@
-from yamler.parser import YamlerMainRuleset, YamlerRuleset
+from yamler.parser import YamlerMainRuleset
+from yamler.parser import YamlerRuleset
+from yamler.parser import YamlerRulesetType
 
 
 class YamlerWrangler:
-    def __init__(self, rules: dict):
+    def __init__(self, rules: dict, rulests):
         self.rules = rules
+        self.rulesets = rulests
 
     def wrangle(self, yaml_data: dict) -> dict:
         violations = {}
-        for rule, required in self.rules.items():
+        for rule, config in self.rules.items():
+            required = config.get('required')
+            dtype = config.get('type')
+
             d = yaml_data.get(rule, None)
+            if d is not None:
+                print(type(d))
+
             if d is None and not required:
                 continue
             
