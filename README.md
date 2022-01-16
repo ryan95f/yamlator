@@ -25,3 +25,11 @@ Install the dependencies:
 ```bash
 pip install -r requirements.txt
 ```
+
+## Running Yamler
+
+To run the yamler demo:
+
+```bash
+python main.py
+```

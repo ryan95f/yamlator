@@ -6,6 +6,7 @@ from yamler.wrangler import YamlerWrangler, RuleBuilder
 EXAMPLE_RULESET = "example/hello.yamler"
 TEST_YAML_FILE = "example/hello.yaml"
 
+
 def main():
     yaml_data = load_yaml_file(TEST_YAML_FILE)
     ruleset = load_yamler_ruleset(EXAMPLE_RULESET)
@@ -27,8 +28,9 @@ def main():
 
     for violation in violations.values():
         for vtype, message in violation.items():
-                print(f"{vtype}: {message}")       
+            print(f"{vtype}: {message}")
     print("=================================")
+
 
 if __name__ == '__main__':
     main()

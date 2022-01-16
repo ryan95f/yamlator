@@ -16,7 +16,7 @@ class YamlerWrangler:
     def _wrangle(self, data: dict, rules: dict, violations: dict):
         for name, rule in rules.items():
             required = rule.get('required')
-            dtype = rule.get('type')                
+            dtype = rule.get('type')
 
             d = data.get(name, None)
             if d is not None and isinstance(dtype, YamlerRulesetType):
@@ -26,18 +26,18 @@ class YamlerWrangler:
 
             if d is None and not required:
                 continue
-            
+
             if d is None:
                 violations[name] = {
                     "required": f"{name} is missing"
                 }
         return violations
 
+
 class RuleBuilder:
     def __init__(self, components):
         self._identify_components(components)
         self._rule_shake()
-
 
     def _identify_components(self, components):
         self.main = None
@@ -46,7 +46,7 @@ class RuleBuilder:
             if isinstance(item, YamlerMainRuleset):
                 self.main = item
                 continue
-            
+
             if isinstance(item, YamlerRuleset):
                 self.rulesets[item.name] = item
 

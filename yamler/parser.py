@@ -4,7 +4,7 @@ from lark import Transformer
 _GRAMMER_FILE = "grammer.lark"
 
 
-class YamlerParser:    
+class YamlerParser:
     def __init__(self):
         self._parser = Lark.open(_GRAMMER_FILE)
         self._transfomer = YamlerTransformer()
@@ -29,7 +29,7 @@ class YamlerTransformer(Transformer):
     def optional_rule(self, tokens):
         (name, rtype) = tokens
         return YamlerRule(name.value, rtype, False)
-        
+
     def ruleset(self, tokens):
         name = tokens[0].value
         rules = tokens[1:]
@@ -56,7 +56,6 @@ class YamlerTransformer(Transformer):
         (t, ) = tokens
         return t
 
-
     list = list
 
 
@@ -68,10 +67,11 @@ class YamlerType:
     def __str__(self):
         return self.rtype
 
+
 class YamlerInt(YamlerType):
     def __init__(self):
         super(YamlerInt, self).__init__("int", int)
-    
+
 
 class YamlerStr(YamlerType):
     def __init__(self):
@@ -110,7 +110,7 @@ class YamlerRuleset:
     def __init__(self, name, rules):
         self.name = name
         self.rules = self._generate_rules(rules)
-    
+
     def _generate_rules(self, rules):
         rule_lookup = {}
         for rule in rules:
@@ -119,6 +119,7 @@ class YamlerRuleset:
                 'type': rule.rtype
             }
         return rule_lookup
+
 
 class YamlerMainRuleset(YamlerRuleset):
     def __init__(self, rules):
