@@ -1,4 +1,4 @@
 root:
-  message: hello
-  address:
-    road: "hello"
+  hello: hello
+  surname: hello
+  age: 1

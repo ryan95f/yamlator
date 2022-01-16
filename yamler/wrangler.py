@@ -10,10 +10,10 @@ class YamlerWrangler:
 
     def wrangle(self, yaml_data: dict) -> dict:
         violations = {}
-        self._r_wrangle(yaml_data, self.rules, violations)
+        self._wrangle(yaml_data, self.rules, violations)
         return violations
 
-    def _r_wrangle(self, data: dict, rules: dict, violations: dict):
+    def _wrangle(self, data: dict, rules: dict, violations: dict):
         for name, rule in rules.items():
             required = rule.get('required')
             dtype = rule.get('type')                
@@ -22,7 +22,7 @@ class YamlerWrangler:
             if d is not None and isinstance(dtype, YamlerRulesetType):
                 r_name = dtype.ruleset_name
                 r = self.rulesets.get(r_name).rules
-                self._r_wrangle(d, r, violations)
+                self._wrangle(d, r, violations)
 
             if d is None and not required:
                 continue

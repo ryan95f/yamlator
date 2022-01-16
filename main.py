@@ -4,9 +4,10 @@ from yamler.parser import YamlerParser
 from yamler.wrangler import YamlerWrangler, RuleBuilder
 
 EXAMPLE_RULESET = "example/hello.yamler"
+TEST_YAML_FILE = "example/hello.yaml"
 
 def main():
-    yaml_data = load_yaml_file("example/hello.yaml")
+    yaml_data = load_yaml_file(TEST_YAML_FILE)
     ruleset = load_yamler_ruleset(EXAMPLE_RULESET)
 
     parser = YamlerParser()
@@ -20,9 +21,13 @@ def main():
     print("=================================")
     if len(violations) == 0:
         print("No Violations")
+    else:
+        print("Violation Report")
+        print("=================================")
 
-    for idx, (key, message) in enumerate(violations.items()):
-        print(message)
+    for violation in violations.values():
+        for vtype, message in violation.items():
+                print(f"{vtype}: {message}")       
     print("=================================")
 
 if __name__ == '__main__':
