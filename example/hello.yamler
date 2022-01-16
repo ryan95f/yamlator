@@ -7,9 +7,9 @@ ruleset person {
     name str required
     surname str required
     age int required
-    address ruleset address required
+    address (address) required
 }
 
 ruleset main {
-    root ruleset person required
+    root (person) required
 }
