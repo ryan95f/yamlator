@@ -3,11 +3,11 @@ ruleset address {
 }
 
 ruleset person {
-    hello str required
-    name str required
-    surname str required
-    age int required
-    address (address) required
+    hello str
+    name str
+    surname str
+    age int
+    address (address)
 }
 
 ruleset main {

@@ -19,6 +19,7 @@ primitives: ESCAPED_STRING
      | optional_rule
 
 required_rule: /[a-zA-Z0-9]+/ type "required"
+             | /[a-zA-Z0-9]+/ type
 optional_rule: /[a-zA-Z0-9]+/ type "optional"
 
 main_ruleset: "ruleset" "main" "{" rule+ "}"
