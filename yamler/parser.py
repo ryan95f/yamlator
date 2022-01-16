@@ -31,9 +31,13 @@ class YamlerTransformer(Transformer):
         return YamlerRule(name.value, rtype, False)
         
     def ruleset(self, tokens):
-        name = tokens[0]
+        name = tokens[0].value
         rules = tokens[1:]
         return YamlerRuleset(name, rules)
+
+    def main_ruleset(self, tokens):
+        rules = tokens
+        return YamlerMainRuleset(rules)
 
     def start(self, instructions):
         return list(instructions)
@@ -57,7 +61,7 @@ class YamlerRule:
         self.required = required
 
     def __str__(self):
-        return f"{self.name} {self.required}"
+        return f"{self.name} {self.rtype}({self.required})"
 
 
 class YamlerRuleset:
@@ -68,5 +72,11 @@ class YamlerRuleset:
     def _generate_rules(self, rules):
         rule_lookup = {}
         for rule in rules:
-            rule_lookup[rule.name] = rule.required
+            rule_lookup[rule.name] = {
+                'required': rule.required
+            }
         return rule_lookup
+
+class YamlerMainRuleset(YamlerRuleset):
+    def __init__(self, rules):
+        super(YamlerMainRuleset, self).__init__("main", rules)
