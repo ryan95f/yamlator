@@ -15,42 +15,63 @@ class YamlerParser:
 
 
 class YamlerTransformer(Transformer):
-    def enum(self, tokens):
-        return YamlerEnum(tokens[0], tokens[1])
-
-    def number(self, number):
-        (n, ) = number
-        return int(n)
-
     def required_rule(self, tokens):
         (name, rtype) = tokens
-        return YamlerRule(name.value, rtype, True)
+        return {
+            "name": name.value,
+            "rtype": rtype,
+            "required": True
+        }
 
     def optional_rule(self, tokens):
         (name, rtype) = tokens
-        return YamlerRule(name.value, rtype, False)
+        return{
+            "name": name.value,
+            "rtype": rtype,
+            "required": False
+        }
 
     def ruleset(self, tokens):
         name = tokens[0].value
         rules = tokens[1:]
-        return YamlerRuleset(name, rules)
+        return {
+            "name": name,
+            "rules": rules
+        }
 
     def main_ruleset(self, tokens):
         rules = tokens
-        return YamlerMainRuleset(rules)
+        return {
+            'name': 'main',
+            'rules': rules
+        }
 
     def start(self, instructions):
-        return list(instructions)
+        root = None
+        rules = {}
+        for instruction in instructions:
+            name = instruction.get('name')
+            if name == 'main':
+                root = instruction
+            else:
+                rules[name] = instruction
+        return {
+            'main': root,
+            'rules': rules
+        }
 
     def str_type(self, tokens):
-        return YamlerStr()
+        return {'type': str}
 
     def int_type(self, tokens):
-        return YamlerInt()
+        return {'type': int}
 
     def ruleset_type(self, tokens):
         (name, ) = tokens
-        return YamlerRulesetType(name)
+        return {
+            'type': 'ruleset',
+            'lookup': name.value
+        }
 
     def type(self, tokens):
         (t, ) = tokens
@@ -109,7 +130,7 @@ class YamlerRule:
 class YamlerRuleset:
     def __init__(self, name, rules):
         self.name = name
-        self.rules = self._generate_rules(rules)
+        # self.rules = self._generate_rules(rules)
 
     def _generate_rules(self, rules):
         rule_lookup = {}

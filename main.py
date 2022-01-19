@@ -14,21 +14,23 @@ def main():
     parser = YamlerParser()
     tokens = parser.parse(ruleset)
 
-    builder = RuleBuilder(tokens)
+    print(tokens)
 
-    wrangler = YamlerWrangler(builder.rules, builder.rulesets)
-    violations = wrangler.wrangle(yaml_data)
+    # builder = RuleBuilder(tokens)
 
-    print("=================================")
-    if len(violations) == 0:
-        print("No Violations")
-    else:
-        print("Violation Report")
-        print("=================================")
+    # wrangler = YamlerWrangler(builder.rules, builder.rulesets)
+    # violations = wrangler.wrangle(yaml_data)
 
-    for violation in violations.values():
-        for vtype, message in violation.items():
-            print(f"{vtype}: {message}")
+    # print("=================================")
+    # if len(violations) == 0:
+    #     print("No Violations")
+    # else:
+    #     print("Violation Report")
+    #     print("=================================")
+
+    # for violation in violations.values():
+    #     for vtype, message in violation.items():
+    #         print(f"{vtype}: {message}")
     print("=================================")
 
 
