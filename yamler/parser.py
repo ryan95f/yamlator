@@ -5,11 +5,25 @@ _GRAMMER_FILE = "grammer.lark"
 
 
 class YamlerParser:
+    """Parsers a YAML file to generate the rules that will be
+    applied against a YAML file
+    """
+
     def __init__(self):
+        """YamlerParser Constructor"""
         self._parser = Lark.open(_GRAMMER_FILE)
         self._transfomer = YamlerTransformer()
 
-    def parse(self, text):
+    def parse(self, text: str) -> dict:
+        """Parses the yamler file contents to generate the rules
+
+        Args:
+            text (str): The content of the yamler file
+
+        Returns:
+            dict of the rules in a format that can be used
+            to validate a YAML file
+        """
         tokens = self._parser.parse(text)
         return self._transfomer.transform(tokens)
 
