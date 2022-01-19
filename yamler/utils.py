@@ -2,6 +2,18 @@ import yaml
 
 
 def load_yaml_file(filename: str) -> dict:
+    """Load a YAML file from a the file system and
+    convert it into a dict
+
+    Args:
+        filename (str): The path to the YAML file
+
+    Returns:
+        The YAML file contents as a dict
+
+    Raises:
+        ValueError: If the filename parameter is None or an empty string
+    """
     if filename is None:
         raise ValueError("filename cannot be None")
 
@@ -13,5 +25,13 @@ def load_yaml_file(filename: str) -> dict:
 
 
 def load_yamler_ruleset(filename: str) -> str:
+    """Load the contents of a Yamler file as a string
+
+    Args:
+        filename (str): The path to the Yamler file
+
+    Returns:
+        The content of the file as a string
+    """
     with open(filename) as f:
         return f.read()

@@ -1,7 +1,7 @@
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
 from yamler.parser import YamlerParser
-from yamler.wrangler import YamlerWrangler, RuleBuilder
+from yamler.wrangler import YamlerWrangler
 
 EXAMPLE_RULESET = "example/hello.yamler"
 TEST_YAML_FILE = "example/hello.yaml"
@@ -14,9 +14,7 @@ def main():
     parser = YamlerParser()
     tokens = parser.parse(ruleset)
 
-    builder = RuleBuilder(tokens)
-
-    wrangler = YamlerWrangler(builder.rules, builder.rulesets)
+    wrangler = YamlerWrangler(tokens)
     violations = wrangler.wrangle(yaml_data)
 
     print("=================================")
