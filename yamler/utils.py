@@ -13,6 +13,7 @@ def load_yaml_file(filename: str) -> dict:
 
     Raises:
         ValueError: If the filename parameter is None or an empty string
+        FileNotFoundError: If the file specified in filename does not exist
     """
     if filename is None:
         raise ValueError("filename cannot be None")
@@ -33,5 +34,11 @@ def load_yamler_ruleset(filename: str) -> str:
     Returns:
         The content of the file as a string
     """
+    if filename is None:
+        raise ValueError("filename cannot be None")
+
+    if len(filename) == 0:
+        raise ValueError("filename cannot be an empty string")
+
     with open(filename) as f:
         return f.read()
