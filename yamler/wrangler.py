@@ -14,16 +14,16 @@ class YamlerWrangler:
             rtype = rule.get('rtype')
             required = rule.get('required')
 
-            d = data.get(name, None)
-            if d is not None and rtype['type'] == 'ruleset':
-                r_name = rtype['lookup']
-                r = self.instructions['rules'].get(r_name)
-                self._wrangle(d, r['rules'], violations)
+            sub_data = data.get(name, None)
+            if sub_data is not None and rtype['type'] == 'ruleset':
+                ruleset_name = rtype['lookup']
+                ruleset = self.instructions['rules'].get(ruleset_name)
+                self._wrangle(sub_data, ruleset['rules'], violations)
 
-            if d is None and not required:
+            if sub_data is None and not required:
                 continue
 
-            if d is None:
+            if sub_data is None:
                 violations[name] = {
                     "required": f"{name} is missing"
                 }
