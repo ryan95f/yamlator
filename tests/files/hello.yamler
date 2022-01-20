@@ -1,0 +1,4 @@
+ruleset main {
+    message string
+    number int
+}
