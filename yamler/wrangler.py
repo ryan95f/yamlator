@@ -1,7 +1,7 @@
 class YamlerWrangler:
     def __init__(self, instructions: dict):
         self.instructions = instructions
-        self.main = instructions.get('main')
+        self.main = instructions.get('main', {})
 
     def wrangle(self, yaml_data: dict) -> dict:
         violations = {}
