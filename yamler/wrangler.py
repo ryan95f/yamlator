@@ -3,15 +3,16 @@ class YamlerWrangler:
         if instructions is None:
             raise ValueError("instructions should not be None")
 
-        self.instructions = instructions
-        self.main = instructions.get('main', {})
+        self._instructions = instructions
+        self._main = instructions.get('main', {})
 
     def wrangle(self, yaml_data: dict) -> dict:
         if yaml_data is None:
             raise ValueError("yaml_data should not be None")
 
         violations = {}
-        self._wrangle(yaml_data, self.main.get('rules', []), violations)
+        main_rules = self._main.get('rules', [])
+        self._wrangle(yaml_data, main_rules, violations)
         return violations
 
     def _wrangle(self, data: dict, rules: list, violations: dict):
@@ -23,7 +24,7 @@ class YamlerWrangler:
             sub_data = data.get(name, None)
             if sub_data is not None and rtype['type'] == 'ruleset':
                 ruleset_name = rtype['lookup']
-                ruleset = self.instructions['rules'].get(ruleset_name)
+                ruleset = self._instructions['rules'].get(ruleset_name)
                 self._wrangle(sub_data, ruleset['rules'], violations)
 
             if sub_data is None and not required:
