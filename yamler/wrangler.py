@@ -1,11 +1,17 @@
 class YamlerWrangler:
     def __init__(self, instructions: dict):
+        if instructions is None:
+            raise ValueError("instructions should not be None")
+
         self.instructions = instructions
         self.main = instructions.get('main', {})
 
     def wrangle(self, yaml_data: dict) -> dict:
+        if yaml_data is None:
+            raise ValueError("yaml_data should not be None")
+
         violations = {}
-        self._wrangle(yaml_data, self.main.get('rules'), violations)
+        self._wrangle(yaml_data, self.main.get('rules', []), violations)
         return violations
 
     def _wrangle(self, data: dict, rules: list, violations: dict):
