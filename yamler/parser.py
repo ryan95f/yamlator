@@ -1,5 +1,6 @@
 from lark import Lark
 from lark import Transformer
+from lark.exceptions import UnexpectedEOF
 
 _GRAMMER_FILE = "grammer.lark"
 
@@ -24,8 +25,14 @@ class YamlerParser:
             dict of the rules in a format that can be used
             to validate a YAML file
         """
-        tokens = self._parser.parse(text)
-        return self._transfomer.transform(tokens)
+        if text is None:
+            raise ValueError("text cannot be None")
+
+        try:
+            tokens = self._parser.parse(text)
+            return self._transfomer.transform(tokens)
+        except UnexpectedEOF:
+            return {}
 
 
 class YamlerTransformer(Transformer):

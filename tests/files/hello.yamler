@@ -1,4 +1,4 @@
 ruleset main {
-    message string
+    message str
     number int
 }
