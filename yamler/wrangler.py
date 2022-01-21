@@ -1,5 +1,18 @@
 class YamlerWrangler:
+    """Reads the instructions from the parser to validate if a
+    YAML file meets the define rules
+    """
+
     def __init__(self, instructions: dict):
+        """YamlerWrangler constructor
+
+        Args:
+            instructions (dict): Contains the main ruleset and a list of
+                                 other rulesets
+
+        Raises:
+            ValueError: If instructions is None
+        """
         if instructions is None:
             raise ValueError("instructions should not be None")
 
@@ -7,6 +20,18 @@ class YamlerWrangler:
         self._main = instructions.get('main', {})
 
     def wrangle(self, yaml_data: dict) -> dict:
+        """Wrangle the YAML file to determine if there are any
+        violations when compared to the rulesets
+
+        Args:
+            yaml_data (dict): The yaml data represented as a dict
+
+        Returns:
+            A `dict` of violations that were detected
+
+        Raises:
+            ValueError: If `yaml_data` is None
+        """
         if yaml_data is None:
             raise ValueError("yaml_data should not be None")
 
