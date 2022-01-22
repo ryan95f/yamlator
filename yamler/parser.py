@@ -1,0 +1,101 @@
+from lark import Lark
+from lark import Transformer
+from lark.exceptions import UnexpectedEOF
+
+_GRAMMER_FILE = "grammer.lark"
+
+
+class YamlerParser:
+    """Parsers a YAML file to generate the rules that will be
+    applied against a YAML file
+    """
+
+    def __init__(self):
+        """YamlerParser Constructor"""
+        self._parser = Lark.open(_GRAMMER_FILE)
+        self._transfomer = YamlerTransformer()
+
+    def parse(self, text: str) -> dict:
+        """Parses the yamler file contents to generate the rules
+
+        Args:
+            text (str): The content of the yamler file
+
+        Returns:
+            dict of the rules in a format that can be used
+            to validate a YAML file
+        """
+        if text is None:
+            raise ValueError("text cannot be None")
+
+        try:
+            tokens = self._parser.parse(text)
+            return self._transfomer.transform(tokens)
+        except UnexpectedEOF:
+            return {}
+
+
+class YamlerTransformer(Transformer):
+    def required_rule(self, tokens):
+        (name, rtype) = tokens
+        return {
+            "name": name.value,
+            "rtype": rtype,
+            "required": True
+        }
+
+    def optional_rule(self, tokens):
+        (name, rtype) = tokens
+        return{
+            "name": name.value,
+            "rtype": rtype,
+            "required": False
+        }
+
+    def ruleset(self, tokens):
+        name = tokens[0].value
+        rules = tokens[1:]
+        return {
+            "name": name,
+            "rules": rules
+        }
+
+    def main_ruleset(self, tokens):
+        rules = tokens
+        return {
+            'name': 'main',
+            'rules': rules
+        }
+
+    def start(self, instructions):
+        root = None
+        rules = {}
+        for instruction in instructions:
+            name = instruction.get('name')
+            if name == 'main':
+                root = instruction
+            else:
+                rules[name] = instruction
+        return {
+            'main': root,
+            'rules': rules
+        }
+
+    def str_type(self, tokens):
+        return {'type': str}
+
+    def int_type(self, tokens):
+        return {'type': int}
+
+    def ruleset_type(self, tokens):
+        (name, ) = tokens
+        return {
+            'type': 'ruleset',
+            'lookup': name.value
+        }
+
+    def type(self, tokens):
+        (t, ) = tokens
+        return t
+
+    list = list

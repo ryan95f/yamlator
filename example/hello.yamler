@@ -1,0 +1,15 @@
+ruleset address {
+    road str required
+}
+
+ruleset person {
+    hello str
+    name str
+    surname str
+    age int
+    address (address)
+}
+
+ruleset main {
+    root (person) required
+}
