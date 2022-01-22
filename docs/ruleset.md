@@ -10,7 +10,7 @@ ruleset <name> {
 }
 ```
 
-In order for a ruleset to be executed by Yamler, it needs to be attached to the *main ruleset*. This acts as an entry point for Yamler to start validation. The definition of a main ruleset:
+In order for a ruleset to be executed by Yamler, it needs to be attached to the *main ruleset*. This acts as an entry point for Yamler to start the validation process. The definition of a main ruleset:
 
 ```text
 ruleset main {
@@ -20,7 +20,7 @@ ruleset main {
 
 ## Rules
 
-Each roleset hs a number of rules. These define the checks that will compared against the Yaml. A rule can be defined as either **optional** or **required**. Each rule starts with the name of the key to look for in the Yaml file, followed by a type and if required / not.
+Each roleset has one or more rules. These define the checks that will compared against the Yaml. A rule can be defined as either **optional** or **required**. Each rule starts with the name of the key to look for in the Yaml file, followed by a type and if required / not.
 
 To define a key with a required string:
 
@@ -28,7 +28,7 @@ To define a key with a required string:
 hello str required
 ```
 
-Other rulesets can be linked up to a ruleset. A special syntax `(<ruleset_name>` around the type to indicate it is a ruleset. For example:
+Other rulesets can be linked up to a ruleset. A special syntax `(<ruleset_name>)` around the type to indicates it is a ruleset. For example:
 
 ```text
 ruleset person {
@@ -39,5 +39,3 @@ ruleset details {
     person (person) required
 }
 ```
-
-This links the ruleset person to the details ruleset.
