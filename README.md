@@ -1,16 +1,22 @@
 # Yamler
 
-A parser to validate YAML files
+A parser built using Lark to validate that a `.yaml` / `.yml` file contains a set of required fields.
 
 ## Setting up the environment
 
-Create the virtual environment:
+To set up the environment, ensure the virtualenv package has been installed. This can be added to your Python instance with:
+
+```bash
+pip install virtualenv
+```
+
+Once `virtualenv` has been installed. A new virtual environment can be created with:
 
 ```bash
 python -m venv env
 ```
 
-Activate the virtual environment:
+Then activate the virtual environment witb:
 
 ```bash
 # For Windows
@@ -20,10 +26,10 @@ Activate the virtual environment:
 source env/bin/activate
 ```
 
-Install the dependencies:
+Then install the development dependencies:
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 ```
 
 ## Running Yamler
@@ -36,7 +42,24 @@ python main.py
 
 ## Running the Tests
 
+This project uses `unittest` and `coverage`. The tests must be executed first before the coverage report can be shown.
+
+To run the tests:
+
 ```bash
 coverage run -m unittest
+```
+
+The coverage report can then be shown with:
+
+```bash
 coverage report -m
+```
+
+## Coding Standards
+
+This project follows the [PEP 8](https://www.python.org/dev/peps/pep-0008/) coding standard. To validate the code run with `pycodestyle` linter with:
+
+```bash
+pycodestyle .
 ```
