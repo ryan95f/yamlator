@@ -40,7 +40,8 @@ class YamlerWrangler:
         self._wrangle(yaml_data, main_rules, violations)
         return violations
 
-    def _wrangle(self, data: dict, rules: list, violations: dict):
+    def _wrangle(self, data: dict, rules: list, violations: dict,
+                 parent: str = ""):
         for rule in rules:
             name = rule.get('name')
             rtype = rule.get('rtype')
@@ -50,22 +51,28 @@ class YamlerWrangler:
             if sub_data is not None and rtype['type'] == 'ruleset':
                 ruleset_name = rtype['lookup']
                 ruleset = self._instructions['rules'].get(ruleset_name)
-                self._wrangle(sub_data, ruleset['rules'], violations)
+                self._wrangle(sub_data, ruleset['rules'], violations, name)
                 continue
 
             if sub_data is None and not required:
                 continue
 
             if sub_data is None:
-                sub = violations.get(name, {})
-                sub["required"] = f"{name} is missing"
-                violations[name] = sub
+                self._required_resolve(name, violations)
                 continue
-            
-            t = rtype['type']
-            if (type(sub_data) != t):
-                sub = violations.get(name, {})
-                sub["type"] = f"{name} should type({t.__name__})"
-                violations[name] = sub
+
+            if (type(sub_data) != rtype["type"]):
+                self._missing_type_resolve(name, rtype["type"], violations)
+                continue
 
         return violations
+
+    def _required_resolve(self, name, violations: dict):
+        sub = violations.get(name, {})
+        sub["required"] = f"{name} is missing"
+        violations[name] = sub
+
+    def _missing_type_resolve(self, name, expected_type, violations: dict):
+        sub = violations.get(name, {})
+        sub["type"] = f"{name} should be of type({expected_type.__name__})"
+        violations[name] = sub
