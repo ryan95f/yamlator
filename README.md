@@ -2,6 +2,12 @@
 
 A parser built using Lark to validate that a `.yaml` / `.yml` file contains a set of required fields.
 
+## Requirements
+
+The project requires the following:
+
+* Python 3.7 or above
+
 ## Setting up the environment
 
 To set up the environment, ensure the virtualenv package has been installed. This can be added to your Python instance with:
@@ -26,7 +32,7 @@ Then activate the virtual environment witb:
 source env/bin/activate
 ```
 
-Then install the development dependencies:
+Install the development dependencies:
 
 ```bash
 pip install -r requirements-dev.txt
