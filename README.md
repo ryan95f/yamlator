@@ -33,3 +33,10 @@ To run the yamler demo:
 ```bash
 python main.py
 ```
+
+## Running the Tests
+
+```bash
+coverage run -m unittest
+coverage report -m
+```
