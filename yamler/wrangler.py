@@ -51,12 +51,21 @@ class YamlerWrangler:
                 ruleset_name = rtype['lookup']
                 ruleset = self._instructions['rules'].get(ruleset_name)
                 self._wrangle(sub_data, ruleset['rules'], violations)
+                continue
 
             if sub_data is None and not required:
                 continue
 
             if sub_data is None:
-                violations[name] = {
-                    "required": f"{name} is missing"
-                }
+                sub = violations.get(name, {})
+                sub["required"] = f"{name} is missing"
+                violations[name] = sub
+                continue
+            
+            t = rtype['type']
+            if (type(sub_data) != t):
+                sub = violations.get(name, {})
+                sub["type"] = f"{name} should type({t.__name__})"
+                violations[name] = sub
+
         return violations
