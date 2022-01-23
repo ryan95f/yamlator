@@ -25,8 +25,8 @@ def main():
         print("=================================")
 
     for violation in violations.values():
-        for vtype, message in violation.items():
-            print(f"{vtype}: {message}")
+        for v in violation:
+            print(v.message)
     print("=================================")
 
 

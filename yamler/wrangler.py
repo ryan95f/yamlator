@@ -1,3 +1,31 @@
+from enum import Enum
+
+
+class ViolationType(Enum):
+    REQUIRED = "required",
+    TYPE = "type"
+
+
+class Violation:
+    def __init__(self, message: str, v_type: ViolationType):
+        self._message = message
+        self.v_type = v_type
+
+    @property
+    def message(self):
+        return self._message
+
+
+class RequiredViolation(Violation):
+    def __init__(self, message: str):
+        super().__init__(message, ViolationType.REQUIRED)
+
+
+class TypeViolation(Violation):
+    def __init__(self, message: str):
+        super().__init__(message, ViolationType.TYPE)
+
+
 class YamlerWrangler:
     """Reads the instructions from the parser to validate if a
     YAML file meets the define rules
@@ -35,59 +63,42 @@ class YamlerWrangler:
         if yaml_data is None:
             raise ValueError("yaml_data should not be None")
 
-        violations = {}
+        self.violations = {}
         main_rules = self._main.get('rules', [])
-        self._wrangle(yaml_data, main_rules, violations)
-        return violations
+        self._wrangle(yaml_data, main_rules)
+        return self.violations
 
-    def _wrangle(self, data: dict, rules: list, violations: dict,
-                 parent: str = ""):
+    def _wrangle(self, data: dict, rules: list, parent: str = ""):
         for rule in rules:
             name = rule.get('name')
             rtype = rule.get('rtype')
             required = rule.get('required')
 
             sub_data = data.get(name, None)
-
             if required and sub_data is None:
-                sub = violations.get(name, {})
-                sub["required"] = f"{name} is missing"
-                violations[name] = sub
+                msg = f"{name} is missing"
+                self._update_violation(name, RequiredViolation(msg))
                 continue
 
             if rtype['type'] == 'ruleset':
                 if self._is_ruleset_type(sub_data):
                     ruleset_name = rtype['lookup']
                     ruleset = self._instructions['rules'].get(ruleset_name)
-                    self._wrangle(sub_data, ruleset['rules'], violations, name)
+                    self._wrangle(sub_data, ruleset['rules'], name)
                     continue
                 else:
-                    sub = violations.get(name, {})
-                    sub["type"] = f"{name} should be type(ruleset)"
-                    violations[name] = sub
+                    msg = f"{name} should be type(ruleset)"
+                    self._update_violation(name, TypeViolation(msg))
             else:
                 if type(sub_data) != rtype['type']:
-                    sub = violations.get(name, {})
-                    sub["type"] = f"{name} should be type({rtype['type'].__name__})"
-                    violations[name] = sub
-        return violations
+                    msg = f"{name} should be type({rtype['type'].__name__})"
+                    self._update_violation(name, TypeViolation(msg))
+        return self.violations
 
     def _is_ruleset_type(self, data):
         return type(data) == dict
 
-
-    def _required_resolve(self, name, violations: dict):
-        sub = violations.get(name, {})
-        sub["required"] = f"{name} is missing"
-        violations[name] = sub
-
-    def _missing_type_resolve(self, data, name, expected_type, violations: dict):
-        if data is None:
-            return
-
-        sub = violations.get(name, {})
-        if expected_type == 'ruleset':
-            sub["type"] = f"{name} should be of type(ruleset)"
-        else:
-            sub["type"] = f"{name} should be of type({expected_type.__name__})"
-        violations[name] = sub
+    def _update_violation(self, name: str, violation: Violation):
+        sub = self.violations.get(name, [])
+        sub.append(violation)
+        self.violations[name] = sub
