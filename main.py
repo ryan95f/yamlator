@@ -17,17 +17,16 @@ def main():
     wrangler = YamlerWrangler(tokens)
     violations = wrangler.wrangle(yaml_data)
 
-    print("=================================")
-    if len(violations) == 0:
-        print("No Violations")
-    else:
-        print("Violation Report")
-        print("=================================")
+    violation_count = len(violations)
+    print("\n{:<4} violation(s) found".format(violation_count))
 
-    for violation in violations.values():
-        for v in violation:
-            print(v.message)
-    print("=================================")
+    if len(violations) > 0:
+        print("\n{:<15} {:20}".format("Violation", "Message"))
+        print("-----------------------------------------")
+        for violation in violations.values():
+            for v in violation:
+                print("{:<15} {:20}".format(v.violation_type, v.message))
+        print("-----------------------------------------")
 
 
 if __name__ == '__main__':

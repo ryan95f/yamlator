@@ -3,18 +3,22 @@ from re import sub
 
 
 class ViolationType(Enum):
-    REQUIRED = "required",
+    REQUIRED = "required"
     TYPE = "type"
 
 
 class Violation:
     def __init__(self, message: str, v_type: ViolationType):
         self._message = message
-        self.v_type = v_type
+        self._v_type = v_type
 
     @property
     def message(self):
         return self._message
+
+    @property
+    def violation_type(self):
+        return self._v_type.value
 
 
 class RequiredViolation(Violation):
@@ -112,6 +116,11 @@ class YamlerWrangler:
             ruleset_name = rtype['lookup']
             ruleset = self._instructions['rules'].get(ruleset_name)
             self._wrangle(data, ruleset['rules'], name)
+            return
+
+        # Ignore optional rulesets
+        required = rule.get('required', True)
+        if not required:
             return
 
         msg = f"{name} should be type(ruleset)"
