@@ -2,3 +2,4 @@ root:
   hello: hello
   surname: hello
   age: wow
+person: str

@@ -47,7 +47,12 @@ class YamlerWrangler:
             rtype = rule.get('rtype')
             required = rule.get('required')
 
+            print(data)
             sub_data = data.get(name, None)
+
+            if (type(sub_data) != rtype["type"]):
+                self._missing_type_resolve(sub_data, name, rtype["type"], violations)
+
             if sub_data is not None and rtype['type'] == 'ruleset':
                 ruleset_name = rtype['lookup']
                 ruleset = self._instructions['rules'].get(ruleset_name)
@@ -60,11 +65,6 @@ class YamlerWrangler:
             if sub_data is None:
                 self._required_resolve(name, violations)
                 continue
-
-            if (type(sub_data) != rtype["type"]):
-                self._missing_type_resolve(name, rtype["type"], violations)
-                continue
-
         return violations
 
     def _required_resolve(self, name, violations: dict):
@@ -72,7 +72,15 @@ class YamlerWrangler:
         sub["required"] = f"{name} is missing"
         violations[name] = sub
 
-    def _missing_type_resolve(self, name, expected_type, violations: dict):
+    def _missing_type_resolve(self, data, name, expected_type, violations: dict):
+        if data is None:
+            return
+
+        if (type(data) == dict and expected_type == 'ruleset'):
+            return
         sub = violations.get(name, {})
-        sub["type"] = f"{name} should be of type({expected_type.__name__})"
+        if expected_type == 'ruleset':
+            sub["type"] = f"{name} should be of type(ruleset)"
+        else:
+            sub["type"] = f"{name} should be of type({expected_type.__name__})"
         violations[name] = sub

@@ -1,8 +1,9 @@
 import unittest
-from lark.exceptions import UnexpectedCharacters
+
 from yamler.parser import YamlerParser
 from yamler.utils import load_yamler_ruleset
 from yamler.utils import load_yaml_file
+from lark.exceptions import UnexpectedCharacters
 
 
 class TestYamlerParser(unittest.TestCase):

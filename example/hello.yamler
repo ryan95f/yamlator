@@ -12,4 +12,5 @@ ruleset person {
 
 ruleset main {
     root (person) required
+    person (person)
 }
