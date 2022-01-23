@@ -1,4 +1,5 @@
 from enum import Enum
+from re import sub
 
 
 class ViolationType(Enum):
@@ -72,33 +73,49 @@ class YamlerWrangler:
         for rule in rules:
             name = rule.get('name')
             rtype = rule.get('rtype')
-            required = rule.get('required')
 
             sub_data = data.get(name, None)
-            if required and sub_data is None:
-                msg = f"{name} is missing"
-                self._update_violation(name, RequiredViolation(msg))
+            if self._is_missing_required_data(sub_data, rule):
+                self._update_violation(name, RequiredViolation(f"{name} is missing"))
                 continue
 
-            if rtype['type'] == 'ruleset':
-                if self._is_ruleset_type(sub_data):
-                    ruleset_name = rtype['lookup']
-                    ruleset = self._instructions['rules'].get(ruleset_name)
-                    self._wrangle(sub_data, ruleset['rules'], name)
-                    continue
-                else:
-                    msg = f"{name} should be type(ruleset)"
-                    self._update_violation(name, TypeViolation(msg))
-            else:
-                if type(sub_data) != rtype['type']:
-                    msg = f"{name} should be type({rtype['type'].__name__})"
-                    self._update_violation(name, TypeViolation(msg))
+            if self._is_ruleset_rule(rule):
+                self._wrangle_rulesets(name, sub_data, rule)
+                continue
+
+            if self._has_incorrect_type(sub_data, rule):
+                msg = f"{name} should be type({rtype['type'].__name__})"
+                self._update_violation(name, TypeViolation(msg))
+
         return self.violations
+
+    def _is_missing_required_data(self, data, rule):
+        required = rule['required']
+        return required and data is None
 
     def _is_ruleset_type(self, data):
         return type(data) == dict
+
+    def _is_ruleset_rule(self, rule):
+        rtype = rule['rtype']
+        return rtype['type'] == 'ruleset'
+
+    def _wrangle_rulesets(self, name, data, rule):
+        rtype = rule.get('rtype')
+        if self._is_ruleset_type(data):
+            ruleset_name = rtype['lookup']
+            ruleset = self._instructions['rules'].get(ruleset_name)
+            self._wrangle(data, ruleset['rules'], name)
+            return
+
+        msg = f"{name} should be type(ruleset)"
+        self._update_violation(name, TypeViolation(msg))
 
     def _update_violation(self, name: str, violation: Violation):
         sub = self.violations.get(name, [])
         sub.append(violation)
         self.violations[name] = sub
+
+    def _has_incorrect_type(self, data, rule: dict):
+        rtype = rule['rtype']
+        return (type(data) != rtype['type']) and (data is not None)
