@@ -47,25 +47,34 @@ class YamlerWrangler:
             rtype = rule.get('rtype')
             required = rule.get('required')
 
-            print(data)
             sub_data = data.get(name, None)
 
-            if (type(sub_data) != rtype["type"]):
-                self._missing_type_resolve(sub_data, name, rtype["type"], violations)
-
-            if sub_data is not None and rtype['type'] == 'ruleset':
-                ruleset_name = rtype['lookup']
-                ruleset = self._instructions['rules'].get(ruleset_name)
-                self._wrangle(sub_data, ruleset['rules'], violations, name)
+            if required and sub_data is None:
+                sub = violations.get(name, {})
+                sub["required"] = f"{name} is missing"
+                violations[name] = sub
                 continue
 
-            if sub_data is None and not required:
-                continue
-
-            if sub_data is None:
-                self._required_resolve(name, violations)
-                continue
+            if rtype['type'] == 'ruleset':
+                if self._is_ruleset_type(sub_data):
+                    ruleset_name = rtype['lookup']
+                    ruleset = self._instructions['rules'].get(ruleset_name)
+                    self._wrangle(sub_data, ruleset['rules'], violations, name)
+                    continue
+                else:
+                    sub = violations.get(name, {})
+                    sub["type"] = f"{name} should be type(ruleset)"
+                    violations[name] = sub
+            else:
+                if type(sub_data) != rtype['type']:
+                    sub = violations.get(name, {})
+                    sub["type"] = f"{name} should be type({rtype['type'].__name__})"
+                    violations[name] = sub
         return violations
+
+    def _is_ruleset_type(self, data):
+        return type(data) == dict
+
 
     def _required_resolve(self, name, violations: dict):
         sub = violations.get(name, {})
@@ -76,8 +85,6 @@ class YamlerWrangler:
         if data is None:
             return
 
-        if (type(data) == dict and expected_type == 'ruleset'):
-            return
         sub = violations.get(name, {})
         if expected_type == 'ruleset':
             sub["type"] = f"{name} should be of type(ruleset)"
