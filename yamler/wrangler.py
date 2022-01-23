@@ -76,7 +76,8 @@ class YamlerWrangler:
 
             sub_data = data.get(name, None)
             if self._is_missing_required_data(sub_data, rule):
-                self._update_violation(name, RequiredViolation(f"{name} is missing"))
+                msg = f"{name} is missing"
+                self._update_violation(name, RequiredViolation(msg))
                 continue
 
             if self._is_ruleset_rule(rule):
@@ -96,6 +97,11 @@ class YamlerWrangler:
     def _is_ruleset_type(self, data):
         return type(data) == dict
 
+    def _update_violation(self, name: str, violation: Violation):
+        sub = self.violations.get(name, [])
+        sub.append(violation)
+        self.violations[name] = sub
+
     def _is_ruleset_rule(self, rule):
         rtype = rule['rtype']
         return rtype['type'] == 'ruleset'
@@ -110,11 +116,6 @@ class YamlerWrangler:
 
         msg = f"{name} should be type(ruleset)"
         self._update_violation(name, TypeViolation(msg))
-
-    def _update_violation(self, name: str, violation: Violation):
-        sub = self.violations.get(name, [])
-        sub.append(violation)
-        self.violations[name] = sub
 
     def _has_incorrect_type(self, data, rule: dict):
         rtype = rule['rtype']
