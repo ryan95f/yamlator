@@ -1,5 +1,4 @@
 from enum import Enum
-from re import sub
 
 
 class ViolationType(Enum):
@@ -120,7 +119,7 @@ class YamlerWrangler:
 
         # Ignore optional rulesets
         required = rule.get('required', True)
-        if not required:
+        if not required and data is None:
             return
 
         msg = f"{name} should be type(ruleset)"

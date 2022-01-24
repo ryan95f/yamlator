@@ -1,10 +1,12 @@
 import unittest
-from yamler.wrangler import YamlerWrangler
+
+from yamler.wrangler import Violation, YamlerWrangler
+from yamler.utils import load_yamler_ruleset
 
 
 class TestYamlerWrangler(unittest.TestCase):
     def setUp(self):
-        self.instructions = {
+        self.flat_instructions = {
             'main': {
                 'rules': [
                     {
@@ -18,10 +20,61 @@ class TestYamlerWrangler(unittest.TestCase):
                         'required': True
                     }
                 ]
+            },
+        }
+
+        self.nested_instructions = {
+            'main': {
+                'rules': [
+                    {
+                        'name': 'message',
+                        'rtype': {'type': str},
+                        'required': False
+                    },
+                    {
+                        'name': 'person',
+                        'rtype': {
+                            'type': 'ruleset',
+                            'lookup': 'person'
+                        },
+                        'required': True
+                    },
+                    {
+                        'name': 'otherPerson',
+                        'rtype': {
+                            'type': 'ruleset',
+                            'lookup': 'person'
+                        },
+                        'required': False
+                    }
+                ]
+            },
+            "rules": {
+                "person": {
+                    "rules": [
+                        {
+                            'name': 'first_name',
+                            'rtype': {'type': str},
+                            'required': True
+                        },
+                        {
+                            'name': 'surname',
+                            'rtype': {'type': str},
+                            'required': False
+                        },
+                        {
+                            'name': 'age',
+                            'rtype': {'type': int},
+                            'required': False
+                        }
+                    ]
+                }
             }
         }
-        self.wrangler = YamlerWrangler(self.instructions)
+        self.wrangler = YamlerWrangler(self.flat_instructions)
         self.data = {'message': 'Hello World', 'number': 42}
+
+        self.nested_wrangle = YamlerWrangler(self.nested_instructions)
 
     def test_create_wrangler_empty_instructions(self):
         expected_violations = 0
@@ -55,6 +108,65 @@ class TestYamlerWrangler(unittest.TestCase):
         data = {'message': 'Hello World', 'number': 42}
         expected_violations = 0
         violations = self.wrangler.wrangle(data)
+        self._assert_violation_count(expected_violations, violations)
+
+    def test_wrangle_with_invalid_type_violations(self):
+        data = {'message': 'Hello World', 'number': "42"}
+        expected_violations = 1
+        violations = self.wrangler.wrangle(data)
+        self._assert_violation_count(expected_violations, violations)
+
+    def test_wrangle_with_nested_ruleset_valid_data(self):
+        data = {
+            'message': 'Hello World',
+            'person': {
+                'first_name': 'Hello',
+                'surname': 'World',
+                'age': 100
+            },
+            'otherPerson': {
+                'first_name': 'Hello',
+                'surname': 'World',
+                'age': 100
+            }
+        }
+        expected_violations = 0
+        violations = self.nested_wrangle.wrangle(data)
+        self._assert_violation_count(expected_violations, violations)
+
+    def test_wrangler_with_optionals_removed_from_data(self):
+        data = {
+            'message': 'Hello World',
+            'person': {
+                'first_name': 'Hello',
+                'surname': 'World',
+                'age': 100
+            }
+        }
+        expected_violations = 0
+        violations = self.nested_wrangle.wrangle(data)
+        self._assert_violation_count(expected_violations, violations)
+
+    def test_wrangler_with_ruleset_type_violation(self):
+        data = {
+            'message': 'Hello World',
+            'person': {
+                'first_name': 'Hello',
+                'surname': 'World',
+                'age': 100
+            },
+            'otherPerson': 43
+        }
+        expected_violations = 1
+        violations = self.nested_wrangle.wrangle(data)
+        self._assert_violation_count(expected_violations, violations)
+
+    def test_wrangler_with_required_ruleset_violation(self):
+        data = {
+            'message': 'Hello World'
+        }
+        expected_violations = 1
+        violations = self.nested_wrangle.wrangle(data)
         self._assert_violation_count(expected_violations, violations)
 
 
