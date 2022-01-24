@@ -1,7 +1,6 @@
 import unittest
 
-from yamler.wrangler import Violation, YamlerWrangler
-from yamler.utils import load_yamler_ruleset
+from yamler.wrangler import YamlerWrangler
 
 
 class TestYamlerWrangler(unittest.TestCase):
