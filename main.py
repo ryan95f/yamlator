@@ -24,8 +24,9 @@ def main():
         print("\n{:<15} {:20}".format("Violation", "Message"))
         print("-----------------------------------------")
         for violation in violations.values():
-            for v in violation:
-                print("{:<15} {:20}".format(v.violation_type, v.message))
+            print("{:<15} {:20}".format(
+                violation.violation_type,
+                violation.message))
         print("-----------------------------------------")
 
 

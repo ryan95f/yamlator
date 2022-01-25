@@ -101,9 +101,8 @@ class YamlerWrangler:
         return type(data) == dict
 
     def _update_violation(self, name: str, violation: Violation):
-        sub = self.violations.get(name, [])
-        sub.append(violation)
-        self.violations[name] = sub
+        sub = self.violations.get(name, None)
+        self.violations[name] = violation
 
     def _is_ruleset_rule(self, rule):
         rtype = rule['rtype']
