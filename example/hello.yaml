@@ -3,8 +3,6 @@ root:
   surname: hello
   age: r
 myList:
-  - hello: Hello
-    surname: test
-    age: 23
-    address:
-      road: test
+  - - hello: Hello
+      surname: test
+      age: 23

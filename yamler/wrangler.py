@@ -28,6 +28,8 @@ class Violation:
 
     @property
     def parent(self):
+        if len(self._parent) == 0:
+            return "-"
         return self._parent
 
 
@@ -112,7 +114,8 @@ class YamlerWrangler:
 
                     if type(item) != list_type['type']:
                         msg = f"{name}[{i}] should be {list_type['type'].__name__}"
-                        self._update_violation(f"{parent}#{name}[{i}]", TypeViolation(name, parent, msg))
+                        self._update_violation(f"{parent}#{name}[{i}]", TypeViolation(f"{name}[{i}]", parent, msg))
+            # TODO Do a check within the list resolver to handle nested lists
 
         return self.violations
 
