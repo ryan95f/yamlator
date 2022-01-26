@@ -2,3 +2,8 @@ root:
   hello: hello
   surname: hello
   age: r
+myList:
+  - name: Hello
+    surname: wow
+  - name: wow
+    surname: test

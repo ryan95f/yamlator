@@ -94,6 +94,9 @@ class YamlerTransformer(Transformer):
             'lookup': name.value
         }
 
+    def list_type(self, tokens):
+        return {'type': list}
+
     def type(self, tokens):
         (t, ) = tokens
         return t

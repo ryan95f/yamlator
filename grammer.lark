@@ -6,10 +6,12 @@
 
 type: int_type
      | str_type
+     | list_type
      | ruleset_type
 
 str_type: "str"
 int_type: "int"
+list_type: "list"
 ruleset_type: "("/[a-zA-Z0-9]+/")"
 
 primitives: ESCAPED_STRING
