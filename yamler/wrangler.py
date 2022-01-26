@@ -8,10 +8,15 @@ class ViolationType(Enum):
 
 
 class Violation:
-    def __init__(self, parent: str, message: str, v_type: ViolationType):
+    def __init__(self, key: str, parent: str, message: str, v_type: ViolationType):
+        self._key = key
         self._message = message
         self._parent = parent
         self._v_type = v_type
+
+    @property
+    def key(self):
+        return self._key
 
     @property
     def message(self):
@@ -27,13 +32,13 @@ class Violation:
 
 
 class RequiredViolation(Violation):
-    def __init__(self, parent: str, message: str):
-        super().__init__(parent, message, ViolationType.REQUIRED)
+    def __init__(self, key: str, parent: str, message: str):
+        super().__init__(key, parent, message, ViolationType.REQUIRED)
 
 
 class TypeViolation(Violation):
-    def __init__(self, parent: str, message: str):
-        super().__init__(parent, message, ViolationType.TYPE)
+    def __init__(self, key: str, parent: str, message: str):
+        super().__init__(key, parent, message, ViolationType.TYPE)
 
 
 class YamlerWrangler:
@@ -86,7 +91,7 @@ class YamlerWrangler:
             sub_data = data.get(name, None)
             if self._is_missing_required_data(sub_data, rule):
                 msg = f"{name} is missing"
-                self._update_violation(f"{parent}#{name}", RequiredViolation(parent, msg))
+                self._update_violation(f"{parent}#{name}", RequiredViolation(name, parent, msg))
                 continue
 
             if self._is_ruleset_rule(rule):
@@ -95,7 +100,7 @@ class YamlerWrangler:
 
             if self._has_incorrect_type(sub_data, rule):
                 msg = f"{name} should be type({rtype['type'].__name__})"
-                self._update_violation(f"{parent}#{name}", TypeViolation(parent, msg))
+                self._update_violation(f"{parent}#{name}", TypeViolation(name, parent, msg))
 
             if rtype['type'] == list:
                 list_type = rtype['sub_type']
@@ -107,7 +112,7 @@ class YamlerWrangler:
 
                     if type(item) != list_type['type']:
                         msg = f"{name}[{i}] should be {list_type['type'].__name__}"
-                        self._update_violation(f"{name}[{i}]", TypeViolation(parent, msg))
+                        self._update_violation(f"{parent}#{name}[{i}]", TypeViolation(name, parent, msg))
 
         return self.violations
 

@@ -8,8 +8,3 @@ myList:
     age: 23
     address:
       road: test
-  - hello: wow
-    surname: test
-    age: 23
-    address:
-      road: test
