@@ -11,7 +11,7 @@ type: int_type
 
 str_type: "str"
 int_type: "int"
-list_type: "list"
+list_type: "list""(" type ")"
 ruleset_type: "("/[a-zA-Z0-9]+/")"
 
 primitives: ESCAPED_STRING

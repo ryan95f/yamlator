@@ -95,7 +95,10 @@ class YamlerTransformer(Transformer):
         }
 
     def list_type(self, tokens):
-        return {'type': list}
+        return {
+            'type': list,
+            'sub_type': tokens[0]
+        }
 
     def type(self, tokens):
         (t, ) = tokens
