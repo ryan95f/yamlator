@@ -13,5 +13,5 @@ ruleset person {
 ruleset main {
     root (person) required
     person (person) optional
-    myList list(list(list((person))))
+    myList list(list(list((person)))) optional
 }
