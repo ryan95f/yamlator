@@ -105,16 +105,8 @@ class YamlerWrangler:
                 self._update_violation(f"{parent}#{name}", TypeViolation(name, parent, msg))
 
             if rtype['type'] == list:
-                list_type = rtype['sub_type']
-                for i, item in enumerate(sub_data):
-                    if list_type['type'] == 'ruleset':
-                        ruleset = self._instructions['rules'].get(list_type['lookup'], {})
-                        self._wrangle(item, ruleset['rules'], f"{name}[{i}]")
-                        continue
+                self._wrangle_lists(parent, name, sub_data, rtype)
 
-                    if type(item) != list_type['type']:
-                        msg = f"{name}[{i}] should be {list_type['type'].__name__}"
-                        self._update_violation(f"{parent}#{name}[{i}]", TypeViolation(f"{name}[{i}]", parent, msg))
             # TODO Do a check within the list resolver to handle nested lists
 
         return self.violations
@@ -152,3 +144,20 @@ class YamlerWrangler:
     def _has_incorrect_type(self, data, rule: dict):
         rtype = rule['rtype']
         return (type(data) != rtype['type']) and (data is not None)
+
+    def _wrangle_lists(self, parent, name, data, rtype):
+        print(parent, name, data)
+        list_type = rtype['sub_type']
+        for i, item in enumerate(data):
+            if list_type['type'] == 'ruleset':
+                ruleset = self._instructions['rules'].get(list_type['lookup'], {})
+                self._wrangle(item, ruleset['rules'], f"{name}[{i}]")
+                continue
+
+            if type(item) != list_type['type']:
+                msg = f"{name}[{i}] should be {list_type['type'].__name__}"
+                self._update_violation(f"{parent}#{name}[{i}]", TypeViolation(f"{name}[{i}]", parent, msg))
+                continue
+            
+            if list_type['type'] == list:
+                self._wrangle_lists(f"{name}[{i}]", i, item, rtype['sub_type'])
