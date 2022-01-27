@@ -1,3 +1,4 @@
+from cgitb import lookup
 from dis import Instruction
 from enum import Enum
 
@@ -8,7 +9,8 @@ class ViolationType(Enum):
 
 
 class Violation:
-    def __init__(self, key: str, parent: str, message: str, v_type: ViolationType):
+    def __init__(self, key: str, parent: str, message: str,
+                 v_type: ViolationType):
         self._key = key
         self._message = message
         self._parent = parent
@@ -93,7 +95,8 @@ class YamlerWrangler:
             sub_data = data.get(name, None)
             if self._is_missing_required_data(sub_data, rule):
                 msg = f"{name} is missing"
-                self._update_violation(f"{parent}#{name}", RequiredViolation(name, parent, msg))
+                violation = RequiredViolation(name, parent, msg)
+                self._update_violation(f"{parent}#{name}", violation)
                 continue
 
             if self._is_ruleset_rule(rule):
@@ -102,12 +105,11 @@ class YamlerWrangler:
 
             if self._has_incorrect_type(sub_data, rule):
                 msg = f"{name} should be type({rtype['type'].__name__})"
-                self._update_violation(f"{parent}#{name}", TypeViolation(name, parent, msg))
+                violation = TypeViolation(name, parent, msg)
+                self._update_violation(f"{parent}#{name}", violation)
 
             if rtype['type'] == list:
                 self._wrangle_lists(parent, name, sub_data, rtype)
-
-            # TODO Do a check within the list resolver to handle nested lists
 
         return self.violations
 
@@ -146,18 +148,24 @@ class YamlerWrangler:
         return (type(data) != rtype['type']) and (data is not None)
 
     def _wrangle_lists(self, parent, name, data, rtype):
-        print(parent, name, data)
         list_type = rtype['sub_type']
         for i, item in enumerate(data):
             if list_type['type'] == 'ruleset':
-                ruleset = self._instructions['rules'].get(list_type['lookup'], {})
+                lookup = list_type['lookup']
+                ruleset = self._instructions['rules'].get(lookup, {})
                 self._wrangle(item, ruleset['rules'], f"{name}[{i}]")
                 continue
 
             if type(item) != list_type['type']:
                 msg = f"{name}[{i}] should be {list_type['type'].__name__}"
-                self._update_violation(f"{parent}#{name}[{i}]", TypeViolation(f"{name}[{i}]", parent, msg))
+                violation = TypeViolation(f"{name}[{i}]", parent, msg)
+                self._update_violation(f"{parent}#{name}[{i}]", violation)
                 continue
-            
+
             if list_type['type'] == list:
-                self._wrangle_lists(f"{name}[{i}]", i, item, rtype['sub_type'])
+                parent_list = f"{name}[{i}]"
+                list_name = f"{name}[{i}]"
+                self._wrangle_lists(parent_list,
+                                    list_name,
+                                    item,
+                                    rtype['sub_type'])
