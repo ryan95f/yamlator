@@ -108,7 +108,7 @@ class YamlerWrangler:
                 violation = TypeViolation(name, parent, msg)
                 self._update_violation(f"{parent}#{name}", violation)
 
-            if rtype['type'] == list:
+            if rtype['type'] == list and rule['required']:
                 self._wrangle_lists(parent, name, sub_data, rtype)
 
         return self.violations

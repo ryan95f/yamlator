@@ -21,16 +21,16 @@ def main():
     print("\n{:<4} violation(s) found".format(violation_count))
 
     if len(violations) > 0:
-        print("\n{:<15} {:<15} {:<15} {:20}".format(
-                "Key", "Parent", "Violation", "Message"))
-        print("------------------------------------------------------------------")  # nopep8
+        print("\n{:<30} {:<20} {:<15} {:20}".format(
+                "Parent", "Key", "Violation", "Message"))
+        print("---------------------------------------------------------------------------")  # nopep8
         for violation in violations.values():
-            print("{:<15} {:<15} {:<15} {:20}".format(
-                violation.key,
+            print("{:<30} {:<20} {:<15} {:20}".format(
                 violation.parent,
+                violation.key,
                 violation.violation_type,
                 violation.message))
-        print("------------------------------------------------------------------")  # nopep8
+        print("---------------------------------------------------------------------------")  # nopep8
 
 
 if __name__ == '__main__':
