@@ -1,6 +1,7 @@
 from cgitb import lookup
 from dis import Instruction
 from enum import Enum
+from re import sub
 
 
 class ViolationType(Enum):
@@ -93,6 +94,9 @@ class YamlerWrangler:
             rtype = rule.get('rtype')
 
             sub_data = data.get(name, None)
+            if self.is_optional_field_missing(sub_data, rule):
+                continue
+
             if self._is_missing_required_data(sub_data, rule):
                 msg = f"{name} is missing"
                 violation = RequiredViolation(name, parent, msg)
@@ -108,10 +112,14 @@ class YamlerWrangler:
                 violation = TypeViolation(name, parent, msg)
                 self._update_violation(f"{parent}#{name}", violation)
 
-            if rtype['type'] == list and rule['required']:
+            if rtype['type'] == list:
                 self._wrangle_lists(parent, name, sub_data, rtype)
 
         return self.violations
+
+    def is_optional_field_missing(self, data, rule):
+        required = rule['required']
+        return (not required) and (data is None)
 
     def _is_missing_required_data(self, data, rule):
         required = rule['required']
