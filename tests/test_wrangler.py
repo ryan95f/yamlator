@@ -73,10 +73,37 @@ class TestYamlerWrangler(unittest.TestCase):
                 }
             }
         }
+
+        self.list_instructions = {
+            'main': {
+                'rules': [
+                    {
+                        'name': "myList",
+                        'rtype': {'type': list, 'sub_type': {
+                            'type': int
+                            }
+                        },
+                        'required': True
+                    },
+                    {
+                        'name': "myOtherList",
+                        'rtype': {'type': list, 'sub_type': {
+                            'type': list, 'sub_type': {
+                                'type': int
+                                }
+                            }
+                        },
+                        'required': False
+                    }
+                ]
+            }
+        }
+
         self.wrangler = YamlerWrangler(self.flat_instructions)
         self.data = {'message': 'Hello World', 'number': 42}
 
         self.nested_wrangle = YamlerWrangler(self.nested_instructions)
+        self.list_wrangler = YamlerWrangler(self.list_instructions)
 
     def test_create_wrangler_empty_instructions(self):
         expected_violations = 0
@@ -144,7 +171,10 @@ class TestYamlerWrangler(unittest.TestCase):
         violations = self.wrangler.wrangle(data)
 
         self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("", "number", violations, TypeViolation)
+        self._assert_key_name_violations("",
+                                         "number",
+                                         violations,
+                                         TypeViolation)
 
     def test_wrangle_with_nested_ruleset_valid_data(self):
         data = {
@@ -208,6 +238,24 @@ class TestYamlerWrangler(unittest.TestCase):
         self._assert_key_name_violations("", "person",
                                          violations,
                                          RequiredViolation)
+
+    def test_wrangler_with_valid_list_data(self):
+        data = {
+            'myList': [1, 2, 3, 4, 5],
+            'myOtherList': [[0, 1, 2], [3, 4, 5]]
+        }
+        expected_violations = 0
+        violations = self.list_wrangler.wrangle(data)
+        self._assert_violation_count(expected_violations, violations)
+
+    def test_wrangler_with_invalid_list_types(self):
+        data = {
+            'myList': "hello",
+            'myOtherList': ["wow", "hello"]
+        }
+        expected_violations = 3
+        violations = self.list_wrangler.wrangle(data)
+        self._assert_violation_count(expected_violations, violations)
 
 
 if __name__ == '__main__':
