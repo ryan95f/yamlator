@@ -1,5 +1,6 @@
 import unittest
 
+from yamler.wrangler import Violation
 from yamler.wrangler import YamlerWrangler
 from yamler.wrangler import RequiredViolation
 from yamler.wrangler import TypeViolation
@@ -96,18 +97,20 @@ class TestYamlerWrangler(unittest.TestCase):
         violations = self.wrangler.wrangle({})
 
         self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("message",
+        self._assert_key_name_violations("", "message",
                                          violations,
                                          RequiredViolation)
 
-        self._assert_key_name_violations("number",
+        self._assert_key_name_violations("", "number",
                                          violations,
                                          RequiredViolation)
 
-    def _assert_key_name_violations(self, key: str, violations: dict,
-                                    violation_type):
-        key_violation = violations.get(key, None)
-        msg = f"{key} was not found in the violations"
+    def _assert_key_name_violations(self, parent: str, key: str,
+                                    violations: dict,
+                                    violation_type: type):
+        violation_key = f"{parent}#{key}"
+        key_violation = violations.get(violation_key, None)
+        msg = f"{violation_key} was not found in the violations"
         self.assertIsNotNone(key_violation, msg)
 
         is_type = type(key_violation) == violation_type
@@ -124,7 +127,7 @@ class TestYamlerWrangler(unittest.TestCase):
         violations = self.wrangler.wrangle(data)
 
         self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("message",
+        self._assert_key_name_violations("", "message",
                                          violations,
                                          RequiredViolation)
 
@@ -141,7 +144,7 @@ class TestYamlerWrangler(unittest.TestCase):
         violations = self.wrangler.wrangle(data)
 
         self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("number", violations, TypeViolation)
+        self._assert_key_name_violations("", "number", violations, TypeViolation)
 
     def test_wrangle_with_nested_ruleset_valid_data(self):
         data = {
@@ -190,7 +193,7 @@ class TestYamlerWrangler(unittest.TestCase):
         violations = self.nested_wrangle.wrangle(data)
 
         self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("otherPerson",
+        self._assert_key_name_violations("", "otherPerson",
                                          violations,
                                          TypeViolation)
 
@@ -202,7 +205,7 @@ class TestYamlerWrangler(unittest.TestCase):
         violations = self.nested_wrangle.wrangle(data)
 
         self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("person",
+        self._assert_key_name_violations("", "person",
                                          violations,
                                          RequiredViolation)
 

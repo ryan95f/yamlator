@@ -104,7 +104,7 @@ class YamlerWrangler:
                 continue
 
             if self._is_ruleset_rule(rule):
-                self._wrangle_rulesets(name, sub_data, rule)
+                self._wrangle_rulesets(parent, name, sub_data, rule)
                 continue
 
             if self._has_incorrect_type(sub_data, rule):
@@ -135,7 +135,7 @@ class YamlerWrangler:
         rtype = rule['rtype']
         return rtype['type'] == 'ruleset'
 
-    def _wrangle_rulesets(self, name, data, rule):
+    def _wrangle_rulesets(self, parent, name, data, rule):
         rtype = rule.get('rtype')
         if self._is_ruleset_type(data):
             ruleset_name = rtype['lookup']
@@ -149,7 +149,8 @@ class YamlerWrangler:
             return
 
         msg = f"{name} should be type(ruleset)"
-        self._update_violation(name, TypeViolation(msg))
+        violation = TypeViolation(parent, name, msg)
+        self._update_violation(f"{parent}#{name}", violation)
 
     def _has_incorrect_type(self, data, rule: dict):
         rtype = rule['rtype']
