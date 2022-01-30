@@ -1,7 +1,5 @@
-from cgitb import lookup
-from dis import Instruction
+import logging
 from enum import Enum
-from re import sub
 
 
 class ViolationType(Enum):
@@ -34,6 +32,11 @@ class Violation:
         if len(self._parent) == 0:
             return "-"
         return self._parent
+
+    def __repr__(self) -> str:
+        message_template = "{}(parent={}, key={}, message={}"
+        return message_template.format(__class__.__name__,
+                                       self.parent, self.key, self.message)
 
 
 class RequiredViolation(Violation):
@@ -111,9 +114,11 @@ class YamlerWrangler:
                 msg = f"{name} should be type({rtype['type'].__name__})"
                 violation = TypeViolation(name, parent, msg)
                 self._update_violation(f"{parent}#{name}", violation)
+                continue
 
             if rtype['type'] == list:
                 self._wrangle_lists(parent, name, sub_data, rtype)
+                continue
 
         return self.violations
 
