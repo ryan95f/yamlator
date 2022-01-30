@@ -142,9 +142,9 @@ class TestYamlerWranglerNew(unittest.TestCase):
         ("invald_ruleset_type", COMPLEX_RULESET, {
             'person': 3
         }, 1),
-        # ("invalid_list_ruleset_type", COMPLEX_RULESET, {
-        #     "personList": [0, 2, 3]
-        # }, 3)
+        ("invalid_list_ruleset_type", COMPLEX_RULESET, {
+            "personList": [0, 2, 3]
+        }, 3)
     ])
     def test_wrangler(self, name, ruleset, data, expected_violations_count):
         wrangler = YamlerWrangler(ruleset)

@@ -167,6 +167,11 @@ class YamlerWrangler:
             if list_type['type'] == 'ruleset':
                 lookup = list_type['lookup']
                 ruleset = self._instructions['rules'].get(lookup, {})
+                if not self._is_ruleset_type(item):
+                    msg = f"{name}[{i}] should be type(ruleset)"
+                    violation = TypeViolation(parent, name, msg)
+                    self._update_violation(f"{parent}#{name}[{i}]", violation)
+                    continue
                 self._wrangle(item, ruleset['rules'], f"{name}[{i}]")
                 continue
 
