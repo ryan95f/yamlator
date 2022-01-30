@@ -44,6 +44,11 @@ def create_complex_ruleset():
                         'lookup': 'person'
                     }},
                     'required': False
+                },
+                {
+                    'name': 'person',
+                    'rtype': {'type': "ruleset", 'lookup': 'person'},
+                    'required': False
                 }
             ]
         },
@@ -71,22 +76,6 @@ COMPLEX_RULESET = create_complex_ruleset()
 
 
 class TestYamlerWranglerNew(unittest.TestCase):
-    """
-    Constructor Tests:
-        1. Empty Dict
-        2. None Dict - Done
-        3. Valid Instructions
-
-    Wrangler Tests
-        1. Empty Data
-        2. None Data
-        3. Optional Data
-        4. Roleset (with optional / required fields)
-        5. Incorrect type
-        6. list
-        7. nested lists
-    """
-
     @parameterized.expand([
         ("empty_instructions", {}),
         ("valid_instructions", FLAT_RULESET)
@@ -99,33 +88,63 @@ class TestYamlerWranglerNew(unittest.TestCase):
         with self.assertRaises(ValueError):
             YamlerWrangler(None)
 
+    def test_wrangler_none_data(self):
+        wrangler = YamlerWrangler(FLAT_RULESET)
+        with self.assertRaises(ValueError):
+            wrangler.wrangle(None)
+
     @parameterized.expand([
         ("empty_data_and_rules", {}, {}, 0),
         ("empty_rules", {}, {"message": "hello"}, 0),
-        ("valid_flat_rules", FLAT_RULESET, {"message": "hello", "number": 1}, 0),
-        ("flat_rules_invalid_data", FLAT_RULESET, {"message": 12, "number": []}, 2),
-        ("flat_rules_missing_required", FLAT_RULESET, {"number": 2}, 1),
-        ("flat_rules_missing_optional", FLAT_RULESET, {"message": "hello"}, 0),
-        ("complex_valid_ruleset", COMPLEX_RULESET, {
+        ("primitive_data_rules", FLAT_RULESET, {
+            "message": "hello", "number": 1
+        }, 0),
+        ("primitive_data_invalid_data", FLAT_RULESET, {
+            "message": 12, "number": []
+        }, 2),
+        ("primitive_data_missing_required", FLAT_RULESET, {
+            "number": 2
+        }, 1),
+        ("primitive_data_missing_optional", FLAT_RULESET, {
+            "message": "hello"
+        }, 0),
+        ("int_list", COMPLEX_RULESET, {
             "num_lists": [[0, 1, 2], [3, 4, 5]]
         }, 0),
-        ("complex_rules_invalid_list_type", COMPLEX_RULESET, {
+        ("invalid_list_type", COMPLEX_RULESET, {
             "num_lists": [
                 ["hello", "world"]
             ]
         }, 2),
-        ("complex_rules_valid_ruleset", COMPLEX_RULESET, {
+        ("list_ruleset", COMPLEX_RULESET, {
             "personList": [
                 {"name": "hello", "age": 2},
                 {"name": "world"}
             ]
         }, 0),
-        ("complex_rules_invalid_ruleset", COMPLEX_RULESET, {
+        ("list_ruleset_invalid_type", COMPLEX_RULESET, {
             "personList": [
                 {"name": 0},
                 {"age": 2}
             ]
-        }, 2)
+        }, 2),
+        ('valid_ruleset_type', COMPLEX_RULESET, {
+            'person': {
+                'name': 'Test',
+                'age': 100
+            }
+        }, 0),
+        ('valid_ruleset_missing_optional', COMPLEX_RULESET, {
+            'person': {
+                'name': 'Test'
+            }
+        }, 0),
+        ("invald_ruleset_type", COMPLEX_RULESET, {
+            'person': 3
+        }, 1),
+        # ("invalid_list_ruleset_type", COMPLEX_RULESET, {
+        #     "personList": [0, 2, 3]
+        # }, 3)
     ])
     def test_wrangler(self, name, ruleset, data, expected_violations_count):
         wrangler = YamlerWrangler(ruleset)
