@@ -94,8 +94,37 @@ class TestYamlerWrangler(unittest.TestCase):
                             }
                         },
                         'required': False
+                    },
+                    {
+                        'name': 'personList',
+                        'rtype': {'type': list,  'sub_type': {
+                            'type': 'ruleset',
+                            'lookup': 'person'
+                        }},
+                        'required': False
                     }
                 ]
+            },
+            "rules": {
+                "person": {
+                    "rules": [
+                        {
+                            'name': 'first_name',
+                            'rtype': {'type': str},
+                            'required': True
+                        },
+                        {
+                            'name': 'surname',
+                            'rtype': {'type': str},
+                            'required': False
+                        },
+                        {
+                            'name': 'age',
+                            'rtype': {'type': int},
+                            'required': False
+                        }
+                    ]
+                }
             }
         }
 
@@ -242,7 +271,16 @@ class TestYamlerWrangler(unittest.TestCase):
     def test_wrangler_with_valid_list_data(self):
         data = {
             'myList': [1, 2, 3, 4, 5],
-            'myOtherList': [[0, 1, 2], [3, 4, 5]]
+            'myOtherList': [[0, 1, 2], [3, 4, 5]],
+            'personList': [{
+                'first_name': 'Hello',
+                'surname': 'World',
+                'age': 100
+            }, {
+                'first_name': 'Hello',
+                'surname': 'World',
+                'age': 100
+            }]
         }
         expected_violations = 0
         violations = self.list_wrangler.wrangle(data)
@@ -254,6 +292,15 @@ class TestYamlerWrangler(unittest.TestCase):
             'myOtherList': ["wow", "hello"]
         }
         expected_violations = 3
+        violations = self.list_wrangler.wrangle(data)
+        self._assert_violation_count(expected_violations, violations)
+
+    def test_wrangler_with_empty_lists(self):
+        data = {
+            'myList': [],
+            'myOtherList': []
+        }
+        expected_violations = 0
         violations = self.list_wrangler.wrangle(data)
         self._assert_violation_count(expected_violations, violations)
 
