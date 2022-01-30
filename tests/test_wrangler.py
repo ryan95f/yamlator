@@ -1,308 +1,136 @@
 import unittest
 
-from yamler.wrangler import Violation
+from parameterized import parameterized
 from yamler.wrangler import YamlerWrangler
-from yamler.wrangler import RequiredViolation
-from yamler.wrangler import TypeViolation
 
 
-class TestYamlerWrangler(unittest.TestCase):
-    def setUp(self):
-        self.flat_instructions = {
-            'main': {
-                'rules': [
-                    {
-                        'name': 'message',
-                        'rtype': {'type': str},
-                        'required': True
-                    },
-                    {
-                        'name': 'number',
-                        'rtype': {'type': int},
-                        'required': True
-                    }
-                ]
-            },
-        }
-
-        self.nested_instructions = {
-            'main': {
-                'rules': [
-                    {
-                        'name': 'message',
-                        'rtype': {'type': str},
-                        'required': False
-                    },
-                    {
-                        'name': 'person',
-                        'rtype': {
-                            'type': 'ruleset',
-                            'lookup': 'person'
-                        },
-                        'required': True
-                    },
-                    {
-                        'name': 'otherPerson',
-                        'rtype': {
-                            'type': 'ruleset',
-                            'lookup': 'person'
-                        },
-                        'required': False
-                    }
-                ]
-            },
-            "rules": {
-                "person": {
-                    "rules": [
-                        {
-                            'name': 'first_name',
-                            'rtype': {'type': str},
-                            'required': True
-                        },
-                        {
-                            'name': 'surname',
-                            'rtype': {'type': str},
-                            'required': False
-                        },
-                        {
-                            'name': 'age',
-                            'rtype': {'type': int},
-                            'required': False
-                        }
-                    ]
+def create_flat_ruleset():
+    return {
+        'main': {
+            'rules': [
+                {
+                    'name': 'message',
+                    'rtype': {'type': str},
+                    'required': True
+                },
+                {
+                    'name': 'number',
+                    'rtype': {'type': int},
+                    'required': False
                 }
-            }
-        }
+            ]
+        },
+    }
 
-        self.list_instructions = {
-            'main': {
-                'rules': [
-                    {
-                        'name': "myList",
-                        'rtype': {'type': list, 'sub_type': {
+
+def create_complex_ruleset():
+    return {
+        'main': {
+            'rules': [
+                {
+                    'name': "num_lists",
+                    'rtype': {'type': list, 'sub_type': {
+                        'type': list, 'sub_type': {
                             'type': int
                             }
-                        },
+                        }
+                    },
+                    'required': False
+                },
+                {
+                    'name': 'personList',
+                    'rtype': {'type': list,  'sub_type': {
+                        'type': 'ruleset',
+                        'lookup': 'person'
+                    }},
+                    'required': False
+                }
+            ]
+        },
+        "rules": {
+            "person": {
+                "rules": [
+                    {
+                        'name': 'name',
+                        'rtype': {'type': str},
                         'required': True
                     },
                     {
-                        'name': "myOtherList",
-                        'rtype': {'type': list, 'sub_type': {
-                            'type': list, 'sub_type': {
-                                'type': int
-                                }
-                            }
-                        },
-                        'required': False
-                    },
-                    {
-                        'name': 'personList',
-                        'rtype': {'type': list,  'sub_type': {
-                            'type': 'ruleset',
-                            'lookup': 'person'
-                        }},
+                        'name': 'age',
+                        'rtype': {'type': int},
                         'required': False
                     }
                 ]
-            },
-            "rules": {
-                "person": {
-                    "rules": [
-                        {
-                            'name': 'first_name',
-                            'rtype': {'type': str},
-                            'required': True
-                        },
-                        {
-                            'name': 'surname',
-                            'rtype': {'type': str},
-                            'required': False
-                        },
-                        {
-                            'name': 'age',
-                            'rtype': {'type': int},
-                            'required': False
-                        }
-                    ]
-                }
             }
         }
+    }
 
-        self.wrangler = YamlerWrangler(self.flat_instructions)
-        self.data = {'message': 'Hello World', 'number': 42}
 
-        self.nested_wrangle = YamlerWrangler(self.nested_instructions)
-        self.list_wrangler = YamlerWrangler(self.list_instructions)
+FLAT_RULESET = create_flat_ruleset()
+COMPLEX_RULESET = create_complex_ruleset()
 
-    def test_create_wrangler_empty_instructions(self):
-        expected_violations = 0
-        wrangler = YamlerWrangler({})
-        violations = wrangler.wrangle(self.data)
 
-        self._assert_violation_count(expected_violations, violations)
+class TestYamlerWranglerNew(unittest.TestCase):
+    """
+    Constructor Tests:
+        1. Empty Dict
+        2. None Dict - Done
+        3. Valid Instructions
 
-    def _assert_violation_count(self, expected, violations):
-        self.assertEqual(expected, len(violations))
+    Wrangler Tests
+        1. Empty Data
+        2. None Data
+        3. Optional Data
+        4. Roleset (with optional / required fields)
+        5. Incorrect type
+        6. list
+        7. nested lists
+    """
 
-    def test_create_wrangler_none_instructions(self):
+    @parameterized.expand([
+        ("empty_instructions", {}),
+        ("valid_instructions", FLAT_RULESET)
+    ])
+    def test_constructor(self, name, rulesets):
+        wrangler = YamlerWrangler(rulesets)
+        self.assertIsNotNone(wrangler)
+
+    def test_constructor_none_instructions(self):
         with self.assertRaises(ValueError):
             YamlerWrangler(None)
 
-    def test_wrangle_empty_data_dict(self):
-        expected_violations = 2
-        violations = self.wrangler.wrangle({})
-
-        self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("", "message",
-                                         violations,
-                                         RequiredViolation)
-
-        self._assert_key_name_violations("", "number",
-                                         violations,
-                                         RequiredViolation)
-
-    def _assert_key_name_violations(self, parent: str, key: str,
-                                    violations: dict,
-                                    violation_type: type):
-        violation_key = f"{parent}#{key}"
-        key_violation = violations.get(violation_key, None)
-        msg = f"{violation_key} was not found in the violations"
-        self.assertIsNotNone(key_violation, msg)
-
-        is_type = type(key_violation) == violation_type
-        msg = f"{key} was not a {violation_type.__name__}"
-        self.assertTrue(is_type, msg)
-
-    def test_wrangle_none_data_dict(self):
-        with self.assertRaises(ValueError):
-            self.wrangler.wrangle(None)
-
-    def test_wrangle_with_rule_violations(self):
-        data = {'name': 'Yamler', 'number': 34}
-        expected_violations = 1
-        violations = self.wrangler.wrangle(data)
-
-        self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("", "message",
-                                         violations,
-                                         RequiredViolation)
-
-    def test_wrangle_with_no_rule_violations(self):
-        data = {'message': 'Hello World', 'number': 42}
-        expected_violations = 0
-        violations = self.wrangler.wrangle(data)
-
-        self._assert_violation_count(expected_violations, violations)
-
-    def test_wrangle_with_invalid_type_violations(self):
-        data = {'message': 'Hello World', 'number': "42"}
-        expected_violations = 1
-        violations = self.wrangler.wrangle(data)
-
-        self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("",
-                                         "number",
-                                         violations,
-                                         TypeViolation)
-
-    def test_wrangle_with_nested_ruleset_valid_data(self):
-        data = {
-            'message': 'Hello World',
-            'person': {
-                'first_name': 'Hello',
-                'surname': 'World',
-                'age': 100
-            },
-            'otherPerson': {
-                'first_name': 'Hello',
-                'surname': 'World',
-                'age': 100
-            }
-        }
-        expected_violations = 0
-        violations = self.nested_wrangle.wrangle(data)
-
-        self._assert_violation_count(expected_violations, violations)
-
-    def test_wrangler_with_optionals_removed_from_data(self):
-        data = {
-            'message': 'Hello World',
-            'person': {
-                'first_name': 'Hello',
-                'surname': 'World',
-                'age': 100
-            }
-        }
-        expected_violations = 0
-        violations = self.nested_wrangle.wrangle(data)
-
-        self._assert_violation_count(expected_violations, violations)
-
-    def test_wrangler_with_ruleset_type_violation(self):
-        data = {
-            'message': 'Hello World',
-            'person': {
-                'first_name': 'Hello',
-                'surname': 'World',
-                'age': 100
-            },
-            'otherPerson': 43
-        }
-        expected_violations = 1
-        violations = self.nested_wrangle.wrangle(data)
-
-        self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("", "otherPerson",
-                                         violations,
-                                         TypeViolation)
-
-    def test_wrangler_with_required_ruleset_violation(self):
-        data = {
-            'message': 'Hello World'
-        }
-        expected_violations = 1
-        violations = self.nested_wrangle.wrangle(data)
-
-        self._assert_violation_count(expected_violations, violations)
-        self._assert_key_name_violations("", "person",
-                                         violations,
-                                         RequiredViolation)
-
-    def test_wrangler_with_valid_list_data(self):
-        data = {
-            'myList': [1, 2, 3, 4, 5],
-            'myOtherList': [[0, 1, 2], [3, 4, 5]],
-            'personList': [{
-                'first_name': 'Hello',
-                'surname': 'World',
-                'age': 100
-            }, {
-                'first_name': 'Hello',
-                'surname': 'World',
-                'age': 100
-            }]
-        }
-        expected_violations = 0
-        violations = self.list_wrangler.wrangle(data)
-        self._assert_violation_count(expected_violations, violations)
-
-    def test_wrangler_with_invalid_list_types(self):
-        data = {
-            'myList': "hello",
-            'myOtherList': ["wow", "hello"]
-        }
-        expected_violations = 3
-        violations = self.list_wrangler.wrangle(data)
-        self._assert_violation_count(expected_violations, violations)
-
-    def test_wrangler_with_empty_lists(self):
-        data = {
-            'myList': [],
-            'myOtherList': []
-        }
-        expected_violations = 0
-        violations = self.list_wrangler.wrangle(data)
-        self._assert_violation_count(expected_violations, violations)
+    @parameterized.expand([
+        ("empty_data_and_rules", {}, {}, 0),
+        ("empty_rules", {}, {"message": "hello"}, 0),
+        ("valid_flat_rules", FLAT_RULESET, {"message": "hello", "number": 1}, 0),
+        ("flat_rules_invalid_data", FLAT_RULESET, {"message": 12, "number": []}, 2),
+        ("flat_rules_missing_required", FLAT_RULESET, {"number": 2}, 1),
+        ("flat_rules_missing_optional", FLAT_RULESET, {"message": "hello"}, 0),
+        ("complex_valid_ruleset", COMPLEX_RULESET, {
+            "num_lists": [[0, 1, 2], [3, 4, 5]]
+        }, 0),
+        ("complex_rules_invalid_list_type", COMPLEX_RULESET, {
+            "num_lists": [
+                ["hello", "world"]
+            ]
+        }, 2),
+        ("complex_rules_valid_ruleset", COMPLEX_RULESET, {
+            "personList": [
+                {"name": "hello", "age": 2},
+                {"name": "world"}
+            ]
+        }, 0),
+        ("complex_rules_invalid_ruleset", COMPLEX_RULESET, {
+            "personList": [
+                {"name": 0},
+                {"age": 2}
+            ]
+        }, 2)
+    ])
+    def test_wrangler(self, name, ruleset, data, expected_violations_count):
+        wrangler = YamlerWrangler(ruleset)
+        violations = wrangler.wrangle(data)
+        self.assertEqual(expected_violations_count, len(violations))
 
 
 if __name__ == '__main__':
