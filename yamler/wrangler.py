@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 
 
@@ -7,9 +8,16 @@ class ViolationType(Enum):
 
 
 class Violation:
-    def __init__(self, message: str, v_type: ViolationType):
+    def __init__(self, key: str, parent: str, message: str,
+                 v_type: ViolationType):
+        self._key = key
         self._message = message
+        self._parent = parent
         self._v_type = v_type
+
+    @property
+    def key(self):
+        return self._key
 
     @property
     def message(self):
@@ -19,15 +27,26 @@ class Violation:
     def violation_type(self):
         return self._v_type.value
 
+    @property
+    def parent(self):
+        if len(self._parent) == 0:
+            return "-"
+        return self._parent
+
+    def __repr__(self) -> str:
+        message_template = "{}(parent={}, key={}, message={}"
+        return message_template.format(__class__.__name__,
+                                       self.parent, self.key, self.message)
+
 
 class RequiredViolation(Violation):
-    def __init__(self, message: str):
-        super().__init__(message, ViolationType.REQUIRED)
+    def __init__(self, key: str, parent: str, message: str):
+        super().__init__(key, parent, message, ViolationType.REQUIRED)
 
 
 class TypeViolation(Violation):
-    def __init__(self, message: str):
-        super().__init__(message, ViolationType.TYPE)
+    def __init__(self, key: str, parent: str, message: str):
+        super().__init__(key, parent, message, ViolationType.TYPE)
 
 
 class YamlerWrangler:
@@ -78,20 +97,34 @@ class YamlerWrangler:
             rtype = rule.get('rtype')
 
             sub_data = data.get(name, None)
+            if self.is_optional_field_missing(sub_data, rule):
+                continue
+
             if self._is_missing_required_data(sub_data, rule):
                 msg = f"{name} is missing"
-                self._update_violation(name, RequiredViolation(msg))
+                violation = RequiredViolation(name, parent, msg)
+                self._update_violation(f"{parent}#{name}", violation)
                 continue
 
             if self._is_ruleset_rule(rule):
-                self._wrangle_rulesets(name, sub_data, rule)
+                self._wrangle_rulesets(parent, name, sub_data, rule)
                 continue
 
             if self._has_incorrect_type(sub_data, rule):
                 msg = f"{name} should be type({rtype['type'].__name__})"
-                self._update_violation(name, TypeViolation(msg))
+                violation = TypeViolation(name, parent, msg)
+                self._update_violation(f"{parent}#{name}", violation)
+                continue
+
+            if rtype['type'] == list:
+                self._wrangle_lists(parent, name, sub_data, rtype)
+                continue
 
         return self.violations
+
+    def is_optional_field_missing(self, data, rule):
+        required = rule['required']
+        return (not required) and (data is None)
 
     def _is_missing_required_data(self, data, rule):
         required = rule['required']
@@ -101,14 +134,13 @@ class YamlerWrangler:
         return type(data) == dict
 
     def _update_violation(self, name: str, violation: Violation):
-        sub = self.violations.get(name, None)
         self.violations[name] = violation
 
     def _is_ruleset_rule(self, rule):
         rtype = rule['rtype']
         return rtype['type'] == 'ruleset'
 
-    def _wrangle_rulesets(self, name, data, rule):
+    def _wrangle_rulesets(self, parent, name, data, rule):
         rtype = rule.get('rtype')
         if self._is_ruleset_type(data):
             ruleset_name = rtype['lookup']
@@ -122,8 +154,37 @@ class YamlerWrangler:
             return
 
         msg = f"{name} should be type(ruleset)"
-        self._update_violation(name, TypeViolation(msg))
+        violation = TypeViolation(parent, name, msg)
+        self._update_violation(f"{parent}#{name}", violation)
 
     def _has_incorrect_type(self, data, rule: dict):
         rtype = rule['rtype']
         return (type(data) != rtype['type']) and (data is not None)
+
+    def _wrangle_lists(self, parent, name, data, rtype):
+        list_type = rtype['sub_type']
+        for i, item in enumerate(data):
+            if list_type['type'] == 'ruleset':
+                lookup = list_type['lookup']
+                ruleset = self._instructions['rules'].get(lookup, {})
+                if not self._is_ruleset_type(item):
+                    msg = f"{name}[{i}] should be type(ruleset)"
+                    violation = TypeViolation(parent, name, msg)
+                    self._update_violation(f"{parent}#{name}[{i}]", violation)
+                    continue
+                self._wrangle(item, ruleset['rules'], f"{name}[{i}]")
+                continue
+
+            if type(item) != list_type['type']:
+                msg = f"{name}[{i}] should be {list_type['type'].__name__}"
+                violation = TypeViolation(f"{name}[{i}]", parent, msg)
+                self._update_violation(f"{parent}#{name}[{i}]", violation)
+                continue
+
+            if list_type['type'] == list:
+                parent_list = f"{name}[{i}]"
+                list_name = f"{name}[{i}]"
+                self._wrangle_lists(parent_list,
+                                    list_name,
+                                    item,
+                                    rtype['sub_type'])
