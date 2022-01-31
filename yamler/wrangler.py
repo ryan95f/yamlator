@@ -188,3 +188,79 @@ class YamlerWrangler:
                                     list_name,
                                     item,
                                     rtype['sub_type'])
+
+
+class ImprovedWrangler:
+    def __init__(self, instructions: dict):
+        """YamlerWrangler constructor
+
+        Args:
+            instructions (dict): Contains the main ruleset and a list of
+                                 other rulesets
+
+        Raises:
+            ValueError: If instructions is None
+        """
+        if instructions is None:
+            raise ValueError("instructions should not be None")
+
+        self._instructions = instructions
+        self._main = instructions.get('main', {})
+
+    def wrangle(self, yaml_data: dict) -> dict:
+        """Wrangle the YAML file to determine if there are any
+        violations when compared to the rulesets
+
+        Args:
+            yaml_data (dict): The yaml data represented as a dict
+
+        Returns:
+            A `dict` of violations that were detected
+
+        Raises:
+            ValueError: If `yaml_data` is None
+        """
+        if yaml_data is None:
+            raise ValueError("yaml_data should not be None")
+
+        self.violations = {}
+        main_rules = self._main.get('rules', [])
+        self._wrangle(yaml_data, main_rules)
+        return self.violations
+
+    def _wrangle(self, data, rules):
+        for rule in rules:
+            sub_data = data.get(rule['name'], None)
+
+            if self._is_required_missing_data(sub_data, rule):
+                print("required violation", rule)
+                continue
+
+            if self._is_ruleset_rule(rule):
+                self._wrangle_ruleset(data, rule)
+                continue
+
+            if self._is_list_rule(rule):
+                print("list type", rule)
+                continue
+
+    def _is_required_missing_data(self, data, rule):
+        is_required = rule['required']
+        return (is_required) and (data is None)
+
+    def _is_ruleset_rule(self, rule):
+        rtype = rule['rtype']
+        return rtype['type'] == 'ruleset'
+
+    def _wrangle_ruleset(self, data, rule):
+        rtype = rule['rtype']
+        lookup_name = rtype['lookup']
+        ruleset = self._instructions['rules'].get(lookup_name, {})
+        self._wrangle(data, ruleset['rules'])
+
+    def _is_list_rule(self, rule):
+        rtype = rule['rtype']
+        return rtype['type'] == list
+
+    def _wrangle_lists(self, data, rules):
+        pass
