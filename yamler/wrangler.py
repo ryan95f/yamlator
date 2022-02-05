@@ -1,5 +1,6 @@
 import logging
 from enum import Enum
+from turtle import right
 
 
 class ViolationType(Enum):
@@ -245,10 +246,11 @@ class ImprovedWrangler:
                 continue
 
             if self._is_list_rule(rule):
+                self._wrangle_lists(sub_data, rule)
                 continue
 
             if self._has_incorrect_type(sub_data, rule):
-                violation_type = TypeViolation(rule['name'], parent, f"{rule['name']} should be {rule['rtype']['type'].__name__}")
+                violation_type = TypeViolation(key=rule['name'], parent=parent, message=f"{rule['name']} should be {rule['rtype']['type'].__name__}")
                 self.violations.append(violation_type)
                 continue
 
@@ -274,8 +276,12 @@ class ImprovedWrangler:
         rtype = rule['rtype']
         return rtype['type'] == list
 
-    def _wrangle_lists(self, data, rules):
-        pass
+    def _wrangle_lists(self, data, rule):
+        sub_type = rule['rtype']['sub_type']['type']
+        for idx, d in enumerate(data):
+            if type(d) != sub_type:
+                violation_type = TypeViolation(key=rule['name'], parent=rule['name'], message=f"{rule['name']}[{idx}] should be {sub_type.__name__}")
+                self.violations.append(violation_type)
 
     def _has_incorrect_type(self, data, rule: dict):
         rtype = rule['rtype']

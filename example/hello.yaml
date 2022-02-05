@@ -2,3 +2,6 @@ root:
   hello: hello
   surname: hello
   age: r
+numbers:
+  - 0
+  - hello

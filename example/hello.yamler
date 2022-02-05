@@ -14,4 +14,5 @@ ruleset main {
     number int
     root (person) required
     person (person) optional
+    numbers list(int)
 }
