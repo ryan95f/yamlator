@@ -1,8 +1,12 @@
 from lark import Lark
 from lark import Transformer
 from lark.exceptions import UnexpectedEOF
+from collections import namedtuple
 
 _GRAMMER_FILE = "grammer.lark"
+
+
+Rule = namedtuple("Rule", ["name", "rtype", "is_required"])
 
 
 class YamlerParser:
@@ -38,19 +42,21 @@ class YamlerParser:
 class YamlerTransformer(Transformer):
     def required_rule(self, tokens):
         (name, rtype) = tokens
-        return {
-            "name": name.value,
-            "rtype": rtype,
-            "required": True
-        }
+        return Rule(name.value, rtype, True)
+        # return {
+        #     "name": name.value,
+        #     "rtype": rtype,
+        #     "required": True
+        # }
 
     def optional_rule(self, tokens):
         (name, rtype) = tokens
-        return{
-            "name": name.value,
-            "rtype": rtype,
-            "required": False
-        }
+        return Rule(name.value, rtype, False)
+        # return{
+        #     "name": name.value,
+        #     "rtype": rtype,
+        #     "required": False
+        # }
 
     def ruleset(self, tokens):
         name = tokens[0].value
