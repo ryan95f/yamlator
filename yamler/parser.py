@@ -1,12 +1,11 @@
 from lark import Lark
 from lark import Transformer
 from lark.exceptions import UnexpectedEOF
-from collections import namedtuple
+
+from .types import Rule
+
 
 _GRAMMER_FILE = "grammer.lark"
-
-
-Rule = namedtuple("Rule", ["name", "rtype", "is_required"])
 
 
 class YamlerParser:

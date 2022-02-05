@@ -1,7 +1,7 @@
-import logging
 from enum import Enum
 from typing import Iterable
-from .parser import Rule
+
+from .types import Rule
 
 
 class ViolationType(Enum):
@@ -42,7 +42,8 @@ class Violation:
 
 
 class RequiredViolation(Violation):
-    def __init__(self, key: str, parent: str, message: str):
+    def __init__(self, key: str, parent: str):
+        message = f"{key} is required"
         super().__init__(key, parent, message, ViolationType.REQUIRED)
 
 
@@ -50,6 +51,11 @@ class TypeViolation(Violation):
     def __init__(self, key: str, parent: str, message: str):
         super().__init__(key, parent, message, ViolationType.TYPE)
 
+
+class RulesetTypeViolation(TypeViolation):
+    def __init__(self, key: str, parent: str):
+        message = f"{key} should be a ruleset"
+        super().__init__(key, parent, message)
 
 # class YamlerWrangler:
 #     """Reads the instructions from the parser to validate if a
@@ -237,13 +243,13 @@ class ImprovedWrangler:
                 continue
 
             if self._is_required_missing_data(sub_data, rule):
-                violation_type = RequiredViolation(rule.name, parent, f"{rule.name} is required")
+                violation_type = RequiredViolation(rule.name, parent)
                 self.violations.append(violation_type)
                 continue
 
             if self._is_ruleset_rule(rule):
                 if type(sub_data) != dict:
-                    violation_type = TypeViolation(rule.name, parent, f"{rule.name} should be a ruleset")
+                    violation_type = RulesetTypeViolation(rule.name, parent)
                     self.violations.append(violation_type)
                     continue
 
@@ -283,7 +289,7 @@ class ImprovedWrangler:
         for idx, d in enumerate(data):
             if rtype['type'] == "ruleset":
                 if type(d) != dict:
-                    violation_type = TypeViolation(key=key, parent=parent, message=f"{key}[{idx}] should be a ruleset")
+                    violation_type = RulesetTypeViolation(key=f"{key}[{idx}]", parent=parent)
                     self.violations.append(violation_type)
                     continue
 
