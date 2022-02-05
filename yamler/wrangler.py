@@ -246,7 +246,7 @@ class ImprovedWrangler:
                 continue
 
             if self._is_list_rule(rule):
-                self._wrangle_lists(sub_data, rule)
+                self._wrangle_lists(parent, rule['name'], sub_data, rule['rtype']['sub_type'])
                 continue
 
             if self._has_incorrect_type(sub_data, rule):
@@ -276,12 +276,16 @@ class ImprovedWrangler:
         rtype = rule['rtype']
         return rtype['type'] == list
 
-    def _wrangle_lists(self, data, rule):
-        sub_type = rule['rtype']['sub_type']['type']
+    def _wrangle_lists(self, parent, key, data, rtype):
         for idx, d in enumerate(data):
-            if type(d) != sub_type:
-                violation_type = TypeViolation(key=rule['name'], parent=rule['name'], message=f"{rule['name']}[{idx}] should be {sub_type.__name__}")
+            if type(d) != rtype['type']:
+                violation_type = TypeViolation(key=key, parent=parent, message=f"{key}[{idx}] should be {rtype['type'].__name__}")
                 self.violations.append(violation_type)
+                continue
+
+            if rtype['type'] == list:
+                self._wrangle_lists(f"{key}[{idx}]", f"{key}[{idx}]", d, rtype['sub_type'])
+                continue
 
     def _has_incorrect_type(self, data, rule: dict):
         rtype = rule['rtype']
