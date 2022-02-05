@@ -2,11 +2,3 @@ root:
   hello: hello
   surname: hello
   age: r
-myList:
-  - - - hello: Hello
-        surname: test
-        age: fdf
-      - hello: Hello
-        surname: test
-        age: fdf
-  

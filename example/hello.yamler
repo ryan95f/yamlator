@@ -14,5 +14,4 @@ ruleset main {
     number int
     root (person) required
     person (person) optional
-    myList list(list(list((person))))
 }
