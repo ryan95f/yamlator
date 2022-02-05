@@ -3,6 +3,5 @@ root:
   surname: hello
   age: r
 numbers:
-  - - 0
-    - hello
-  
+  - name: wow
+  - name: hello

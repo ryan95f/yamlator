@@ -278,6 +278,17 @@ class ImprovedWrangler:
 
     def _wrangle_lists(self, parent, key, data, rtype):
         for idx, d in enumerate(data):
+            if rtype['type'] == "ruleset":
+                if type(d) != dict:
+                    violation_type = TypeViolation(key=key, parent=parent, message=f"{key}[{idx}] should be a ruleset")
+                    self.violations.append(violation_type)
+                    continue
+
+                lookup_name = rtype['lookup']
+                ruleset = self._instructions['rules'].get(lookup_name, {})
+                self._wrangle(f"{key}[{idx}]", d, ruleset['rules'])
+                continue
+
             if type(d) != rtype['type']:
                 violation_type = TypeViolation(key=key, parent=parent, message=f"{key}[{idx}] should be {rtype['type'].__name__}")
                 self.violations.append(violation_type)
