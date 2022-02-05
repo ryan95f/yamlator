@@ -1,7 +1,7 @@
 import unittest
 
 from parameterized import parameterized
-from yamler.wrangler import YamlerWrangler
+from yamler.wrangler import ImprovedWrangler as YamlerWrangler
 
 
 def create_flat_ruleset():

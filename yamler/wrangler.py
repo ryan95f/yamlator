@@ -242,6 +242,11 @@ class ImprovedWrangler:
                 continue
 
             if self._is_ruleset_rule(rule):
+                if type(sub_data) != dict:
+                    violation_type = TypeViolation(rule['name'], parent, f"{rule['name']} should be a ruleset")
+                    self.violations.append(violation_type)
+                    continue
+
                 self._wrangle_ruleset(sub_data, rule)
                 continue
 
