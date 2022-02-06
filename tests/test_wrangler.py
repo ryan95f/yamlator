@@ -2,15 +2,15 @@ import unittest
 
 from parameterized import parameterized
 from yamler.wrangler import ImprovedWrangler as YamlerWrangler
-from yamler.types import Rule
+from yamler.types import Rule, RuleType
 
 
 def create_flat_ruleset():
     return {
         'main': {
             'rules': [
-                Rule('message', {'type': str}, True),
-                Rule('number', {'type': int}, False)
+                Rule('message', RuleType(type=str), True),
+                Rule('number', RuleType(type=int), False)
             ]
         },
     }
@@ -20,30 +20,18 @@ def create_complex_ruleset():
     return {
         'main': {
             'rules': [
-                Rule("num_lists", {
-                    'type': list, 'sub_type': {
-                        'type': list, 'sub_type': {
-                            'type': int
-                        }
-                    }
-                }, False),
-                Rule('personList', {
-                    'type': list,  'sub_type': {
-                        'type': 'ruleset',
-                        'lookup': 'person'
-                    }
-                }, False),
-                Rule('person', {
-                    'type': "ruleset",
-                    'lookup': 'person'
-                }, False)
+                Rule("num_lists", RuleType(type=list,
+                                           sub_type=RuleType(type=list,
+                                                             sub_type=RuleType(type=int))), False),  # nopep8
+                Rule('personList', RuleType(type=list, sub_type=RuleType(type="ruleset", lookup="person")), False),  # nopep8
+                Rule('person', RuleType(type="ruleset", lookup="person"), False)
             ]
         },
         "rules": {
             "person": {
                 "rules": [
-                    Rule('name', {'type': str}, True),
-                    Rule('age', {'type': int}, False)
+                    Rule('name', RuleType(type=str), True),
+                    Rule('age', RuleType(type=int), False)
                 ]
             }
         }
