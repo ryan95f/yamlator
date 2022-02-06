@@ -2,22 +2,15 @@ import unittest
 
 from parameterized import parameterized
 from yamler.wrangler import ImprovedWrangler as YamlerWrangler
+from yamler.types import Rule
 
 
 def create_flat_ruleset():
     return {
         'main': {
             'rules': [
-                {
-                    'name': 'message',
-                    'rtype': {'type': str},
-                    'required': True
-                },
-                {
-                    'name': 'number',
-                    'rtype': {'type': int},
-                    'required': False
-                }
+                Rule('message', {'type': str}, True),
+                Rule('number', {'type': int}, False)
             ]
         },
     }
@@ -27,44 +20,30 @@ def create_complex_ruleset():
     return {
         'main': {
             'rules': [
-                {
-                    'name': "num_lists",
-                    'rtype': {'type': list, 'sub_type': {
+                Rule("num_lists", {
+                    'type': list, 'sub_type': {
                         'type': list, 'sub_type': {
                             'type': int
-                            }
                         }
-                    },
-                    'required': False
-                },
-                {
-                    'name': 'personList',
-                    'rtype': {'type': list,  'sub_type': {
+                    }
+                }, False),
+                Rule('personList', {
+                    'type': list,  'sub_type': {
                         'type': 'ruleset',
                         'lookup': 'person'
-                    }},
-                    'required': False
-                },
-                {
-                    'name': 'person',
-                    'rtype': {'type': "ruleset", 'lookup': 'person'},
-                    'required': False
-                }
+                    }
+                }, False),
+                Rule('person', {
+                    'type': "ruleset",
+                    'lookup': 'person'
+                }, False)
             ]
         },
         "rules": {
             "person": {
                 "rules": [
-                    {
-                        'name': 'name',
-                        'rtype': {'type': str},
-                        'required': True
-                    },
-                    {
-                        'name': 'age',
-                        'rtype': {'type': int},
-                        'required': False
-                    }
+                    Rule('name', {'type': str}, True),
+                    Rule('age', {'type': int}, False)
                 ]
             }
         }

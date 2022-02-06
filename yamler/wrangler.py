@@ -54,7 +54,7 @@ class TypeViolation(Violation):
 
 class BuiltInTypeViolation(TypeViolation):
     def __init__(self, key: str, parent: str, expected_type: type):
-        message = f"{key} should be type {expected_type.__name__}"
+        message = f"{key} is expected to be an {expected_type.__name__}"
         super().__init__(key, parent, message)
 
 
@@ -120,7 +120,7 @@ class ImprovedWrangler:
                     self.violations.append(violation_type)
                     continue
 
-                self._wrangle_ruleset(sub_data, rule)
+                self._wrangler_ruleset(rule.name, sub_data, rule.rtype)
                 continue
 
             if self._is_list_rule(rule):
@@ -144,11 +144,10 @@ class ImprovedWrangler:
         rtype = rule.rtype
         return rtype['type'] == 'ruleset'
 
-    def _wrangle_ruleset(self, data: dict, rule: Rule):
-        rtype = rule.rtype
+    def _wrangler_ruleset(self, parent: str, data: dict, rtype: dict):
         lookup_name = rtype['lookup']
         ruleset = self._instructions['rules'].get(lookup_name, {})
-        self._wrangle(rule.name, data, ruleset['rules'])
+        self._wrangle(parent, data, ruleset['rules'])
 
     def _is_list_rule(self, rule: Rule):
         rtype = rule.rtype
@@ -164,9 +163,7 @@ class ImprovedWrangler:
                     self.violations.append(violation_type)
                     continue
 
-                lookup_name = rtype['lookup']
-                ruleset = self._instructions['rules'].get(lookup_name, {})
-                self._wrangle(current_key, item, ruleset['rules'])
+                self._wrangler_ruleset(current_key, item, rtype)
                 continue
 
             if type(item) != rtype['type']:
