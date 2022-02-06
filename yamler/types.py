@@ -9,6 +9,18 @@ Data = Union[dict, list, int, float, str]
 
 class RuleType:
     def __init__(self, type: Union[str, type], lookup: str = None, sub_type=None):
+        """RuleType constructor
+
+        Args:
+            type        (str | type): The expected type for a field. Use the str for
+            a `ruleset` and other types will use the build in Python types
+
+            lookup      (str):        Used when type=`ruleset`, this specifies the
+            ruleset to lookup when processing the YAML file
+
+            sub_type    (RuleType): A nested subtype for the type. Used when there are
+            nested list types e.g list(list(int))
+        """
         self.type = type
         self.lookup = lookup
         self.sub_type = sub_type

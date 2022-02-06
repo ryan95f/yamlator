@@ -4,13 +4,13 @@ from typing import Iterable
 from .types import Rule, Data, RuleType
 
 
-class ImprovedWrangler:
+class YamlerWrangler:
     def __init__(self, instructions: dict):
         """YamlerWrangler constructor
 
         Args:
             instructions (dict): Contains the main ruleset and a list of
-                                 other rulesets
+            other rulesets
 
         Raises:
             ValueError: If instructions is None
@@ -126,6 +126,14 @@ class ViolationType(Enum):
 
 class Violation:
     def __init__(self, key: str, parent: str, message: str, v_type: ViolationType):
+        """Violation constructor
+
+        Args:
+            key     (str):  The key name in the YAML file
+            parent  (str):  The parent key in the YAML file
+            message (str):  The message with information regarding the violation
+            v_type  (str):  The violation type. Either `REQUIRED` or `TYPE`
+        """
         self.key = key
         self.message = message
         self.parent = parent
@@ -142,23 +150,59 @@ class Violation:
 
 
 class RequiredViolation(Violation):
+    """Violation for when a required field is missing"""
+
     def __init__(self, key: str, parent: str):
+        """RequiredViolation constructor
+
+        Args:
+            key     (str):  The key name in the YAML file
+            parent  (str):  The parent key in the YAML file
+        """
         message = f"{key} is required"
         super().__init__(key, parent, message, ViolationType.REQUIRED)
 
 
 class TypeViolation(Violation):
+    """Violation when a value in the YAML file has an incorrect type"""
+
     def __init__(self, key: str, parent: str, message: str):
+        """TypeViolation constructor
+
+        Args:
+            key     (str):  The key name in the YAML file
+            parent  (str):  The parent key in the YAML file
+            message (str):  The message with information regarding the type violation
+        """
         super().__init__(key, parent, message, ViolationType.TYPE)
 
 
 class BuiltInTypeViolation(TypeViolation):
+    """Type violation when a field is not using the required
+    built in type e.g (float, int, str, list)
+    """
+
     def __init__(self, key: str, parent: str, expected_type: type):
+        """BuiltInTypeViolation constructor
+
+        Args:
+            key             (str):  The key name in the YAML file
+            parent          (str):  The parent key in the YAML file
+            expected_type   (type): The expected build in type for the field
+        """
         message = f"{key} is expected to be an {expected_type.__name__}"
         super().__init__(key, parent, message)
 
 
 class RulesetTypeViolation(TypeViolation):
+    """Type violation when a field is not a ruleset (dict) in the file"""
+
     def __init__(self, key: str, parent: str):
+        """RulesetTypeViolation constructor
+
+        Args:
+            key     (str):  The key name in the YAML file
+            parent  (str):  The parent key in the YAML file
+        """
         message = f"{key} should be a ruleset"
         super().__init__(key, parent, message)

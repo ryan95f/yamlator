@@ -1,7 +1,7 @@
 import unittest
 
 from parameterized import parameterized
-from yamler.wrangler import ImprovedWrangler as YamlerWrangler
+from yamler.wrangler import YamlerWrangler
 from yamler.types import Rule, RuleType
 
 

@@ -1,7 +1,7 @@
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
 from yamler.parser import YamlerParser
-from yamler.wrangler import ImprovedWrangler
+from yamler.wrangler import YamlerWrangler
 
 EXAMPLE_RULESET = "example/hello.yamler"
 TEST_YAML_FILE = "example/hello.yaml"
@@ -14,7 +14,7 @@ def main():
     parser = YamlerParser()
     tokens = parser.parse(ruleset)
 
-    wrangler = ImprovedWrangler(tokens)
+    wrangler = YamlerWrangler(tokens)
     violations = wrangler.wrangle(yaml_data)
 
     violation_count = len(violations)
@@ -22,7 +22,7 @@ def main():
 
     if len(violations) > 0:
         print("\n{:<30} {:<20} {:<15} {:20}".format(
-                "Parent", "Key", "Violation", "Message"))
+                "Parent Key", "Key", "Violation", "Message"))
         print("---------------------------------------------------------------------------")  # nopep8
         for violation in violations:
             print("{:<30} {:<20} {:<15} {:20}".format(
