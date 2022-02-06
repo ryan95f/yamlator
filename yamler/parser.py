@@ -42,20 +42,10 @@ class YamlerTransformer(Transformer):
     def required_rule(self, tokens):
         (name, rtype) = tokens
         return Rule(name.value, rtype, True)
-        # return {
-        #     "name": name.value,
-        #     "rtype": rtype,
-        #     "required": True
-        # }
 
     def optional_rule(self, tokens):
         (name, rtype) = tokens
         return Rule(name.value, rtype, False)
-        # return{
-        #     "name": name.value,
-        #     "rtype": rtype,
-        #     "required": False
-        # }
 
     def ruleset(self, tokens):
         name = tokens[0].value
