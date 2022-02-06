@@ -22,9 +22,9 @@ def main():
 
     if len(violations) > 0:
         print("\n{:<30} {:<20} {:<15} {:20}".format(
-                "Parent", "Key", "Violation", "Message"))
+                "Parent Key", "Key", "Violation", "Message"))
         print("---------------------------------------------------------------------------")  # nopep8
-        for violation in violations.values():
+        for violation in violations:
             print("{:<30} {:<20} {:<15} {:20}".format(
                 violation.parent,
                 violation.key,
