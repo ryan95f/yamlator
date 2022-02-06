@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Iterable
+from collections import deque
 
 from .types import Rule, Data, RuleType
 
@@ -21,7 +22,7 @@ class YamlerWrangler:
         self._instructions = instructions
         self._main = instructions.get('main', {})
 
-    def wrangle(self, yaml_data: dict) -> dict:
+    def wrangle(self, yaml_data: dict) -> deque:
         """Wrangle the YAML file to determine if there are any
         violations when compared to the rulesets
 
@@ -37,7 +38,7 @@ class YamlerWrangler:
         if yaml_data is None:
             raise ValueError("yaml_data should not be None")
 
-        self.violations = []
+        self.violations = deque()
         main_rules = self._main.get('rules', [])
         self._wrangle("-", yaml_data, main_rules)
         return self.violations
@@ -50,7 +51,7 @@ class YamlerWrangler:
                 continue
 
             if self._is_required_missing_data(sub_data, rule):
-                violation_type = RequiredViolation(rule.name, parent)
+                violation_type = RequiredViolation(key=rule.name, parent=parent)
                 self.violations.append(violation_type)
                 continue
 
@@ -63,16 +64,13 @@ class YamlerWrangler:
                 continue
 
             if self._has_incorrect_type(sub_data, rule.rtype):
-                violation_type = BuiltInTypeViolation(key=rule.name,
-                                                      parent=parent,
-                                                      expected_type=rule.rtype.type)
-                self.violations.append(violation_type)
+                self._resolve_incorrect_type(rule.name, parent, rule.rtype.type)
                 continue
 
-    def _is_optional_missing_data(self, data, rule: Rule) -> bool:
+    def _is_optional_missing_data(self, data: Data, rule: Rule) -> bool:
         return (not rule.is_required) and (data is None)
 
-    def _is_required_missing_data(self, data, rule: Rule) -> bool:
+    def _is_required_missing_data(self, data: Data, rule: Rule) -> bool:
         return (rule.is_required) and (data is None)
 
     def _is_ruleset_rule(self, rtype: RuleType) -> bool:
@@ -83,7 +81,7 @@ class YamlerWrangler:
 
     def _wrangler_ruleset(self, key: str, data: Data, rtype: RuleType) -> None:
         if not self._is_dict_type(data):
-            violation_type = RulesetTypeViolation(key, key)
+            violation_type = RulesetTypeViolation(key=key, parent=key)
             self.violations.append(violation_type)
             return
 
@@ -105,10 +103,7 @@ class YamlerWrangler:
                 continue
 
             if self._has_incorrect_type(item, rtype):
-                violation_type = BuiltInTypeViolation(key=current_key,
-                                                      parent=parent,
-                                                      expected_type=rtype.type)
-                self.violations.append(violation_type)
+                self._resolve_incorrect_type(current_key, parent, rtype.type)
                 continue
 
             if self._is_list_rule(rtype):
@@ -117,6 +112,10 @@ class YamlerWrangler:
 
     def _has_incorrect_type(self, data: Data, rtype: RuleType) -> bool:
         return type(data) != rtype.type
+
+    def _resolve_incorrect_type(self, key: str, parent: str, expected_type: type) -> None:
+        violation_type = BuiltInTypeViolation(key, parent, expected_type)
+        self.violations.append(violation_type)
 
 
 class ViolationType(Enum):

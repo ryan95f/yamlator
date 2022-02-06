@@ -8,7 +8,8 @@ Data = Union[dict, list, int, float, str]
 
 
 class RuleType:
-    def __init__(self, type: Union[str, type], lookup: str = None, sub_type=None):
+    def __init__(self, type: Union[str, type], lookup: str = None,
+                 sub_type: 'RuleType' = None):
         """RuleType constructor
 
         Args:
