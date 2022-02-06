@@ -55,11 +55,6 @@ class ImprovedWrangler:
                 continue
 
             if self._is_ruleset_rule(rule.rtype):
-                if not self._is_dict_type(sub_data):
-                    violation_type = RulesetTypeViolation(rule.name, parent)
-                    self.violations.append(violation_type)
-                    continue
-
                 self._wrangler_ruleset(rule.name, sub_data, rule.rtype)
                 continue
 
@@ -67,7 +62,7 @@ class ImprovedWrangler:
                 self._wrangle_lists(parent, rule.name, sub_data, rule.rtype['sub_type'])
                 continue
 
-            if self._has_incorrect_type(sub_data, rule):
+            if self._has_incorrect_type(sub_data, rule.rtype):
                 violation_type = BuiltInTypeViolation(key=rule.name,
                                                       parent=parent,
                                                       expected_type=rule.rtype['type'])
@@ -86,10 +81,15 @@ class ImprovedWrangler:
     def _is_dict_type(self, data: Data) -> bool:
         return type(data) == dict
 
-    def _wrangler_ruleset(self, parent: str, data: dict, rtype: dict) -> None:
+    def _wrangler_ruleset(self, key: str, data: Data, rtype: dict) -> None:
+        if not self._is_dict_type(data):
+            violation_type = RulesetTypeViolation(key, key)
+            self.violations.append(violation_type)
+            return
+
         lookup_name = rtype['lookup']
         ruleset = self._instructions['rules'].get(lookup_name, {})
-        self._wrangle(parent, data, ruleset['rules'])
+        self._wrangle(key, data, ruleset['rules'])
 
     def _is_list_rule(self, rtype: dict) -> bool:
         return rtype['type'] == list
@@ -97,17 +97,12 @@ class ImprovedWrangler:
     def _wrangle_lists(self, parent: str, key: str, list_data: list, rtype: dict) -> None:
         for idx, item in enumerate(list_data):
             current_key = f"{key}[{idx}]"
-            if self._is_ruleset_rule(rtype):
-                if not self._is_dict_type(item):
-                    violation_type = RulesetTypeViolation(key=current_key,
-                                                          parent=parent)
-                    self.violations.append(violation_type)
-                    continue
 
+            if self._is_ruleset_rule(rtype):
                 self._wrangler_ruleset(current_key, item, rtype)
                 continue
 
-            if type(item) != rtype['type']:
+            if self._has_incorrect_type(item, rtype):
                 violation_type = BuiltInTypeViolation(key=current_key,
                                                       parent=parent,
                                                       expected_type=rtype['type'])
@@ -118,9 +113,8 @@ class ImprovedWrangler:
                 self._wrangle_lists(current_key, current_key, item, rtype['sub_type'])
                 continue
 
-    def _has_incorrect_type(self, data: Data, rule: Rule) -> bool:
-        rtype = rule.rtype
-        return (type(data) != rtype['type'])
+    def _has_incorrect_type(self, data: Data, rtype: dict) -> bool:
+        return type(data) != rtype['type']
 
 
 class ViolationType(Enum):
@@ -129,8 +123,7 @@ class ViolationType(Enum):
 
 
 class Violation:
-    def __init__(self, key: str, parent: str, message: str,
-                 v_type: ViolationType):
+    def __init__(self, key: str, parent: str, message: str, v_type: ViolationType):
         self.key = key
         self.message = message
         self.parent = parent
