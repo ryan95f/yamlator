@@ -1,7 +1,7 @@
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
 from yamler.parser import YamlerParser
-from yamler.wrangler import ChianWrangler
+from yamler.handlers import ChianWrangler
 
 EXAMPLE_RULESET = "example/hello.yamler"
 TEST_YAML_FILE = "example/hello.yaml"
