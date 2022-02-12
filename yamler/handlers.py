@@ -1,15 +1,9 @@
-from abc import abstractmethod, ABC
-
-
-from enum import Enum
 from typing import Iterable
 from collections import deque
 from abc import ABC, abstractmethod
 
-from .types import Rule, Data, RuleType
+from .types import Rule
 
-
-# Chian of responsibility pattern
 
 class Handler(ABC):
     next: 'Handler' = None
@@ -48,29 +42,40 @@ class RequiredFieldHandler(Handler):
 class RuleSetTypeHandler(Handler):
     def __init__(self, instructions: dict) -> None:
         self.instructions = instructions
+        self._next_ruleset = None
+
+    def set_next_ruleset(self, next: Handler) -> Handler:
+        self._next_ruleset = next
+        return next
 
     def validate(self, key, data, parent, rule: Rule) -> None:
-        if not self._is_ruleset_rule(rule.rtype):
-            return
-
-        if not self._is_ruleset(data):
-            print(f"{key} is not a ruleset")
-            return
-
-        if self.next is not None:
+        if self._is_ruleset_rule(rule.rtype) and self._is_ruleset(data):
             lookup_name = rule.rtype.lookup
             ruleset = self.instructions['rules'].get(lookup_name, {})
+            
             rules: Iterable[Rule] = ruleset['rules']
-
             for r_rule in rules:
                 sub_data = data.get(r_rule.name, None)
-                self.next.validate(r_rule.name, sub_data, key, r_rule)
+                self._next_ruleset.validate(r_rule.name, sub_data, key, r_rule)
+
+        if self.next is not None:
+            self.next.validate(key, data, parent, rule)
 
     def _is_ruleset_rule(self, rtype) -> bool:
         return rtype.type == 'ruleset'
 
     def _is_ruleset(self, data):
         return type(data) == dict
+
+
+class ListTypeHandler(Handler):
+    def validate(self, key, data, parent, rule: Rule) -> None:
+        if rule.rtype.type == list:
+            for idx, item in enumerate(data):
+                print(item, rule)
+
+        if self.next is not None:
+            self.next.validate()
 
 
 class ChianWrangler:
@@ -93,7 +98,8 @@ class ChianWrangler:
         self.root = OptionalFieldHandler()
         required_handler = self.root.set_next(RequiredFieldHandler())
         ruleset_handler = required_handler.set_next(RuleSetTypeHandler(self._instructions))
-        ruleset_handler.set_next(self.root)
+        ruleset_handler.set_next_ruleset(self.root)
+        list_handler = ruleset_handler.set_next(ListTypeHandler())
 
     def wrangle(self, yaml_data: dict) -> deque:
         """Wrangle the YAML file to determine if there are any
