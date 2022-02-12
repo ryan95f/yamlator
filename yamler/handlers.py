@@ -2,7 +2,7 @@ from typing import Iterable
 from collections import deque
 from abc import ABC, abstractmethod
 
-from .types import Rule
+from .types import Data, Rule
 
 
 class Handler(ABC):
@@ -52,7 +52,7 @@ class RuleSetTypeHandler(Handler):
         if self._is_ruleset_rule(rule.rtype) and self._is_ruleset(data):
             lookup_name = rule.rtype.lookup
             ruleset = self.instructions['rules'].get(lookup_name, {})
-            
+
             rules: Iterable[Rule] = ruleset['rules']
             for r_rule in rules:
                 sub_data = data.get(r_rule.name, None)
@@ -126,3 +126,37 @@ class ChianWrangler:
         for rule in rules:
             sub_data = data.get(rule.name, None)
             self.root.validate(rule.name, sub_data, parent, rule)
+
+
+class Wrangler(ABC):
+    @abstractmethod
+    def wrangle(self, key: str, data: Data, parent: str, rule: Rule):
+        pass
+
+
+class OptionalWrangler(Wrangler):
+    def wrangle(self, key: str, data: Data, parent: str, rule: Rule):
+        is_optional = not rule.is_required
+        missing_data = data is None
+
+        if is_optional and missing_data:
+            return
+
+
+class RequiredWrangler(Wrangler):
+    def wrangle(self, key: str, data: Data, parent: str, rule: Rule):
+        is_required = rule.is_required
+        missing_data = data is None
+
+        if is_required and missing_data:
+            return
+
+
+class RuleSetWrangler(Wrangler):
+    def wrangle(self, key: str, data: Data, parent: str, rule: Rule):
+        pass
+
+
+class ListWrangler(Wrangler):
+    def wrangle(self, key: str, data: Data, parent: str, rule: Rule):
+        pass
