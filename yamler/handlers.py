@@ -1,8 +1,27 @@
+from __future__ import annotations
 from typing import Iterable
 from collections import deque
 from abc import ABC, abstractmethod
 
+from yamler.wrangler import RequiredViolation, Violation
+
+
 from .types import Data, Rule, RuleType
+
+
+class ViolationManager:
+    def __init__(self):
+        self._violations = deque()
+
+    @property
+    def violations(self):
+        return self._violations.copy()
+
+    def add_violation(self, violation: Violation):
+        self._violations.append(violation)
+
+    def clear(self):
+        self._violations.clear()
 
 
 class ChianWrangler:
@@ -22,10 +41,12 @@ class ChianWrangler:
         self._instructions = instructions
         self._main = instructions.get('main', {})
 
-        self.root = OptionalWrangler()
-        required_wrangler = RequiredWrangler()
-        ruleset_wrangler = RuleSetWrangler(self._instructions)
-        list_wrangler = ListWrangler()
+        self._violation_manager = ViolationManager()
+
+        self.root = OptionalWrangler(self._violation_manager)
+        required_wrangler = RequiredWrangler(self._violation_manager)
+        ruleset_wrangler = RuleSetWrangler(self._violation_manager, self._instructions)
+        list_wrangler = ListWrangler(self._violation_manager)
 
         self.root.set_next_wrangler(required_wrangler)
         required_wrangler.set_next_wrangler(ruleset_wrangler)
@@ -49,10 +70,10 @@ class ChianWrangler:
         if yaml_data is None:
             raise ValueError("yaml_data should not be None")
 
-        self.violations = deque()
+        self._violation_manager.clear()
         main_rules = self._main.get('rules', [])
         self._wrangle("-", yaml_data, main_rules)
-        return self.violations
+        return self._violation_manager.violations
 
     def _wrangle(self, parent: str, data: dict, rules: Iterable[Rule]) -> None:
         for rule in rules:
@@ -63,7 +84,10 @@ class ChianWrangler:
 class Wrangler(ABC):
     _next_wrangler = None
 
-    def set_next_wrangler(self, wrangler: 'Wrangler') -> 'Wrangler':
+    def __init__(self, violation_manager: ViolationManager) -> None:
+        self._violation_manager = violation_manager
+
+    def set_next_wrangler(self, wrangler: Wrangler) -> Wrangler:
         self._next_wrangler = wrangler
         return wrangler
 
@@ -88,7 +112,8 @@ class RequiredWrangler(Wrangler):
         missing_data = data is None
 
         if required and missing_data:
-            print(f"{key} is required")
+            violation = RequiredViolation(key, parent)
+            self._violation_manager.add_violation(violation)
             return
 
         if self._next_wrangler is not None:
@@ -96,8 +121,9 @@ class RequiredWrangler(Wrangler):
 
 
 class RuleSetWrangler(Wrangler):
-    def __init__(self, instructions: dict):
+    def __init__(self, violation_manager: ViolationManager, instructions: dict):
         self.instructions = instructions
+        super().__init__(violation_manager)
 
     def set_next_ruleset_wrangler(self, wrangler: Wrangler):
         self._ruleset_wrangler = wrangler
@@ -151,7 +177,6 @@ class ListWrangler(Wrangler):
                     data=item,
                     rtype=rtype.sub_type
                 )
-
 
     def _is_list_rule(self, rtype: RuleType):
         return rtype.type == list
