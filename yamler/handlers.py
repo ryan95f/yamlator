@@ -1,9 +1,13 @@
 from __future__ import annotations
+import re
 from typing import Iterable
 from collections import deque
 from abc import ABC, abstractmethod
 
-from yamler.wrangler import RequiredViolation, Violation
+from yamler.wrangler import RequiredViolation
+from yamler.wrangler import RulesetTypeViolation
+from yamler.wrangler import TypeViolation
+from yamler.wrangler import Violation
 
 
 from .types import Data, Rule, RuleType
@@ -47,12 +51,14 @@ class ChianWrangler:
         required_wrangler = RequiredWrangler(self._violation_manager)
         ruleset_wrangler = RuleSetWrangler(self._violation_manager, self._instructions)
         list_wrangler = ListWrangler(self._violation_manager)
+        type_wrangler = BuildInTypeWrangler(self._violation_manager)
 
         self.root.set_next_wrangler(required_wrangler)
         required_wrangler.set_next_wrangler(ruleset_wrangler)
         ruleset_wrangler.set_next_ruleset_wrangler(self.root)
         ruleset_wrangler.set_next_wrangler(list_wrangler)
         list_wrangler.set_ruleset_wrangler(ruleset_wrangler)
+        list_wrangler.set_next_wrangler(type_wrangler)
 
     def wrangle(self, yaml_data: dict) -> deque:
         """Wrangle the YAML file to determine if there are any
@@ -129,7 +135,13 @@ class RuleSetWrangler(Wrangler):
         self._ruleset_wrangler = wrangler
 
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
-        if self._is_ruleset_rule(rtype) and self._is_ruleset(data):
+        if self._is_ruleset_rule(rtype):
+
+            if not self._is_ruleset(data):
+                violation = RulesetTypeViolation(key, parent)
+                self._violation_manager.add_violation(violation)
+                return
+
             lookup_name = rtype.lookup
             ruleset = self.instructions['rules'].get(lookup_name, {})
 
@@ -178,5 +190,29 @@ class ListWrangler(Wrangler):
                     rtype=rtype.sub_type
                 )
 
+        if self._next_wrangler is not None:
+            self._next_wrangler.wrangle(key, data, parent, rtype, required)
+
     def _is_list_rule(self, rtype: RuleType):
         return rtype.type == list
+
+
+class BuildInTypeWrangler(Wrangler):
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
+        if type(data) != rtype.type and rtype.type != 'ruleset':
+            violation = TypeViolation(
+                key=key,
+                parent=parent,
+                message=f"{key} should be of type {rtype.type}"
+            )
+            self._violation_manager.add_violation(violation)
+            return
+
+        if self._next_wrangler is not None:
+            self._next_wrangler.wrangle(
+                key=key,
+                parent=parent,
+                data=data,
+                rtype=rtype,
+                required=required
+            )
