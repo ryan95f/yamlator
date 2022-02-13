@@ -1,5 +1,4 @@
 from __future__ import annotations
-import re
 from typing import Iterable
 from collections import deque
 from abc import ABC, abstractmethod
@@ -98,32 +97,41 @@ class Wrangler(ABC):
         return wrangler
 
     @abstractmethod
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
-        pass
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False):
+
+        if self._next_wrangler is not None:
+            self._next_wrangler.wrangle(
+                key=key,
+                data=data,
+                parent=parent,
+                rtype=rtype,
+                is_required=is_required
+            )
 
 
 class OptionalWrangler(Wrangler):
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
-        missing_data = data is None
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False):
 
-        if not required and missing_data:
+        missing_data = data is None
+        if not is_required and missing_data:
             return
 
-        if self._next_wrangler is not None:
-            self._next_wrangler.wrangle(key, data, parent, rtype, required)
+        super().wrangle(key, data, parent, rtype, is_required)
 
 
 class RequiredWrangler(Wrangler):
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
-        missing_data = data is None
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False):
 
-        if required and missing_data:
+        missing_data = data is None
+        if is_required and missing_data:
             violation = RequiredViolation(key, parent)
             self._violation_manager.add_violation(violation)
             return
 
-        if self._next_wrangler is not None:
-            self._next_wrangler.wrangle(key, data, parent, rtype, required)
+        super().wrangle(key, data, parent, rtype, is_required)
 
 
 class RuleSetWrangler(Wrangler):
@@ -134,30 +142,31 @@ class RuleSetWrangler(Wrangler):
     def set_next_ruleset_wrangler(self, wrangler: Wrangler):
         self._ruleset_wrangler = wrangler
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
-        if self._is_ruleset_rule(rtype):
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False):
 
-            if not self._is_ruleset(data):
-                violation = RulesetTypeViolation(key, parent)
-                self._violation_manager.add_violation(violation)
-                return
+        if not self._is_ruleset_rule(rtype):
+            super().wrangle(key, data, parent, rtype, is_required)
+            return
 
-            lookup_name = rtype.lookup
-            ruleset = self.instructions['rules'].get(lookup_name, {})
+        if not self._is_ruleset(data):
+            violation = RulesetTypeViolation(key, parent)
+            self._violation_manager.add_violation(violation)
+            return
 
-            rules: Iterable[Rule] = ruleset['rules']
-            for r_rule in rules:
-                sub_data = data.get(r_rule.name, None)
-                self._ruleset_wrangler.wrangle(
-                    key=r_rule.name,
-                    data=sub_data,
-                    parent=key,
-                    rtype=r_rule.rtype,
-                    required=r_rule.is_required
-                )
+        ruleset_lookup_name = rtype.lookup
+        ruleset = self.instructions['rules'].get(ruleset_lookup_name, {})
+        ruleset_rules: Iterable[Rule] = ruleset['rules']
 
-        if self._next_wrangler is not None:
-            self._next_wrangler.wrangle(key, data, parent, rtype, required)
+        for ruleset_rule in ruleset_rules:
+            sub_data = data.get(ruleset_rule.name, None)
+            self._ruleset_wrangler.wrangle(
+                key=ruleset_rule.name,
+                data=sub_data,
+                parent=key,
+                rtype=ruleset_rule.rtype,
+                is_required=ruleset_rule.is_required
+            )
 
     def _is_ruleset_rule(self, rtype) -> bool:
         return rtype.type == 'ruleset'
@@ -167,52 +176,50 @@ class RuleSetWrangler(Wrangler):
 
 
 class ListWrangler(Wrangler):
+    ruleset_wrangler: Wrangler = None
+
     def set_ruleset_wrangler(self, wrangler: Wrangler):
         self.ruleset_wrangler = wrangler
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
-        if self._is_list_rule(rtype):
-            for idx, item in enumerate(data):
-                current_key = f"{key}[{idx}]"
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False):
 
-                # loop over any nested lists
-                self.wrangle(
-                    key=current_key,
-                    parent=current_key,
-                    data=item,
-                    rtype=rtype.sub_type
-                )
+        if not self._is_list_rule(rtype):
+            super().wrangle(key, data, parent, rtype, is_required)
+            return
 
+        for idx, item in enumerate(data):
+            current_key = f"{key}[{idx}]"
+
+            # loop over any nested lists
+            self.wrangle(
+                key=current_key,
+                parent=key,
+                data=item,
+                rtype=rtype.sub_type
+            )
+
+            if self.ruleset_wrangler is not None:
                 self.ruleset_wrangler.wrangle(
                     key=current_key,
-                    parent=parent,
+                    parent=key,
                     data=item,
                     rtype=rtype.sub_type
                 )
-
-        if self._next_wrangler is not None:
-            self._next_wrangler.wrangle(key, data, parent, rtype, required)
 
     def _is_list_rule(self, rtype: RuleType):
         return rtype.type == list
 
 
 class BuildInTypeWrangler(Wrangler):
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
-        if type(data) != rtype.type and rtype.type != 'ruleset':
-            violation = TypeViolation(
-                key=key,
-                parent=parent,
-                message=f"{key} should be of type {rtype.type}"
-            )
-            self._violation_manager.add_violation(violation)
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False):
+
+        if type(data) == rtype.type:
+            super().wrangle(key, data, parent, rtype, is_required)
             return
 
-        if self._next_wrangler is not None:
-            self._next_wrangler.wrangle(
-                key=key,
-                parent=parent,
-                data=data,
-                rtype=rtype,
-                required=required
-            )
+        if rtype.type != 'ruleset':
+            message = f"{key} should be of type {rtype.type}"
+            violation = TypeViolation(key, parent, message)
+            self._violation_manager.add_violation(violation)
