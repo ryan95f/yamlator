@@ -1,5 +1,3 @@
-import enum
-from turtle import rt
 from typing import Iterable
 from collections import deque
 from abc import ABC, abstractmethod
@@ -33,6 +31,7 @@ class ChianWrangler:
         required_wrangler.set_next_wrangler(ruleset_wrangler)
         ruleset_wrangler.set_next_ruleset_wrangler(self.root)
         ruleset_wrangler.set_next_wrangler(list_wrangler)
+        list_wrangler.set_ruleset_wrangler(ruleset_wrangler)
 
     def wrangle(self, yaml_data: dict) -> deque:
         """Wrangle the YAML file to determine if there are any
@@ -130,10 +129,29 @@ class RuleSetWrangler(Wrangler):
 
 
 class ListWrangler(Wrangler):
+    def set_ruleset_wrangler(self, wrangler: Wrangler):
+        self.ruleset_wrangler = wrangler
+
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
         if self._is_list_rule(rtype):
             for idx, item in enumerate(data):
-                print(item)
+                current_key = f"{key}[{idx}]"
+
+                # loop over any nested lists
+                self.wrangle(
+                    key=current_key,
+                    parent=current_key,
+                    data=item,
+                    rtype=rtype.sub_type
+                )
+
+                self.ruleset_wrangler.wrangle(
+                    key=current_key,
+                    parent=parent,
+                    data=item,
+                    rtype=rtype.sub_type
+                )
+
 
     def _is_list_rule(self, rtype: RuleType):
         return rtype.type == list
