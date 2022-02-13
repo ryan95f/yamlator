@@ -1,8 +1,24 @@
+from __future__ import annotations
 from enum import Enum
 from typing import Iterable
 from collections import deque
 
 from .types import Rule, Data, RuleType
+
+
+class ViolationManager:
+    def __init__(self):
+        self._violations = deque()
+
+    @property
+    def violations(self):
+        return self._violations.copy()
+
+    def add_violation(self, violation: Violation):
+        self._violations.append(violation)
+
+    def clear(self):
+        self._violations.clear()
 
 
 class YamlerWrangler:
@@ -158,7 +174,7 @@ class RequiredViolation(Violation):
             key     (str):  The key name in the YAML file
             parent  (str):  The parent key in the YAML file
         """
-        message = f"{key} is required"
+        message = f"{key} is missing"
         super().__init__(key, parent, message, ViolationType.REQUIRED)
 
 

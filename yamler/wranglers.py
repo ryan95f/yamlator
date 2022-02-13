@@ -6,25 +6,10 @@ from abc import ABC, abstractmethod
 from yamler.violations import RequiredViolation
 from yamler.violations import RulesetTypeViolation
 from yamler.violations import TypeViolation
-from yamler.violations import Violation
+from yamler.violations import ViolationManager
 
 
 from .types import Data, Rule, RuleType
-
-
-class ViolationManager:
-    def __init__(self):
-        self._violations = deque()
-
-    @property
-    def violations(self):
-        return self._violations.copy()
-
-    def add_violation(self, violation: Violation):
-        self._violations.append(violation)
-
-    def clear(self):
-        self._violations.clear()
 
 
 def wrangle_data(yaml_data: dict, instructions: dict) -> deque:
@@ -217,6 +202,6 @@ class BuildInTypeWrangler(Wrangler):
             return
 
         if rtype.type != 'ruleset':
-            message = f"{key} should be of type {rtype.type}"
+            message = f"{key} should be of type {rtype.type.__name__}"
             violation = TypeViolation(key, parent, message)
             self._violation_manager.add_violation(violation)
