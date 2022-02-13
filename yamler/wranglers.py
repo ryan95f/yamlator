@@ -3,10 +3,10 @@ from typing import Iterable
 from collections import deque
 from abc import ABC, abstractmethod
 
-from yamler.wrangler import RequiredViolation
-from yamler.wrangler import RulesetTypeViolation
-from yamler.wrangler import TypeViolation
-from yamler.wrangler import Violation
+from yamler.violations import RequiredViolation
+from yamler.violations import RulesetTypeViolation
+from yamler.violations import TypeViolation
+from yamler.violations import Violation
 
 
 from .types import Data, Rule, RuleType
