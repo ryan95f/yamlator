@@ -27,63 +27,48 @@ class ViolationManager:
         self._violations.clear()
 
 
-class ChianWrangler:
-    def __init__(self, instructions: dict):
-        """YamlerWrangler constructor
+def wrangle_data(yaml_data: dict, instructions: dict) -> deque:
+    entry_parent = "-"
+    violation_mgnr = ViolationManager()
+    entry_point = instructions.get('main', {})
 
-        Args:
-            instructions (dict): Contains the main ruleset and a list of
-            other rulesets
+    wranglers = _create_wrangler_chain(
+        instructions=instructions,
+        violation_manager=violation_mgnr
+    )
 
-        Raises:
-            ValueError: If instructions is None
-        """
-        if instructions is None:
-            raise ValueError("instructions should not be None")
+    entry_point_rules: Iterable[Rule] = entry_point.get('rules', [])
+    for rule in entry_point_rules:
+        sub_data = yaml_data.get(rule.name, None)
 
-        self._instructions = instructions
-        self._main = instructions.get('main', {})
+        wranglers.wrangle(
+            key=rule.name,
+            data=sub_data,
+            parent=entry_parent,
+            rtype=rule.rtype,
+            is_required=rule.is_required
+        )
 
-        self._violation_manager = ViolationManager()
+    return violation_mgnr.violations
 
-        self.root = OptionalWrangler(self._violation_manager)
-        required_wrangler = RequiredWrangler(self._violation_manager)
-        ruleset_wrangler = RuleSetWrangler(self._violation_manager, self._instructions)
-        list_wrangler = ListWrangler(self._violation_manager)
-        type_wrangler = BuildInTypeWrangler(self._violation_manager)
 
-        self.root.set_next_wrangler(required_wrangler)
-        required_wrangler.set_next_wrangler(ruleset_wrangler)
-        ruleset_wrangler.set_next_ruleset_wrangler(self.root)
-        ruleset_wrangler.set_next_wrangler(list_wrangler)
-        list_wrangler.set_ruleset_wrangler(ruleset_wrangler)
-        list_wrangler.set_next_wrangler(type_wrangler)
+def _create_wrangler_chain(instructions: dict,
+                           violation_manager: ViolationManager) -> Wrangler:
 
-    def wrangle(self, yaml_data: dict) -> deque:
-        """Wrangle the YAML file to determine if there are any
-        violations when compared to the rulesets
+    root = OptionalWrangler(violation_manager)
+    required_wrangler = RequiredWrangler(violation_manager)
+    ruleset_wrangler = RuleSetWrangler(violation_manager, instructions)
+    list_wrangler = ListWrangler(violation_manager)
+    type_wrangler = BuildInTypeWrangler(violation_manager)
 
-        Args:
-            yaml_data (dict): The yaml data represented as a dict
+    root.set_next_wrangler(required_wrangler)
+    required_wrangler.set_next_wrangler(ruleset_wrangler)
+    ruleset_wrangler.set_next_ruleset_wrangler(root)
+    ruleset_wrangler.set_next_wrangler(list_wrangler)
+    list_wrangler.set_ruleset_wrangler(ruleset_wrangler)
+    list_wrangler.set_next_wrangler(type_wrangler)
 
-        Returns:
-            A `dict` of violations that were detected
-
-        Raises:
-            ValueError: If `yaml_data` is None
-        """
-        if yaml_data is None:
-            raise ValueError("yaml_data should not be None")
-
-        self._violation_manager.clear()
-        main_rules = self._main.get('rules', [])
-        self._wrangle("-", yaml_data, main_rules)
-        return self._violation_manager.violations
-
-    def _wrangle(self, parent: str, data: dict, rules: Iterable[Rule]) -> None:
-        for rule in rules:
-            sub_data = data.get(rule.name, None)
-            self.root.wrangle(rule.name, sub_data, parent, rule.rtype, rule.is_required)
+    return root
 
 
 class Wrangler(ABC):
@@ -154,9 +139,7 @@ class RuleSetWrangler(Wrangler):
             self._violation_manager.add_violation(violation)
             return
 
-        ruleset_lookup_name = rtype.lookup
-        ruleset = self.instructions['rules'].get(ruleset_lookup_name, {})
-        ruleset_rules: Iterable[Rule] = ruleset['rules']
+        ruleset_rules = self._retrieve_next_ruleset(rtype.lookup)
 
         for ruleset_rule in ruleset_rules:
             sub_data = data.get(ruleset_rule.name, None)
@@ -168,11 +151,15 @@ class RuleSetWrangler(Wrangler):
                 is_required=ruleset_rule.is_required
             )
 
-    def _is_ruleset_rule(self, rtype) -> bool:
+    def _is_ruleset_rule(self, rtype: RuleType) -> bool:
         return rtype.type == 'ruleset'
 
-    def _is_ruleset(self, data):
+    def _is_ruleset(self, data: Data) -> bool:
         return type(data) == dict
+
+    def _retrieve_next_ruleset(self, ruleset_name: str) -> Iterable[Rule]:
+        ruleset = self.instructions['rules'].get(ruleset_name, {})
+        return ruleset.get('rules', [])
 
 
 class ListWrangler(Wrangler):
@@ -199,16 +186,26 @@ class ListWrangler(Wrangler):
                 rtype=rtype.sub_type
             )
 
-            if self.ruleset_wrangler is not None:
-                self.ruleset_wrangler.wrangle(
-                    key=current_key,
-                    parent=key,
-                    data=item,
-                    rtype=rtype.sub_type
-                )
+            # a list could contain ruleset items
+            # so need to run each item through that wrangler
+            self._run_ruleset_wrangler(
+                key=current_key,
+                parent=key,
+                data=item,
+                rtype=rtype.sub_type
+            )
 
     def _is_list_rule(self, rtype: RuleType):
         return rtype.type == list
+
+    def _run_ruleset_wrangler(self, key: str, parent: str, data: Data, rtype: RuleType):
+        if self.ruleset_wrangler is not None:
+            self.ruleset_wrangler.wrangle(
+                key=key,
+                parent=parent,
+                data=data,
+                rtype=rtype
+            )
 
 
 class BuildInTypeWrangler(Wrangler):
