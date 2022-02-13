@@ -1,81 +1,10 @@
+import enum
+from turtle import rt
 from typing import Iterable
 from collections import deque
 from abc import ABC, abstractmethod
 
-from .types import Data, Rule
-
-
-class Handler(ABC):
-    next: 'Handler' = None
-
-    def set_next(self, next: 'Handler') -> 'Handler':
-        self.next = next
-        return next
-
-    @abstractmethod
-    def validate(self, key, data, parent, rule: Rule) -> None:
-        pass
-
-
-class OptionalFieldHandler(Handler):
-    def validate(self, key, data, parent, rule: Rule) -> None:
-        is_optional = not rule.is_required
-
-        if is_optional and (data is None):
-            return
-
-        if self.next is not None:
-            self.next.validate(key, data, parent, rule)
-
-
-class RequiredFieldHandler(Handler):
-    def validate(self, key, data, parent, rule: Rule) -> None:
-        is_required = rule.is_required
-        if is_required and (data is None):
-            print(f"{key} is required")
-            return
-
-        if self.next is not None:
-            self.next.validate(key, data, parent, rule)
-
-
-class RuleSetTypeHandler(Handler):
-    def __init__(self, instructions: dict) -> None:
-        self.instructions = instructions
-        self._next_ruleset = None
-
-    def set_next_ruleset(self, next: Handler) -> Handler:
-        self._next_ruleset = next
-        return next
-
-    def validate(self, key, data, parent, rule: Rule) -> None:
-        if self._is_ruleset_rule(rule.rtype) and self._is_ruleset(data):
-            lookup_name = rule.rtype.lookup
-            ruleset = self.instructions['rules'].get(lookup_name, {})
-
-            rules: Iterable[Rule] = ruleset['rules']
-            for r_rule in rules:
-                sub_data = data.get(r_rule.name, None)
-                self._next_ruleset.validate(r_rule.name, sub_data, key, r_rule)
-
-        if self.next is not None:
-            self.next.validate(key, data, parent, rule)
-
-    def _is_ruleset_rule(self, rtype) -> bool:
-        return rtype.type == 'ruleset'
-
-    def _is_ruleset(self, data):
-        return type(data) == dict
-
-
-class ListTypeHandler(Handler):
-    def validate(self, key, data, parent, rule: Rule) -> None:
-        if rule.rtype.type == list:
-            for idx, item in enumerate(data):
-                print(item, rule)
-
-        if self.next is not None:
-            self.next.validate()
+from .types import Data, Rule, RuleType
 
 
 class ChianWrangler:
@@ -95,11 +24,15 @@ class ChianWrangler:
         self._instructions = instructions
         self._main = instructions.get('main', {})
 
-        self.root = OptionalFieldHandler()
-        required_handler = self.root.set_next(RequiredFieldHandler())
-        ruleset_handler = required_handler.set_next(RuleSetTypeHandler(self._instructions))
-        ruleset_handler.set_next_ruleset(self.root)
-        list_handler = ruleset_handler.set_next(ListTypeHandler())
+        self.root = OptionalWrangler()
+        required_wrangler = RequiredWrangler()
+        ruleset_wrangler = RuleSetWrangler(self._instructions)
+        list_wrangler = ListWrangler()
+
+        self.root.set_next_wrangler(required_wrangler)
+        required_wrangler.set_next_wrangler(ruleset_wrangler)
+        ruleset_wrangler.set_next_ruleset_wrangler(self.root)
+        ruleset_wrangler.set_next_wrangler(list_wrangler)
 
     def wrangle(self, yaml_data: dict) -> deque:
         """Wrangle the YAML file to determine if there are any
@@ -125,38 +58,82 @@ class ChianWrangler:
     def _wrangle(self, parent: str, data: dict, rules: Iterable[Rule]) -> None:
         for rule in rules:
             sub_data = data.get(rule.name, None)
-            self.root.validate(rule.name, sub_data, parent, rule)
+            self.root.wrangle(rule.name, sub_data, parent, rule.rtype, rule.is_required)
 
 
 class Wrangler(ABC):
+    _next_wrangler = None
+
+    def set_next_wrangler(self, wrangler: 'Wrangler') -> 'Wrangler':
+        self._next_wrangler = wrangler
+        return wrangler
+
     @abstractmethod
-    def wrangle(self, key: str, data: Data, parent: str, rule: Rule):
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
         pass
 
 
 class OptionalWrangler(Wrangler):
-    def wrangle(self, key: str, data: Data, parent: str, rule: Rule):
-        is_optional = not rule.is_required
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
         missing_data = data is None
 
-        if is_optional and missing_data:
+        if not required and missing_data:
             return
+
+        if self._next_wrangler is not None:
+            self._next_wrangler.wrangle(key, data, parent, rtype, required)
 
 
 class RequiredWrangler(Wrangler):
-    def wrangle(self, key: str, data: Data, parent: str, rule: Rule):
-        is_required = rule.is_required
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
         missing_data = data is None
 
-        if is_required and missing_data:
+        if required and missing_data:
+            print(f"{key} is required")
             return
+
+        if self._next_wrangler is not None:
+            self._next_wrangler.wrangle(key, data, parent, rtype, required)
 
 
 class RuleSetWrangler(Wrangler):
-    def wrangle(self, key: str, data: Data, parent: str, rule: Rule):
-        pass
+    def __init__(self, instructions: dict):
+        self.instructions = instructions
+
+    def set_next_ruleset_wrangler(self, wrangler: Wrangler):
+        self._ruleset_wrangler = wrangler
+
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
+        if self._is_ruleset_rule(rtype) and self._is_ruleset(data):
+            lookup_name = rtype.lookup
+            ruleset = self.instructions['rules'].get(lookup_name, {})
+
+            rules: Iterable[Rule] = ruleset['rules']
+            for r_rule in rules:
+                sub_data = data.get(r_rule.name, None)
+                self._ruleset_wrangler.wrangle(
+                    key=r_rule.name,
+                    data=sub_data,
+                    parent=key,
+                    rtype=r_rule.rtype,
+                    required=r_rule.is_required
+                )
+
+        if self._next_wrangler is not None:
+            self._next_wrangler.wrangle(key, data, parent, rtype, required)
+
+    def _is_ruleset_rule(self, rtype) -> bool:
+        return rtype.type == 'ruleset'
+
+    def _is_ruleset(self, data):
+        return type(data) == dict
 
 
 class ListWrangler(Wrangler):
-    def wrangle(self, key: str, data: Data, parent: str, rule: Rule):
-        pass
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType, required=False):
+        if self._is_list_rule(rtype):
+            for idx, item in enumerate(data):
+                print(item)
+
+    def _is_list_rule(self, rtype: RuleType):
+        return rtype.type == list
