@@ -105,8 +105,18 @@ class OptionalWrangler(Wrangler):
 
 
 class RequiredWrangler(Wrangler):
+    """Wrangler for handling data that is required. If a required value
+    is None, then it is added to the violation manager.
+
+    Args:
+        key         (str): The key that owns the data
+        data        (Data): The data to wrangler
+        parent      (str): The parent key of the data
+        rtype       (RuleType): The type assigned to the rule
+        is_required (bool): Os the rule required
+    """
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False):
+                is_required: bool = False) -> None:
 
         missing_data = data is None
         if is_required and missing_data:

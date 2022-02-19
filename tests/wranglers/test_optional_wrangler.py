@@ -1,18 +1,14 @@
 import unittest
 
+from .base import BaseWranglerTest
+
 from unittest.mock import Mock, patch
 from parameterized import parameterized
-from yamler.types import Data, RuleType
+from yamler.types import Data
 from yamler.wranglers import OptionalWrangler
-from yamler.violations import ViolationManager
 
 
-class TestOptionalWrangler(unittest.TestCase):
-    def setUp(self):
-        self.parent = '-'
-        self.key = 'msg'
-        self.rtype = RuleType(type=str)
-        self.violation_manager = ViolationManager
+class TestOptionalWrangler(BaseWranglerTest):
 
     @parameterized.expand([
         ('with_optional_data', False, 'hello world', 1),
