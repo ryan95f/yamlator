@@ -269,8 +269,21 @@ class ListWrangler(Wrangler):
 
 
 class BuildInTypeWrangler(Wrangler):
+    """Wrangler to handle the build in types. e.g `int`, `list` & `str`"""
+
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False):
+                is_required: bool = False) -> None:
+        """Wrangle the data to valid its data type. If the data matches
+        the rule, then it is passed onto the next stage in the chain otherwise
+        a `TypeViolation` is added to the violation manager.
+
+        Args:
+            key         (str): The key that owns the data
+            data        (Data): The data to wrangler
+            parent      (str): The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool): Os the rule required
+        """
 
         if type(data) == rtype.type:
             super().wrangle(key, data, parent, rtype, is_required)
@@ -280,3 +293,5 @@ class BuildInTypeWrangler(Wrangler):
             message = f"{key} should be of type {rtype.type.__name__}"
             violation = TypeViolation(key, parent, message)
             self._violation_manager.add_violation(violation)
+        else:
+            super().wrangle(key, data, parent, rtype, is_required)
