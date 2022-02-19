@@ -48,8 +48,10 @@ def _create_wrangler_chain(instructions: dict,
 
     root.set_next_wrangler(required_wrangler)
     required_wrangler.set_next_wrangler(ruleset_wrangler)
+
     ruleset_wrangler.set_next_ruleset_wrangler(root)
     ruleset_wrangler.set_next_wrangler(list_wrangler)
+
     list_wrangler.set_ruleset_wrangler(ruleset_wrangler)
     list_wrangler.set_next_wrangler(type_wrangler)
 
@@ -105,18 +107,20 @@ class OptionalWrangler(Wrangler):
 
 
 class RequiredWrangler(Wrangler):
-    """Wrangler for handling data that is required. If a required value
-    is None, then it is added to the violation manager.
+    """Wrangler for handling data that is required"""
 
-    Args:
-        key         (str): The key that owns the data
-        data        (Data): The data to wrangler
-        parent      (str): The parent key of the data
-        rtype       (RuleType): The type assigned to the rule
-        is_required (bool): Os the rule required
-    """
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
                 is_required: bool = False) -> None:
+        """Wrangle the data for required fields. If a required value
+        is None, then it is added to the violation manager.
+
+        Args:
+            key         (str): The key that owns the data
+            data        (Data): The data to wrangler
+            parent      (str): The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool): Os the rule required
+        """
 
         missing_data = data is None
         if is_required and missing_data:
@@ -128,15 +132,42 @@ class RequiredWrangler(Wrangler):
 
 
 class RuleSetWrangler(Wrangler):
+    """Wrangler for handling rulesets"""
+
+    _ruleset_wrangler: Wrangler = None
+
     def __init__(self, violation_manager: ViolationManager, instructions: dict):
+        """RuleSetWrangler Constructor
+
+        Args:
+            violation_manager (ViolationManager):   Violation manager
+            instructions (dict):                    A dict container references to
+            other rulesets
+        """
         self.instructions = instructions
         super().__init__(violation_manager)
 
-    def set_next_ruleset_wrangler(self, wrangler: Wrangler):
+    def set_next_ruleset_wrangler(self, wrangler: Wrangler) -> None:
+        """Set the next wrangler for handling nested rulesets in the data
+
+        Args:
+            wrangler (Wrangler): The wrangler to add to the chain
+        """
         self._ruleset_wrangler = wrangler
 
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
                 is_required: bool = False):
+        """Wrangle the data rulesets and call the chain on the data itself to validate it.
+        If the current rule is not a ruleset then the next wrangler is called
+        in the chain. If the data is not in a dict format then a  type violation is added.
+
+        Args:
+            key         (str): The key that owns the data
+            data        (Data): The data to wrangler
+            parent      (str): The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool): Os the rule required
+        """
 
         if not self._is_ruleset_rule(rtype):
             super().wrangle(key, data, parent, rtype, is_required)
@@ -151,13 +182,15 @@ class RuleSetWrangler(Wrangler):
 
         for ruleset_rule in ruleset_rules:
             sub_data = data.get(ruleset_rule.name, None)
-            self._ruleset_wrangler.wrangle(
-                key=ruleset_rule.name,
-                data=sub_data,
-                parent=key,
-                rtype=ruleset_rule.rtype,
-                is_required=ruleset_rule.is_required
-            )
+
+            if self._ruleset_wrangler is not None:
+                self._ruleset_wrangler.wrangle(
+                    key=ruleset_rule.name,
+                    data=sub_data,
+                    parent=key,
+                    rtype=ruleset_rule.rtype,
+                    is_required=ruleset_rule.is_required
+                )
 
     def _is_ruleset_rule(self, rtype: RuleType) -> bool:
         return rtype.type == 'ruleset'
