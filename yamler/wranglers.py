@@ -81,8 +81,21 @@ class Wrangler(ABC):
 
 
 class OptionalWrangler(Wrangler):
+    """Wrangler for handling optional rules"""
+
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False):
+                is_required: bool = False) -> None:
+        """Wrangle the data to find any optional rules. If an optional rule is
+        found and is None, then the next stage in the chain is not called otherwise
+        it will be called.
+
+        Args:
+            key         (str): The key that owns the data
+            data        (Data): The data to wrangler
+            parent      (str): The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool): Os the rule required
+        """
 
         missing_data = data is None
         if not is_required and missing_data:
