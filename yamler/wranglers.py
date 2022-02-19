@@ -159,7 +159,7 @@ class RuleSetWrangler(Wrangler):
                 is_required: bool = False):
         """Wrangle the data rulesets and call the chain on the data itself to validate it.
         If the current rule is not a ruleset then the next wrangler is called
-        in the chain. If the data is not in a dict format then a  type violation is added.
+        in the chain. If the data is not in a dict format then a type violation is added.
 
         Args:
             key         (str): The key that owns the data
@@ -204,13 +204,32 @@ class RuleSetWrangler(Wrangler):
 
 
 class ListWrangler(Wrangler):
+    """Wrangler for handling list types"""
+
     ruleset_wrangler: Wrangler = None
 
-    def set_ruleset_wrangler(self, wrangler: Wrangler):
+    def set_ruleset_wrangler(self, wrangler: Wrangler) -> None:
+        """Set a wrangler for when nested rulesets are within the list
+
+        Args:
+            wrangler (Wrangler): The wrangler to handle rulesets
+        """
         self.ruleset_wrangler = wrangler
 
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False):
+                is_required: bool = False) -> None:
+        """Wrangle the list data. If there is nested lists then this method
+        will be recursively called. Any rulesets that are within the list will
+        be handled by an additional wrangler that can be set with `set_ruleset_wrangler`.
+        Any data type that is not a list is sent to the next wrangler.
+
+        Args:
+            key         (str): The key that owns the data
+            data        (Data): The data to wrangler
+            parent      (str): The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool): Os the rule required
+        """
 
         if not self._is_list_rule(rtype):
             super().wrangle(key, data, parent, rtype, is_required)
