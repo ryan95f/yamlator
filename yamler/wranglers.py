@@ -45,14 +45,16 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
 def _create_wrangler_chain(instructions: dict,
                            violation_manager: ViolationManager) -> Wrangler:
 
-    root = OptionalWrangler(violation_manager)
+    root = AnyTypeWrangler(violation_manager)
+    optional_wrangler = OptionalWrangler(violation_manager)
     required_wrangler = RequiredWrangler(violation_manager)
     map_wrangler = MapWrangler(violation_manager)
     ruleset_wrangler = RuleSetWrangler(violation_manager, instructions)
     list_wrangler = ListWrangler(violation_manager)
     type_wrangler = BuildInTypeWrangler(violation_manager)
 
-    root.set_next_wrangler(required_wrangler)
+    root.set_next_wrangler(optional_wrangler)
+    optional_wrangler.set_next_wrangler(required_wrangler)
     required_wrangler.set_next_wrangler(map_wrangler)
     map_wrangler.set_next_wrangler(ruleset_wrangler)
 
@@ -320,12 +322,18 @@ class BuildInTypeWrangler(Wrangler):
             super().wrangle(key, data, parent, rtype, is_required)
             return
 
-        if rtype.type != 'ruleset':
+        if not self._is_ruleset_type(rtype) and not self._is_any_type(rtype):
             message = f"{key} should be of type {rtype.type.__name__}"
             violation = TypeViolation(key, parent, message)
             self._violation_manager.add_violation(violation)
         else:
             super().wrangle(key, data, parent, rtype, is_required)
+
+    def _is_ruleset_type(self, rtype: RuleType) -> bool:
+        return rtype.type == 'ruleset'
+
+    def _is_any_type(self, rtype: RuleType):
+        return rtype.type == 'any'
 
 
 class MapWrangler(Wrangler):
@@ -362,3 +370,21 @@ class MapWrangler(Wrangler):
 
     def _is_map_type(self, data: Data):
         return type(data) == dict
+
+
+class AnyTypeWrangler(Wrangler):
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False) -> None:
+
+        if self._is_any_type(rtype):
+            return
+
+        super().wrangle(
+                key=key,
+                data=data,
+                parent=parent,
+                rtype=rtype,
+                is_required=is_required)
+
+    def _is_any_type(self, rtype: RuleType):
+        return rtype.type == 'any'

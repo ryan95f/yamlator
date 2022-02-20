@@ -93,6 +93,9 @@ class YamlerTransformer(Transformer):
     def map_type(self, tokens):
         return RuleType(type=dict, sub_type=tokens[0])
 
+    def any_type(self, tokens):
+        return RuleType(type='any')
+
     def type(self, tokens):
         (t, ) = tokens
         return t
