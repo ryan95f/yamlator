@@ -332,7 +332,7 @@ class MapWrangler(Wrangler):
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
                 is_required: bool = False) -> None:
 
-        if not rtype.type == dict:
+        if not self._is_map_rule(rtype):
             super().wrangle(key, data, parent, rtype, is_required)
             return
 
@@ -342,3 +342,6 @@ class MapWrangler(Wrangler):
                 data=value,
                 parent=key,
                 rtype=rtype.sub_type)
+
+    def _is_map_rule(self, rtype: RuleType):
+        return rtype.type == dict

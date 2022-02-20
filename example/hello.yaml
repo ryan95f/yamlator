@@ -3,7 +3,7 @@ root:
   surname: hello
   age: r
 my_map:
-  test1: 1
+  test1: wow
   test2: 2
 numbers:
   - name: wow
