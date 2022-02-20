@@ -45,16 +45,15 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
 def _create_wrangler_chain(instructions: dict,
                            violation_manager: ViolationManager) -> Wrangler:
 
-    root = AnyTypeWrangler(violation_manager)
-    optional_wrangler = OptionalWrangler(violation_manager)
+    root = OptionalWrangler(violation_manager)
+    any_type_wrangler = AnyTypeWrangler(violation_manager)
     required_wrangler = RequiredWrangler(violation_manager)
     map_wrangler = MapWrangler(violation_manager)
     ruleset_wrangler = RuleSetWrangler(violation_manager, instructions)
     list_wrangler = ListWrangler(violation_manager)
     type_wrangler = BuildInTypeWrangler(violation_manager)
 
-    root.set_next_wrangler(optional_wrangler)
-    optional_wrangler.set_next_wrangler(required_wrangler)
+    root.set_next_wrangler(required_wrangler)
     required_wrangler.set_next_wrangler(map_wrangler)
     map_wrangler.set_next_wrangler(ruleset_wrangler)
 
@@ -62,8 +61,9 @@ def _create_wrangler_chain(instructions: dict,
     ruleset_wrangler.set_next_wrangler(list_wrangler)
 
     list_wrangler.set_ruleset_wrangler(ruleset_wrangler)
-    list_wrangler.set_next_wrangler(type_wrangler)
+    list_wrangler.set_next_wrangler(any_type_wrangler)
 
+    any_type_wrangler.set_next_wrangler(type_wrangler)
     return root
 
 
@@ -322,7 +322,7 @@ class BuildInTypeWrangler(Wrangler):
             super().wrangle(key, data, parent, rtype, is_required)
             return
 
-        if not self._is_ruleset_type(rtype) and not self._is_any_type(rtype):
+        if not self._is_ruleset_type(rtype):
             message = f"{key} should be of type {rtype.type.__name__}"
             violation = TypeViolation(key, parent, message)
             self._violation_manager.add_violation(violation)
@@ -331,9 +331,6 @@ class BuildInTypeWrangler(Wrangler):
 
     def _is_ruleset_type(self, rtype: RuleType) -> bool:
         return rtype.type == 'ruleset'
-
-    def _is_any_type(self, rtype: RuleType):
-        return rtype.type == 'any'
 
 
 class MapWrangler(Wrangler):
