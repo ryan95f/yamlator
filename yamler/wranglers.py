@@ -47,12 +47,14 @@ def _create_wrangler_chain(instructions: dict,
 
     root = OptionalWrangler(violation_manager)
     required_wrangler = RequiredWrangler(violation_manager)
+    map_wrangler = MapWrangler(violation_manager)
     ruleset_wrangler = RuleSetWrangler(violation_manager, instructions)
     list_wrangler = ListWrangler(violation_manager)
     type_wrangler = BuildInTypeWrangler(violation_manager)
 
     root.set_next_wrangler(required_wrangler)
-    required_wrangler.set_next_wrangler(ruleset_wrangler)
+    required_wrangler.set_next_wrangler(map_wrangler)
+    map_wrangler.set_next_wrangler(ruleset_wrangler)
 
     ruleset_wrangler.set_next_ruleset_wrangler(root)
     ruleset_wrangler.set_next_wrangler(list_wrangler)
@@ -258,7 +260,7 @@ class ListWrangler(Wrangler):
             rtype       (RuleType): The type assigned to the rule
             is_required (bool):     Is the rule required
         """
-        if not self._is_list_rule(rtype):
+        if not self._is_list_rule(rtype) or type(data) != list:
             super().wrangle(key, data, parent, rtype, is_required)
             return
 
@@ -303,7 +305,7 @@ class BuildInTypeWrangler(Wrangler):
 
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
                 is_required: bool = False) -> None:
-        """Wrangle the data to valid its data type. If the data matches
+        """Wrangle the data to validate its data type. If the data matches
         the rule, then it is passed onto the next stage in the chain otherwise
         a `TypeViolation` is added to the violation manager.
 
@@ -314,7 +316,6 @@ class BuildInTypeWrangler(Wrangler):
             rtype       (RuleType): The type assigned to the rule
             is_required (bool):     Is the rule required
         """
-
         if type(data) == rtype.type:
             super().wrangle(key, data, parent, rtype, is_required)
             return
@@ -325,3 +326,39 @@ class BuildInTypeWrangler(Wrangler):
             self._violation_manager.add_violation(violation)
         else:
             super().wrangle(key, data, parent, rtype, is_required)
+
+
+class MapWrangler(Wrangler):
+    """Wrangler to handle map types"""
+
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False) -> None:
+        """Wrangle map data. If the rule type is not a map, then this is
+        passed to the next item in the chain. If it is a map type, then each
+        element is iterated over and the wrangler will call itself to iterate
+        over any nested maps.
+
+        Args:
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool):     Is the rule required
+        """
+
+        if not self._is_map_rule(rtype) or not self._is_map_type(data):
+            super().wrangle(key, data, parent, rtype, is_required)
+            return
+
+        for child_key, value in data.items():
+            self.wrangle(
+                key=child_key,
+                data=value,
+                parent=key,
+                rtype=rtype.sub_type)
+
+    def _is_map_rule(self, rtype: RuleType):
+        return rtype.type == dict
+
+    def _is_map_type(self, data: Data):
+        return type(data) == dict

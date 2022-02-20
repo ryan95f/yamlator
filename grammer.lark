@@ -7,11 +7,13 @@
 type: int_type
      | str_type
      | list_type
+     | map_type
      | ruleset_type
 
 str_type: "str"
 int_type: "int"
 list_type: "list""(" type ")"
+map_type: "map""(" type ")"
 ruleset_type: "("/[a-zA-Z0-9]+/")"
 
 primitives: ESCAPED_STRING
@@ -20,9 +22,9 @@ primitives: ESCAPED_STRING
 ?rule: required_rule
      | optional_rule
 
-required_rule: /[a-zA-Z0-9]+/ type "required"
-             | /[a-zA-Z0-9]+/ type
-optional_rule: /[a-zA-Z0-9]+/ type "optional"
+required_rule: /[a-zA-Z0-9_]+/ type "required"
+             | /[a-zA-Z0-9_]+/ type
+optional_rule: /[a-zA-Z0-9_]+/ type "optional"
 
 main_ruleset: "ruleset" "main" "{" rule+ "}"
 ruleset: "ruleset" /[a-z]+/ "{" rule+ "}"
