@@ -24,7 +24,8 @@ def create_complex_ruleset():
                                            sub_type=RuleType(type=list,
                                                              sub_type=RuleType(type=int))), False),  # nopep8
                 Rule('personList', RuleType(type=list, sub_type=RuleType(type="ruleset", lookup="person")), False),  # nopep8
-                Rule('person', RuleType(type="ruleset", lookup="person"), False)
+                Rule('person', RuleType(type="ruleset", lookup="person"), False),
+                Rule('my_map', RuleType(type=dict, sub_type=RuleType(type=str)), False)
             ]
         },
         "rules": {
@@ -104,7 +105,25 @@ class TestWrangleData(unittest.TestCase):
         }, 1),
         ("invalid_list_ruleset_type", COMPLEX_RULESET, {
             "personList": [0, 2, 3]
-        }, 3)
+        }, 3),
+        ('valid_dict_type', COMPLEX_RULESET, {
+            "my_map": {
+                "val1": "Hello",
+                "val2": "World"
+            }
+        }, 0),
+        ('invalid_subtype_map_type', COMPLEX_RULESET, {
+            "my_map": {
+                "val1": 1,
+                "val2": []
+            }
+        }, 2),
+        ('invalid_map_type', COMPLEX_RULESET, {
+            "my_map": []
+        }, 1),
+        ('valid_empty_map_type', COMPLEX_RULESET, {
+            'my_map': {}
+        }, 0)
     ])
     def test_wrangler(self, name, ruleset, data, expected_violations_count):
         violations = wrangle_data(data, ruleset)

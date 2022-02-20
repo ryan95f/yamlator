@@ -346,7 +346,7 @@ class MapWrangler(Wrangler):
             is_required (bool):     Is the rule required
         """
 
-        if not self._is_map_rule(rtype):
+        if not self._is_map_rule(rtype) or not self._is_map_type(data):
             super().wrangle(key, data, parent, rtype, is_required)
             return
 
@@ -359,3 +359,6 @@ class MapWrangler(Wrangler):
 
     def _is_map_rule(self, rtype: RuleType):
         return rtype.type == dict
+
+    def _is_map_type(self, data: Data):
+        return type(data) == dict
