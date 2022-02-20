@@ -1,8 +1,8 @@
 import unittest
 
 from parameterized import parameterized
-from yamler.wrangler import YamlerWrangler
-from yamler.types import Rule, RuleType
+from yamler.wranglers import wrangle_data
+from yamler.types import Data, Rule, RuleType
 
 
 def create_flat_ruleset():
@@ -42,23 +42,16 @@ FLAT_RULESET = create_flat_ruleset()
 COMPLEX_RULESET = create_complex_ruleset()
 
 
-class TestYamlerWranglerNew(unittest.TestCase):
+class TestWrangleData(unittest.TestCase):
+
     @parameterized.expand([
-        ("empty_instructions", {}),
-        ("valid_instructions", FLAT_RULESET)
+        ('none_data', None, FLAT_RULESET),
+        ('none_instructions', {'message': 'hello'}, None),
+        ('none_data_and_instructions', None, None),
     ])
-    def test_constructor(self, name, rulesets):
-        wrangler = YamlerWrangler(rulesets)
-        self.assertIsNotNone(wrangler)
-
-    def test_constructor_none_instructions(self):
+    def test_wrangler_invalid_parameters(self, name: str, data: Data, instructions: dict):
         with self.assertRaises(ValueError):
-            YamlerWrangler(None)
-
-    def test_wrangler_none_data(self):
-        wrangler = YamlerWrangler(FLAT_RULESET)
-        with self.assertRaises(ValueError):
-            wrangler.wrangle(None)
+            wrangle_data(data, instructions)
 
     @parameterized.expand([
         ("empty_data_and_rules", {}, {}, 0),
@@ -114,8 +107,7 @@ class TestYamlerWranglerNew(unittest.TestCase):
         }, 3)
     ])
     def test_wrangler(self, name, ruleset, data, expected_violations_count):
-        wrangler = YamlerWrangler(ruleset)
-        violations = wrangler.wrangle(data)
+        violations = wrangle_data(data, ruleset)
         self.assertEqual(expected_violations_count, len(violations))
 
 
