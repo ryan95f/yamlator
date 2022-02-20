@@ -13,6 +13,7 @@ def main():
 
     parser = YamlerParser()
     tokens = parser.parse(ruleset)
+    print(tokens)
 
     violations = wrangle_data(yaml_data, tokens)
 

@@ -90,6 +90,9 @@ class YamlerTransformer(Transformer):
     def list_type(self, tokens):
         return RuleType(type=list, sub_type=tokens[0])
 
+    def map_type(self, tokens):
+        return RuleType(type=dict, sub_type=tokens[0])
+
     def type(self, tokens):
         (t, ) = tokens
         return t

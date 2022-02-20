@@ -14,5 +14,6 @@ ruleset main {
     number int
     root (person) required
     person (person) optional
+    my_map map(int) required
     numbers list((address))
 }
