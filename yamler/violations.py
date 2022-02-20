@@ -1,9 +1,6 @@
 from __future__ import annotations
 from enum import Enum
-from typing import Iterable
 from collections import deque
-
-from .types import Rule, Data, RuleType
 
 
 class ViolationManager:
@@ -19,119 +16,6 @@ class ViolationManager:
 
     def clear(self):
         self._violations.clear()
-
-
-class YamlerWrangler:
-    def __init__(self, instructions: dict):
-        """YamlerWrangler constructor
-
-        Args:
-            instructions (dict): Contains the main ruleset and a list of
-            other rulesets
-
-        Raises:
-            ValueError: If instructions is None
-        """
-        if instructions is None:
-            raise ValueError("instructions should not be None")
-
-        self._instructions = instructions
-        self._main = instructions.get('main', {})
-
-    def wrangle(self, yaml_data: dict) -> deque:
-        """Wrangle the YAML file to determine if there are any
-        violations when compared to the rulesets
-
-        Args:
-            yaml_data (dict): The yaml data represented as a dict
-
-        Returns:
-            A `dict` of violations that were detected
-
-        Raises:
-            ValueError: If `yaml_data` is None
-        """
-        if yaml_data is None:
-            raise ValueError("yaml_data should not be None")
-
-        self.violations = deque()
-        main_rules = self._main.get('rules', [])
-        self._wrangle("-", yaml_data, main_rules)
-        return self.violations
-
-    def _wrangle(self, parent: str, data: dict, rules: Iterable[Rule]) -> None:
-        for rule in rules:
-            sub_data = data.get(rule.name, None)
-
-            if self._is_optional_missing_data(sub_data, rule):
-                continue
-
-            if self._is_required_missing_data(sub_data, rule):
-                violation_type = RequiredViolation(key=rule.name, parent=parent)
-                self.violations.append(violation_type)
-                continue
-
-            if self._is_ruleset_rule(rule.rtype):
-                self._wrangler_ruleset(rule.name, sub_data, rule.rtype)
-                continue
-
-            if self._is_list_rule(rule.rtype):
-                self._wrangle_lists(parent, rule.name, sub_data, rule.rtype.sub_type)
-                continue
-
-            if self._has_incorrect_type(sub_data, rule.rtype):
-                self._resolve_incorrect_type(rule.name, parent, rule.rtype.type)
-                continue
-
-    def _is_optional_missing_data(self, data: Data, rule: Rule) -> bool:
-        return (not rule.is_required) and (data is None)
-
-    def _is_required_missing_data(self, data: Data, rule: Rule) -> bool:
-        return (rule.is_required) and (data is None)
-
-    def _is_ruleset_rule(self, rtype: RuleType) -> bool:
-        return rtype.type == 'ruleset'
-
-    def _is_dict_type(self, data: Data) -> bool:
-        return type(data) == dict
-
-    def _wrangler_ruleset(self, key: str, data: Data, rtype: RuleType) -> None:
-        if not self._is_dict_type(data):
-            violation_type = RulesetTypeViolation(key=key, parent=key)
-            self.violations.append(violation_type)
-            return
-
-        lookup_name = rtype.lookup
-        ruleset = self._instructions['rules'].get(lookup_name, {})
-        self._wrangle(key, data, ruleset['rules'])
-
-    def _is_list_rule(self, rtype: RuleType) -> bool:
-        return rtype.type == list
-
-    def _wrangle_lists(self, parent: str, key: str, list_data: list,
-                       rtype: RuleType) -> None:
-
-        for idx, item in enumerate(list_data):
-            current_key = f"{key}[{idx}]"
-
-            if self._is_ruleset_rule(rtype):
-                self._wrangler_ruleset(current_key, item, rtype)
-                continue
-
-            if self._has_incorrect_type(item, rtype):
-                self._resolve_incorrect_type(current_key, parent, rtype.type)
-                continue
-
-            if self._is_list_rule(rtype):
-                self._wrangle_lists(current_key, current_key, item, rtype.sub_type)
-                continue
-
-    def _has_incorrect_type(self, data: Data, rtype: RuleType) -> bool:
-        return type(data) != rtype.type
-
-    def _resolve_incorrect_type(self, key: str, parent: str, expected_type: type) -> None:
-        violation_type = BuiltInTypeViolation(key, parent, expected_type)
-        self.violations.append(violation_type)
 
 
 class ViolationType(Enum):
