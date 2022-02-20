@@ -1,19 +1,23 @@
 from __future__ import annotations
-from turtle import rt
+from abc import ABC
 from typing import Iterable
 from collections import deque
-from abc import ABC
 
 from yamler.violations import RequiredViolation
 from yamler.violations import RulesetTypeViolation
 from yamler.violations import TypeViolation
 from yamler.violations import ViolationManager
 
-
 from .types import Data, Rule, RuleType
 
 
-def wrangle_data(yaml_data: dict, instructions: dict) -> deque:
+def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
+    if yaml_data is None:
+        raise ValueError("yaml_data should not be None")
+
+    if instructions is None:
+        raise ValueError("instructions should not be None")
+
     entry_parent = "-"
     violation_mgnr = ViolationManager()
     entry_point = instructions.get('main', {})

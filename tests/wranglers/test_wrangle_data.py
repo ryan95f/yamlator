@@ -2,7 +2,7 @@ import unittest
 
 from parameterized import parameterized
 from yamler.wranglers import wrangle_data
-from yamler.types import Rule, RuleType
+from yamler.types import Data, Rule, RuleType
 
 
 def create_flat_ruleset():
@@ -43,6 +43,16 @@ COMPLEX_RULESET = create_complex_ruleset()
 
 
 class TestWrangleData(unittest.TestCase):
+
+    @parameterized.expand([
+        ('none_data', None, FLAT_RULESET),
+        ('none_instructions', {'message': 'hello'}, None),
+        ('none_data_and_instructions', None, None),
+    ])
+    def test_wrangler_invalid_parameters(self, name: str, data: Data, instructions: dict):
+        with self.assertRaises(ValueError):
+            wrangle_data(data, instructions)
+
     @parameterized.expand([
         ("empty_data_and_rules", {}, {}, 0),
         ("empty_rules", {}, {"message": "hello"}, 0),
