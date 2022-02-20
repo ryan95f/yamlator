@@ -15,7 +15,7 @@ class TestListWrangler(BaseWranglerTest):
 
     @parameterized.expand([
         ('with_non_list_type', RuleType(type=str), 'hello', 0),
-        ('with_list_type', RuleType(type=list, sub_type=RuleType(int)), [0, 1, 2, 3], 4),
+        ('with_list_type', RuleType(type=list, sub_type=RuleType(int)), [0, 1, 2, 3], 0),
         ('with_ruleset_list_type', RuleType(
             type=list, sub_type=RuleType(
                 type='ruleset', lookup='message'
@@ -26,7 +26,7 @@ class TestListWrangler(BaseWranglerTest):
                 type=list, sub_type=RuleType(
                     type=int)
                 )
-        ), [[0, 1, 2], [3, 4, 5]], 8)
+        ), [[0, 1, 2], [3, 4, 5]], 0)
     ])
     def test_list_wrangler(self, name: str, rtype: RuleType, data: str,
                            ruleset_wrangler_call_count: int):

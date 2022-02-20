@@ -1,4 +1,5 @@
 from __future__ import annotations
+from turtle import rt
 from typing import Iterable
 from collections import deque
 from abc import ABC, abstractmethod
@@ -230,7 +231,6 @@ class ListWrangler(Wrangler):
             rtype       (RuleType): The type assigned to the rule
             is_required (bool): Os the rule required
         """
-
         if not self._is_list_rule(rtype):
             super().wrangle(key, data, parent, rtype, is_required)
             return
@@ -259,7 +259,10 @@ class ListWrangler(Wrangler):
         return rtype.type == list
 
     def _run_ruleset_wrangler(self, key: str, parent: str, data: Data, rtype: RuleType):
-        if self.ruleset_wrangler is not None:
+        has_ruleset_wrangler = self.ruleset_wrangler is not None
+        is_ruleset_rule = rtype.type == 'ruleset'
+
+        if has_ruleset_wrangler and is_ruleset_rule:
             self.ruleset_wrangler.wrangle(
                 key=key,
                 parent=parent,
