@@ -4,7 +4,10 @@ from collections import deque
 
 
 class ViolationManager:
+    """Manages the total violations that are found during the wrangling process"""
+
     def __init__(self):
+        """ViolationManager constructor"""
         self._violations = deque()
 
     @property
@@ -28,10 +31,12 @@ class Violation:
         """Violation constructor
 
         Args:
-            key     (str):  The key name in the YAML file
-            parent  (str):  The parent key in the YAML file
-            message (str):  The message with information regarding the violation
-            v_type  (str):  The violation type. Either `REQUIRED` or `TYPE`
+            key     (str):              The key name in the YAML file
+            parent  (str):              The parent key in the YAML file
+            message (str):              The message with information regarding
+            the violation
+
+            v_type  (ViolationType):    The violation type. Either `REQUIRED` or `TYPE`
         """
         self.key = key
         self.message = message
