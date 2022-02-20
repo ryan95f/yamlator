@@ -2,7 +2,7 @@ from __future__ import annotations
 from turtle import rt
 from typing import Iterable
 from collections import deque
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from yamler.violations import RequiredViolation
 from yamler.violations import RulesetTypeViolation
@@ -63,15 +63,36 @@ class Wrangler(ABC):
     _next_wrangler = None
 
     def __init__(self, violation_manager: ViolationManager) -> None:
+        """Wrangler constructor
+
+        Args:
+            violation_manager (ViolationManager): Manges the total violations in the chain
+        """
         self._violation_manager = violation_manager
 
     def set_next_wrangler(self, wrangler: Wrangler) -> Wrangler:
+        """Set the next wrangler in the chain
+
+        Args:
+            wrangler (Wrangler): The next wrangler in the chain
+
+        Returns:
+            The object that was provided in the `wrangler` parameter
+        """
         self._next_wrangler = wrangler
         return wrangler
 
-    @abstractmethod
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
                 is_required: bool = False):
+        """Wrangler the data to detect violations
+
+        Args:
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool):     Is the rule required
+        """
 
         if self._next_wrangler is not None:
             self._next_wrangler.wrangle(
@@ -93,11 +114,11 @@ class OptionalWrangler(Wrangler):
         it will be called.
 
         Args:
-            key         (str): The key that owns the data
-            data        (Data): The data to wrangler
-            parent      (str): The parent key of the data
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool): Os the rule required
+            is_required (bool):     Is the rule required
         """
 
         missing_data = data is None
@@ -116,11 +137,11 @@ class RequiredWrangler(Wrangler):
         is None, then it is added to the violation manager.
 
         Args:
-            key         (str): The key that owns the data
-            data        (Data): The data to wrangler
-            parent      (str): The parent key of the data
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool): Os the rule required
+            is_required (bool):     Is the rule required
         """
 
         missing_data = data is None
@@ -141,7 +162,9 @@ class RuleSetWrangler(Wrangler):
         """RuleSetWrangler Constructor
 
         Args:
-            violation_manager (ViolationManager):   Violation manager
+            violation_manager (ViolationManager):   Manges the total violations
+            in the chain
+
             instructions (dict):                    A dict container references to
             other rulesets
         """
@@ -163,11 +186,11 @@ class RuleSetWrangler(Wrangler):
         in the chain. If the data is not in a dict format then a type violation is added.
 
         Args:
-            key         (str): The key that owns the data
-            data        (Data): The data to wrangler
-            parent      (str): The parent key of the data
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool): Os the rule required
+            is_required (bool):     Is the rule required
         """
 
         if not self._is_ruleset_rule(rtype):
@@ -225,11 +248,11 @@ class ListWrangler(Wrangler):
         Any data type that is not a list is sent to the next wrangler.
 
         Args:
-            key         (str): The key that owns the data
-            data        (Data): The data to wrangler
-            parent      (str): The parent key of the data
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool): Os the rule required
+            is_required (bool):     Is the rule required
         """
         if not self._is_list_rule(rtype):
             super().wrangle(key, data, parent, rtype, is_required)
@@ -281,11 +304,11 @@ class BuildInTypeWrangler(Wrangler):
         a `TypeViolation` is added to the violation manager.
 
         Args:
-            key         (str): The key that owns the data
-            data        (Data): The data to wrangler
-            parent      (str): The parent key of the data
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool): Os the rule required
+            is_required (bool):     Is the rule required
         """
 
         if type(data) == rtype.type:
