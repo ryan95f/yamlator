@@ -372,6 +372,17 @@ class MapWrangler(Wrangler):
 class AnyTypeWrangler(Wrangler):
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
                 is_required: bool = False) -> None:
+        """Wrangle data when the rule marks the key as any type. This effectively
+        ignores all type checks against the key. Any other rule that has a type
+        besides `any` is passed onto the next wrangler in the chain.
+
+        Args:
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool):     Is the rule required
+        """
 
         if self._is_any_type(rtype):
             return
