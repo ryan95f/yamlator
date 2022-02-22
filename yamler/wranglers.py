@@ -370,6 +370,10 @@ class MapWrangler(Wrangler):
 
 
 class AnyTypeWrangler(Wrangler):
+    """Wrangler to handle the `any` type, which ignores all type
+    checks against the data
+    """
+
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
                 is_required: bool = False) -> None:
         """Wrangle data when the rule marks the key as any type. This effectively
