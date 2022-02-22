@@ -46,6 +46,7 @@ def _create_wrangler_chain(instructions: dict,
                            violation_manager: ViolationManager) -> Wrangler:
 
     root = OptionalWrangler(violation_manager)
+    any_type_wrangler = AnyTypeWrangler(violation_manager)
     required_wrangler = RequiredWrangler(violation_manager)
     map_wrangler = MapWrangler(violation_manager)
     ruleset_wrangler = RuleSetWrangler(violation_manager, instructions)
@@ -60,8 +61,9 @@ def _create_wrangler_chain(instructions: dict,
     ruleset_wrangler.set_next_wrangler(list_wrangler)
 
     list_wrangler.set_ruleset_wrangler(ruleset_wrangler)
-    list_wrangler.set_next_wrangler(type_wrangler)
+    list_wrangler.set_next_wrangler(any_type_wrangler)
 
+    any_type_wrangler.set_next_wrangler(type_wrangler)
     return root
 
 
@@ -320,12 +322,15 @@ class BuildInTypeWrangler(Wrangler):
             super().wrangle(key, data, parent, rtype, is_required)
             return
 
-        if rtype.type != 'ruleset':
+        if not self._is_ruleset_type(rtype):
             message = f"{key} should be of type {rtype.type.__name__}"
             violation = TypeViolation(key, parent, message)
             self._violation_manager.add_violation(violation)
         else:
             super().wrangle(key, data, parent, rtype, is_required)
+
+    def _is_ruleset_type(self, rtype: RuleType) -> bool:
+        return rtype.type == 'ruleset'
 
 
 class MapWrangler(Wrangler):
@@ -362,3 +367,36 @@ class MapWrangler(Wrangler):
 
     def _is_map_type(self, data: Data):
         return type(data) == dict
+
+
+class AnyTypeWrangler(Wrangler):
+    """Wrangler to handle the `any` type, which ignores all type
+    checks against the data
+    """
+
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False) -> None:
+        """Wrangle data when the rule marks the key as any type. This effectively
+        ignores all type checks against the key. Any other rule that has a type
+        besides `any` is passed onto the next wrangler in the chain.
+
+        Args:
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool):     Is the rule required
+        """
+
+        if self._is_any_type(rtype):
+            return
+
+        super().wrangle(
+                key=key,
+                data=data,
+                parent=parent,
+                rtype=rtype,
+                is_required=is_required)
+
+    def _is_any_type(self, rtype: RuleType):
+        return rtype.type == 'any'

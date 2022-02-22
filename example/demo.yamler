@@ -1,0 +1,11 @@
+ruleset project {
+    version str
+    projectId str
+    displayName str
+    iam_permission list(str)
+    labels map(str)
+}
+
+ruleset main {
+    project (project)
+}

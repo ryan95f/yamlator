@@ -10,7 +10,7 @@ def create_flat_ruleset():
         'main': {
             'rules': [
                 Rule('message', RuleType(type=str), True),
-                Rule('number', RuleType(type=int), False)
+                Rule('number', RuleType(type=int), False),
             ]
         },
     }
@@ -25,7 +25,9 @@ def create_complex_ruleset():
                                                              sub_type=RuleType(type=int))), False),  # nopep8
                 Rule('personList', RuleType(type=list, sub_type=RuleType(type="ruleset", lookup="person")), False),  # nopep8
                 Rule('person', RuleType(type="ruleset", lookup="person"), False),
-                Rule('my_map', RuleType(type=dict, sub_type=RuleType(type=str)), False)
+                Rule('my_map', RuleType(type=dict, sub_type=RuleType(type=str)), False),
+                Rule('my_any_list', RuleType(
+                    type=list, sub_type=RuleType(type='any')), False)
             ]
         },
         "rules": {
@@ -123,6 +125,9 @@ class TestWrangleData(unittest.TestCase):
         }, 1),
         ('valid_empty_map_type', COMPLEX_RULESET, {
             'my_map': {}
+        }, 0),
+        ('valid_any_type_list', COMPLEX_RULESET, {
+            'my_any_list': [1, 2, None, 'hello']
         }, 0)
     ])
     def test_wrangler(self, name, ruleset, data, expected_violations_count):
