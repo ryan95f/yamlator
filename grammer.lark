@@ -9,6 +9,7 @@ type: int_type
      | list_type
      | map_type
      | any_type
+     | enum_type
      | ruleset_type
 
 str_type: "str"
@@ -17,6 +18,7 @@ any_type: "any"
 list_type: "list""(" type ")"
 map_type: "map""(" type ")"
 ruleset_type: "("/[a-zA-Z0-9]+/")"
+enum_type: /[A-Z]{1}[a-z0-9_]+/
 
 primitives: ESCAPED_STRING
           | INT -> number

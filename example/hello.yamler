@@ -21,4 +21,5 @@ ruleset main {
     person (person) optional
     my_map map(int) required
     numbers list((address))
+    enum1 Status required
 }
