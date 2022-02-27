@@ -31,8 +31,9 @@ optional_rule: /[a-zA-Z0-9_]+/ type "optional"
 main_ruleset: "ruleset" "main" "{" rule+ "}"
 ruleset: "ruleset" /[a-z]+/ "{" rule+ "}"
 
-list: "[" primitives [("," primitives)+] "]"
-enum: "enum" /[a-z]+/ "=" list
+
+enum: "enum" /[A-Z]{1}[a-z0-9_]+/ "{" enum_item+ "}"
+enum_item: /[A-Z0-9_]+/ "=" /[A-Z0-9_]+/
 
 NEW_LINES: "\n"+
 

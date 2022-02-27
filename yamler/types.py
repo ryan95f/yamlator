@@ -1,3 +1,5 @@
+from abc import ABC
+from enum import Enum
 from typing import Union
 from collections import namedtuple
 
@@ -37,3 +39,26 @@ class RuleType:
         return repr_template.format(self.__class__.__name__,
                                     self.type.__name__,
                                     self.sub_type)
+
+
+class ContainerTypes(Enum):
+    RULESET = 0
+    ENUM = 1
+
+
+class YamlerType:
+    def __init__(self, name: str, type: ContainerTypes):
+        self.name = name
+        self.type = type
+
+
+class YamlerRuleSet(YamlerType):
+    def __init__(self, name: str, rules: list):
+        super().__init__(name, ContainerTypes.RULESET)
+        self.rules = rules
+
+
+class YamlerEnum(YamlerType):
+    def __init__(self, name: str, items: list):
+        super().__init__(name, ContainerTypes.ENUM)
+        self.items = items

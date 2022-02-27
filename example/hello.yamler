@@ -1,3 +1,8 @@
+enum Status {
+    SUCCESS = 0
+    ERROR = 1
+}
+
 ruleset address {
     road str required
 }

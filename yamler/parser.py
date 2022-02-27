@@ -2,7 +2,8 @@ from lark import Lark
 from lark import Transformer
 from lark.exceptions import UnexpectedEOF
 
-from .types import Rule
+
+from .types import Rule, YamlerRuleSet, YamlerEnum
 from .types import RuleType
 
 
@@ -51,23 +52,17 @@ class YamlerTransformer(Transformer):
     def ruleset(self, tokens):
         name = tokens[0].value
         rules = tokens[1:]
-        return {
-            "name": name,
-            "rules": rules
-        }
+        return YamlerRuleSet(name, rules)
 
     def main_ruleset(self, tokens):
         rules = tokens
-        return {
-            'name': 'main',
-            'rules': rules
-        }
+        return YamlerRuleSet("main", rules)
 
     def start(self, instructions):
         root = None
         rules = {}
         for instruction in instructions:
-            name = instruction.get('name')
+            name = instruction.name
             if name == 'main':
                 root = instruction
             else:
@@ -96,8 +91,15 @@ class YamlerTransformer(Transformer):
     def any_type(self, tokens):
         return RuleType(type='any')
 
+    def enum_item(self, tokens):
+        name, value = tokens
+        return {'name': name.value, 'value': value.value}
+
+    def enum(self, tokens):
+        name = tokens[0]
+        items = tokens[1:]
+        return YamlerEnum(name, items)
+
     def type(self, tokens):
         (t, ) = tokens
         return t
-
-    list = list

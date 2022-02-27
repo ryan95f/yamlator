@@ -8,7 +8,7 @@ from yamler.violations import RulesetTypeViolation
 from yamler.violations import TypeViolation
 from yamler.violations import ViolationManager
 
-from .types import Data, Rule, RuleType
+from .types import Data, Rule, RuleType, YamlerRuleSet
 
 
 def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
@@ -20,14 +20,14 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
 
     entry_parent = "-"
     violation_mgnr = ViolationManager()
-    entry_point = instructions.get('main', {})
+    entry_point: YamlerRuleSet = instructions.get('main', {})
 
     wranglers = _create_wrangler_chain(
         instructions=instructions,
         violation_manager=violation_mgnr
     )
 
-    entry_point_rules: Iterable[Rule] = entry_point.get('rules', [])
+    entry_point_rules: Iterable[Rule] = entry_point.rules
     for rule in entry_point_rules:
         sub_data = yaml_data.get(rule.name, None)
 
@@ -232,7 +232,7 @@ class RuleSetWrangler(Wrangler):
 
     def _retrieve_next_ruleset(self, ruleset_name: str) -> Iterable[Rule]:
         ruleset = self.instructions['rules'].get(ruleset_name, {})
-        return ruleset.get('rules', [])
+        return ruleset.rules
 
 
 class ListWrangler(Wrangler):
