@@ -3,8 +3,11 @@ from lark import Lark
 from lark import Transformer
 from lark.exceptions import UnexpectedEOF
 
-
-from .types import ContainerTypes, Rule, YamlerRuleSet, YamlerEnum, YamlerType
+from .types import Rule
+from .types import ContainerTypes
+from .types import YamlerRuleSet
+from .types import YamlerEnum
+from .types import YamlerType
 from .types import RuleType
 
 
@@ -109,7 +112,7 @@ class YamlerTransformer(Transformer):
     def enum(self, tokens):
         name = tokens[0]
         items = tokens[1:]
-        return YamlerEnum(name, items)
+        return YamlerEnum(name.value, items)
 
     def type(self, tokens):
         (t, ) = tokens

@@ -8,7 +8,7 @@ from yamler.violations import RulesetTypeViolation
 from yamler.violations import TypeViolation
 from yamler.violations import ViolationManager
 
-from .types import Data, Rule, RuleType, YamlerRuleSet
+from .types import Data, Rule, RuleType, YamlerEnum, YamlerRuleSet
 
 
 def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
@@ -23,7 +23,8 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
     entry_point: YamlerRuleSet = instructions.get('main', {})
 
     wranglers = _create_wrangler_chain(
-        instructions=instructions,
+        ruleset_lookups=instructions,
+        enum_looksups=instructions.get("enums", {}),
         violation_manager=violation_mgnr
     )
 
@@ -42,15 +43,17 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
     return violation_mgnr.violations
 
 
-def _create_wrangler_chain(instructions: dict,
+def _create_wrangler_chain(ruleset_lookups: dict,
+                           enum_looksups: dict,
                            violation_manager: ViolationManager) -> Wrangler:
 
     root = OptionalWrangler(violation_manager)
     any_type_wrangler = AnyTypeWrangler(violation_manager)
     required_wrangler = RequiredWrangler(violation_manager)
     map_wrangler = MapWrangler(violation_manager)
-    ruleset_wrangler = RuleSetWrangler(violation_manager, instructions)
+    ruleset_wrangler = RuleSetWrangler(violation_manager, ruleset_lookups)
     list_wrangler = ListWrangler(violation_manager)
+    enum_wrangler = EnumTypeWrangler(violation_manager, enum_looksups)
     type_wrangler = BuildInTypeWrangler(violation_manager)
 
     root.set_next_wrangler(required_wrangler)
@@ -61,8 +64,9 @@ def _create_wrangler_chain(instructions: dict,
     ruleset_wrangler.set_next_wrangler(list_wrangler)
 
     list_wrangler.set_ruleset_wrangler(ruleset_wrangler)
-    list_wrangler.set_next_wrangler(any_type_wrangler)
+    list_wrangler.set_next_wrangler(enum_wrangler)
 
+    enum_wrangler.set_next_wrangler(any_type_wrangler)
     any_type_wrangler.set_next_wrangler(type_wrangler)
     return root
 
@@ -391,12 +395,32 @@ class AnyTypeWrangler(Wrangler):
         if self._is_any_type(rtype):
             return
 
-        super().wrangle(
-                key=key,
-                data=data,
-                parent=parent,
-                rtype=rtype,
-                is_required=is_required)
+        super().wrangle(key, data, parent, rtype, is_required)
 
     def _is_any_type(self, rtype: RuleType):
         return rtype.type == 'any'
+
+
+class EnumTypeWrangler(Wrangler):
+    def __init__(self, violation_manager: ViolationManager, enums: dict):
+        super().__init__(violation_manager)
+        self.enums = enums
+
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False) -> None:
+
+        if not self._is_enum_rule(rtype):
+            super().wrangle(key, data, parent, rtype, is_required)
+            return
+
+        target_enum: YamlerEnum = self.enums.get(rtype.lookup)
+        for item in target_enum.items:
+            if data == item['value']:
+                return
+
+        message = f"{key} has no valid value that matches enum {rtype.lookup}"
+        violation = TypeViolation(key, parent, message)
+        self._violation_manager.add_violation(violation)
+
+    def _is_enum_rule(self, rtype: RuleType) -> bool:
+        return rtype.type == 'enum'

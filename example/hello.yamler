@@ -1,6 +1,6 @@
 enum Status {
-    SUCCESS = 0
-    ERROR = 1
+    SUCCESS = success
+    ERROR = failure
 }
 
 ruleset address {

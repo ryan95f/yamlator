@@ -35,7 +35,7 @@ ruleset: "ruleset" /[a-z]+/ "{" rule+ "}"
 
 
 enum: "enum" /[A-Z]{1}[a-z0-9_]+/ "{" enum_item+ "}"
-enum_item: /[A-Z0-9_]+/ "=" /[A-Z0-9_]+/
+enum_item: /[A-Z0-9_]+/ "=" /[A-Za-z0-9_]+/
 
 NEW_LINES: "\n"+
 
