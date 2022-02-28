@@ -414,11 +414,12 @@ class EnumTypeWrangler(Wrangler):
             return
 
         target_enum: YamlerEnum = self.enums.get(rtype.lookup)
-        for item in target_enum.items:
-            if data == item.value:
-                return
+        enum_value = target_enum.items.get(data, None)
 
-        message = f"{key} has no valid value that matches enum {rtype.lookup}"
+        if enum_value is not None:
+            return
+
+        message = f"{key} does not match any value in enum {rtype.lookup}"
         violation = TypeViolation(key, parent, message)
         self._violation_manager.add_violation(violation)
 

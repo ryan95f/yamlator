@@ -113,7 +113,10 @@ class YamlerTransformer(Transformer):
     def enum(self, tokens):
         name = tokens[0]
         items = tokens[1:]
-        return YamlerEnum(name.value, items)
+        enums = {}
+        for item in items:
+            enums[item.value] = item
+        return YamlerEnum(name.value, enums)
 
     def type(self, tokens):
         (t, ) = tokens
