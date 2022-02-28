@@ -413,15 +413,20 @@ class EnumTypeWrangler(Wrangler):
             super().wrangle(key, data, parent, rtype, is_required)
             return
 
-        target_enum: YamlerEnum = self.enums.get(rtype.lookup)
-        enum_value = target_enum.items.get(data, None)
-
-        if enum_value is not None:
+        if self._matches_enum_data(data, rtype.lookup):
             return
 
-        message = f"{key} does not match any value in enum {rtype.lookup}"
-        violation = TypeViolation(key, parent, message)
-        self._violation_manager.add_violation(violation)
+        self._add_enum_violation(key, parent, rtype.lookup)
 
     def _is_enum_rule(self, rtype: RuleType) -> bool:
         return rtype.type == 'enum'
+
+    def _matches_enum_data(self, data: Data, enum_name: str) -> bool:
+        target_enum = self.enums.get(enum_name)
+        enum_value = target_enum.items.get(data, None)
+        return enum_value is not None
+
+    def _add_enum_violation(self, key: str, parent: str, enum_name: str):
+        message = f"{key} does not match any value in enum {enum_name}"
+        violation = TypeViolation(key, parent, message)
+        self._violation_manager.add_violation(violation)
