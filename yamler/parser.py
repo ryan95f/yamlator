@@ -9,6 +9,7 @@ from .types import YamlerRuleSet
 from .types import YamlerEnum
 from .types import YamlerType
 from .types import RuleType
+from .types import EnumItem
 
 
 _GRAMMER_FILE = "grammer.lark"
@@ -107,7 +108,7 @@ class YamlerTransformer(Transformer):
 
     def enum_item(self, tokens):
         name, value = tokens
-        return {'name': name.value, 'value': value.value}
+        return EnumItem(name=name.value, value=value.value)
 
     def enum(self, tokens):
         name = tokens[0]

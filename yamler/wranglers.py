@@ -23,7 +23,7 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
     entry_point: YamlerRuleSet = instructions.get('main', {})
 
     wranglers = _create_wrangler_chain(
-        ruleset_lookups=instructions,
+        ruleset_lookups=instructions.get("rules", {}),
         enum_looksups=instructions.get("enums", {}),
         violation_manager=violation_mgnr
     )
@@ -235,7 +235,7 @@ class RuleSetWrangler(Wrangler):
         return type(data) == dict
 
     def _retrieve_next_ruleset(self, ruleset_name: str) -> Iterable[Rule]:
-        ruleset = self.instructions['rules'].get(ruleset_name, {})
+        ruleset = self.instructions.get(ruleset_name, {})
         return ruleset.rules
 
 
@@ -415,7 +415,7 @@ class EnumTypeWrangler(Wrangler):
 
         target_enum: YamlerEnum = self.enums.get(rtype.lookup)
         for item in target_enum.items:
-            if data == item['value']:
+            if data == item.value:
                 return
 
         message = f"{key} has no valid value that matches enum {rtype.lookup}"

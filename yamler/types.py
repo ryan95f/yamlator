@@ -1,9 +1,10 @@
 from abc import ABC
 from enum import Enum
-from typing import Union
+from typing import Iterator, Union
 from collections import namedtuple
 
 Rule = namedtuple("Rule", ["name", "rtype", "is_required"])
+EnumItem = namedtuple("EnumItem", ["name", "value"])
 
 # The support types that can be present in the YAML file
 Data = Union[dict, list, int, float, str]
@@ -53,12 +54,12 @@ class YamlerType:
 
 
 class YamlerRuleSet(YamlerType):
-    def __init__(self, name: str, rules: list):
+    def __init__(self, name: str, rules: dict):
         super().__init__(name, ContainerTypes.RULESET)
         self.rules = rules
 
 
 class YamlerEnum(YamlerType):
-    def __init__(self, name: str, items: list):
+    def __init__(self, name: str, items: dict):
         super().__init__(name, ContainerTypes.ENUM)
         self.items = items
