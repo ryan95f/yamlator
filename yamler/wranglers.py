@@ -10,8 +10,6 @@ from yamler.violations import ViolationManager
 
 from .types import Data, Rule, RuleType, YamlerRuleSet
 
-_DEFAULT_RULEST = YamlerRuleSet('main', [])
-
 
 def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
     if yaml_data is None:
@@ -22,7 +20,7 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
 
     entry_parent = "-"
     violation_mgnr = ViolationManager()
-    entry_point: YamlerRuleSet = instructions.get('main', _DEFAULT_RULEST)
+    entry_point: YamlerRuleSet = instructions.get('main', YamlerRuleSet('main', []))
 
     wranglers = _create_wrangler_chain(
         ruleset_lookups=instructions.get("rules", {}),
@@ -237,7 +235,8 @@ class RuleSetWrangler(Wrangler):
         return type(data) == dict
 
     def _retrieve_next_ruleset(self, ruleset_name: str) -> Iterable[Rule]:
-        ruleset = self.instructions.get(ruleset_name, {})
+        default_missing_ruleset = YamlerRuleSet(ruleset_name, [])
+        ruleset = self.instructions.get(ruleset_name, default_missing_ruleset)
         return ruleset.rules
 
 

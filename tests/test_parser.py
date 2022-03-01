@@ -23,7 +23,7 @@ class TestYamlerParser(unittest.TestCase):
     def test_parse_with_valid_content(self):
         yamler_content = load_yamler_ruleset(self.valid_yamler_file)
         instructions = self.parser.parse(yamler_content)
-        main = instructions.get('name')
+        main = instructions.name
 
         self.assertIsNotNone(instructions)
         self.assertIsNotNone(main)

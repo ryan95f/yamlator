@@ -3,7 +3,7 @@ import unittest
 from .base import BaseWranglerTest
 from parameterized import parameterized
 from yamler.wranglers import RuleSetWrangler
-from yamler.types import Data, Rule, RuleType
+from yamler.types import Data, Rule, RuleType, YamlerRuleSet
 
 
 class TestRuleSetWrangler(BaseWranglerTest):
@@ -12,14 +12,13 @@ class TestRuleSetWrangler(BaseWranglerTest):
         self.instructions = self._create_flat_ruleset()
 
     def _create_flat_ruleset(self):
+        message_ruleset = YamlerRuleSet('message', [
+            Rule('message', RuleType(type=str), True),
+            Rule('number', RuleType(type=int), False)
+        ])
         return {
             'rules': {
-                'message': {
-                    'rules': [
-                        Rule('message', RuleType(type=str), True),
-                        Rule('number', RuleType(type=int), False)
-                    ]
-                },
+                'message': message_ruleset
             }
         }
 
