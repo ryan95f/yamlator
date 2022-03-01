@@ -52,9 +52,12 @@ class YamlerType:
         self.name = name
         self.type = type
 
+    def __repr__(self) -> str:
+        return f"{self.type}({self.name})"
+
 
 class YamlerRuleSet(YamlerType):
-    def __init__(self, name: str, rules: dict):
+    def __init__(self, name: str, rules: list):
         super().__init__(name, ContainerTypes.RULESET)
         self.rules = rules
 
