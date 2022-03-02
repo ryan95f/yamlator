@@ -12,6 +12,21 @@ from .types import Data, Rule, RuleType, YamlerRuleSet
 
 
 def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
+    """Traverse through the data to find any violations against the provided
+    instructions.
+
+    Args:
+        yaml_data (dict | list | int | float | str): The yaml data to validate
+
+        instructions                         (dict): The instructions containing
+        enums and rulesets that will be validated
+
+    Returns:
+        A deque with the violations that were detected in the data.
+
+    Raises:
+        ValueError if the parameters `yaml_data` or `instructions` are `None`.
+    """
     if yaml_data is None:
         raise ValueError("yaml_data should not be None")
 
