@@ -1,10 +1,9 @@
 import unittest
 
-from yamler.types import EnumItem, RuleType, YamlerEnum
-
 from .base import BaseWranglerTest
 from parameterized import parameterized
 from yamler.wranglers import EnumTypeWrangler
+from yamler.types import EnumItem, RuleType, YamlerEnum
 
 
 class TestEnumTypeWrangler(BaseWranglerTest):
@@ -35,6 +34,7 @@ class TestEnumTypeWrangler(BaseWranglerTest):
 
         violation_count = len(self.violation_manager.violations)
         self.assertEqual(expected_violation_count, violation_count)
+
 
 if __name__ == '__main__':
     unittest.main()
