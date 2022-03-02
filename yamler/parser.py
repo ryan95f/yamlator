@@ -1,7 +1,10 @@
+from __future__ import annotations
 from typing import Iterator
 from lark import Lark
 from lark import Transformer
 from lark.exceptions import UnexpectedEOF
+
+from yamler.wranglers import RuleSetWrangler
 
 from .types import Rule
 from .types import ContainerTypes
@@ -46,6 +49,9 @@ class YamlerParser:
 
 
 class YamlerTransformer(Transformer):
+    def __init__(self, visit_tokens: bool = True) -> None:
+        super().__init__(visit_tokens)
+
     def required_rule(self, tokens):
         (name, rtype) = tokens
         return Rule(name.value, rtype, True)
@@ -67,16 +73,16 @@ class YamlerTransformer(Transformer):
         root = None
         rules = {}
         enums = {}
+
+        handler_chain = _RulesetInstructionHandler(rules)
+        handler_chain.set_next_handler(_EnumInstructionHandler(enums))
+
         for instruction in instructions:
-            name = instruction.name
-            instruction_type = instruction.type
-            if name == 'main':
-                root = instruction
-            else:
-                if instruction_type == ContainerTypes.RULESET:
-                    rules[name] = instruction
-                else:
-                    enums[name] = instruction
+            handler_chain.handle(instruction)
+
+        root = rules.get('main')
+        del rules['main']
+
         return {
             'main': root,
             'rules': rules,
@@ -121,3 +127,41 @@ class YamlerTransformer(Transformer):
     def type(self, tokens):
         (t, ) = tokens
         return t
+
+
+class _InstructionHandler:
+    _next_handler = None
+
+    def set_next_handler(self, handler: _InstructionHandler) -> _InstructionHandler:
+        self._next_handler = handler
+        return handler
+
+    def handle(self, instruction: YamlerType) -> None:
+        if self._next_handler is not None:
+            self._next_handler.handle(instruction)
+
+
+class _EnumInstructionHandler(_InstructionHandler):
+    def __init__(self, enums: dict):
+        super().__init__()
+        self._enums = enums
+
+    def handle(self, instruction: YamlerType) -> None:
+        if instruction.type != ContainerTypes.ENUM:
+            super().handle(instruction)
+            return
+
+        self._enums[instruction.name] = instruction
+
+
+class _RulesetInstructionHandler(_InstructionHandler):
+    def __init__(self, rulesets: dict):
+        super().__init__()
+        self._rulesets = rulesets
+
+    def handle(self, instruction: YamlerType) -> None:
+        if instruction.type != ContainerTypes.RULESET:
+            super().handle(instruction)
+            return
+
+        self._rulesets[instruction.name] = instruction
