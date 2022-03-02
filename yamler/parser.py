@@ -4,8 +4,6 @@ from lark import Lark
 from lark import Transformer
 from lark.exceptions import UnexpectedEOF
 
-from yamler.wranglers import RuleSetWrangler
-
 from .types import Rule
 from .types import ContainerTypes
 from .types import YamlerRuleSet
@@ -81,7 +79,8 @@ class YamlerTransformer(Transformer):
             handler_chain.handle(instruction)
 
         root = rules.get('main')
-        del rules['main']
+        if root is not None:
+            del rules['main']
 
         return {
             'main': root,
@@ -117,9 +116,11 @@ class YamlerTransformer(Transformer):
         return EnumItem(name=name.value, value=value.value)
 
     def enum(self, tokens):
+        enums = {}
+
         name = tokens[0]
         items = tokens[1:]
-        enums = {}
+
         for item in items:
             enums[item.value] = item
         return YamlerEnum(name.value, enums)
