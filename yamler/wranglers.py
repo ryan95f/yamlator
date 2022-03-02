@@ -432,9 +432,12 @@ class EnumTypeWrangler(Wrangler):
             rtype       (RuleType): The type assigned to the rule
             is_required (bool):     Is the rule required
         """
-
         if not self._is_enum_rule(rtype):
             super().wrangle(key, data, parent, rtype, is_required)
+            return
+
+        if not self._is_enum_str_data(data):
+            self._add_enum_violation(key, parent, rtype.lookup)
             return
 
         if self._matches_enum_data(data, rtype.lookup):
@@ -444,6 +447,9 @@ class EnumTypeWrangler(Wrangler):
 
     def _is_enum_rule(self, rtype: RuleType) -> bool:
         return rtype.type == 'enum'
+
+    def _is_enum_str_data(self, data: Data):
+        return isinstance(data, str)
 
     def _matches_enum_data(self, data: Data, enum_name: str) -> bool:
         target_enum = self.enums.get(enum_name, None)

@@ -2,7 +2,7 @@ import unittest
 
 from parameterized import parameterized
 from yamler.wranglers import wrangle_data
-from yamler.types import Data, Rule, RuleType, YamlerRuleSet
+from yamler.types import Data, EnumItem, Rule, RuleType, YamlerEnum, YamlerRuleSet
 
 
 def create_flat_ruleset():
@@ -22,17 +22,24 @@ def create_complex_ruleset():
         Rule('age', RuleType(type=int), False)
     ])
 
+    status_enum = YamlerEnum("Status", {
+        "success": EnumItem("SUCCESS", "success"),
+        "error":  EnumItem("ERR", "error"),
+    })
+
     main_ruleset = YamlerRuleSet("main", [
         Rule("num_lists", RuleType(type=list, sub_type=RuleType(type=list, sub_type=RuleType(type=int))), False),  # nopep8
         Rule('personList', RuleType(type=list, sub_type=RuleType(type="ruleset", lookup="person")), False),  # nopep8
         Rule('person', RuleType(type="ruleset", lookup="person"), False),
         Rule('my_map', RuleType(type=dict, sub_type=RuleType(type=str)), False),
-        Rule('my_any_list', RuleType(type=list, sub_type=RuleType(type='any')), False)
+        Rule('my_any_list', RuleType(type=list, sub_type=RuleType(type='any')), False),
+        Rule('status', RuleType(type="enum", lookup="Status"), False),
     ])
 
     return {
         'main': main_ruleset,
-        "rules": {"person": person_ruleset}
+        "rules": {"person": person_ruleset},
+        "enums": {"Status": status_enum}
     }
 
 
@@ -123,7 +130,16 @@ class TestWrangleData(unittest.TestCase):
         }, 0),
         ('valid_any_type_list', COMPLEX_RULESET, {
             'my_any_list': [1, 2, None, 'hello']
-        }, 0)
+        }, 0),
+        ('enum_value_matches_rule', COMPLEX_RULESET, {
+            'status': "error",
+        }, 0),
+        ('enum_value_does_not_matche_rule', COMPLEX_RULESET, {
+            'status': "not_found",
+        }, 1),
+        ('enum_value_wrong_type', COMPLEX_RULESET, {
+            'status': [],
+        }, 1),
     ])
     def test_wrangler(self, name, ruleset, data, expected_violations_count):
         violations = wrangle_data(data, ruleset)
