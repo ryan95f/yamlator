@@ -446,7 +446,11 @@ class EnumTypeWrangler(Wrangler):
         return rtype.type == 'enum'
 
     def _matches_enum_data(self, data: Data, enum_name: str) -> bool:
-        target_enum = self.enums.get(enum_name)
+        target_enum = self.enums.get(enum_name, None)
+
+        if target_enum is None:
+            return False
+
         enum_value = target_enum.items.get(data, None)
         return enum_value is not None
 
