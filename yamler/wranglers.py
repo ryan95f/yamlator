@@ -177,7 +177,7 @@ class RuleSetWrangler(Wrangler):
             violation_manager (ViolationManager):   Manges the total violations
             in the chain
 
-            instructions (dict):                    A dict container references to
+            instructions (dict):                    A dict containering references to
             other rulesets
         """
         self.instructions = instructions
@@ -403,12 +403,35 @@ class AnyTypeWrangler(Wrangler):
 
 
 class EnumTypeWrangler(Wrangler):
+    """Wrangler to handle data that is contained in a enum as a constant"""
+
     def __init__(self, violation_manager: ViolationManager, enums: dict):
+        """EnumTypeWrangler constructor
+
+        Args:
+            violation_manager (ViolationManager): Manges the total violations in the chain
+
+            enums                         (dict): A dict that contains references to enums
+            referenced in the rulesets.
+        """
         super().__init__(violation_manager)
         self.enums = enums
 
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
                 is_required: bool = False) -> None:
+        """Wrangle enum data in the YAML and validate that
+        there is a matching value in the rule. If a match is
+        not found then a `TypeViolation` is added to the violation
+        mamager. If the rule type is not a enum, then pass to the next
+        wrangler.
+
+        Args:
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool):     Is the rule required
+        """
 
         if not self._is_enum_rule(rtype):
             super().wrangle(key, data, parent, rtype, is_required)
