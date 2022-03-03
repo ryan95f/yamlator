@@ -14,7 +14,7 @@ def _create_args_parser():
     parser.add_argument('file', type=str,
                         help='The file to be validated')
 
-    parser.add_argument("--schema", type=str, required=True, dest='ruleset_schema',
+    parser.add_argument("-schema", type=str, required=True, dest='ruleset_schema',
                         help="The schama that will be used to validate the file")
     return parser
 
@@ -33,7 +33,14 @@ def main():
         print(f"File {args.file} was not found!")
         sys.exit(-1)
 
-    ruleset = load_yamler_ruleset(args.ruleset_schema)
+    try:
+        ruleset = load_yamler_ruleset(args.ruleset_schema)
+    except ValueError as ex:
+        print(f"Error reading Yamler schema file: {ex}")
+        sys.exit(-1)
+    except FileNotFoundError:
+        print(f"Yamler schema {args.ruleset_schema} was not found")
+        sys.exit(-1)
 
     parser = YamlerParser()
     tokens = parser.parse(ruleset)

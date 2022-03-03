@@ -71,3 +71,11 @@ This project follows the [PEP 8](https://www.python.org/dev/peps/pep-0008/) codi
 ```bash
 pycodestyle .
 ```
+
+## Running the example
+
+To run the example:
+
+```bash
+python -m yamler example/hello.yaml -schema example/hello.yamler
+```
