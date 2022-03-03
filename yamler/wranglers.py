@@ -8,10 +8,25 @@ from yamler.violations import RulesetTypeViolation
 from yamler.violations import TypeViolation
 from yamler.violations import ViolationManager
 
-from .types import Data, Rule, RuleType
+from .types import Data, Rule, RuleType, YamlerRuleSet
 
 
 def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
+    """Traverse through the data to find any violations against the provided
+    instructions.
+
+    Args:
+        yaml_data (dict | list | int | float | str): The yaml data to validate
+
+        instructions                         (dict): The instructions containing
+        enums and rulesets that will be validated
+
+    Returns:
+        A deque with the violations that were detected in the data.
+
+    Raises:
+        ValueError if the parameters `yaml_data` or `instructions` are `None`.
+    """
     if yaml_data is None:
         raise ValueError("yaml_data should not be None")
 
@@ -20,14 +35,15 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
 
     entry_parent = "-"
     violation_mgnr = ViolationManager()
-    entry_point = instructions.get('main', {})
+    entry_point: YamlerRuleSet = instructions.get('main', YamlerRuleSet('main', []))
 
     wranglers = _create_wrangler_chain(
-        instructions=instructions,
+        ruleset_lookups=instructions.get("rules", {}),
+        enum_looksups=instructions.get("enums", {}),
         violation_manager=violation_mgnr
     )
 
-    entry_point_rules: Iterable[Rule] = entry_point.get('rules', [])
+    entry_point_rules: Iterable[Rule] = entry_point.rules
     for rule in entry_point_rules:
         sub_data = yaml_data.get(rule.name, None)
 
@@ -42,15 +58,17 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
     return violation_mgnr.violations
 
 
-def _create_wrangler_chain(instructions: dict,
+def _create_wrangler_chain(ruleset_lookups: dict,
+                           enum_looksups: dict,
                            violation_manager: ViolationManager) -> Wrangler:
 
     root = OptionalWrangler(violation_manager)
     any_type_wrangler = AnyTypeWrangler(violation_manager)
     required_wrangler = RequiredWrangler(violation_manager)
     map_wrangler = MapWrangler(violation_manager)
-    ruleset_wrangler = RuleSetWrangler(violation_manager, instructions)
+    ruleset_wrangler = RuleSetWrangler(violation_manager, ruleset_lookups)
     list_wrangler = ListWrangler(violation_manager)
+    enum_wrangler = EnumTypeWrangler(violation_manager, enum_looksups)
     type_wrangler = BuildInTypeWrangler(violation_manager)
 
     root.set_next_wrangler(required_wrangler)
@@ -61,8 +79,9 @@ def _create_wrangler_chain(instructions: dict,
     ruleset_wrangler.set_next_wrangler(list_wrangler)
 
     list_wrangler.set_ruleset_wrangler(ruleset_wrangler)
-    list_wrangler.set_next_wrangler(any_type_wrangler)
+    list_wrangler.set_next_wrangler(enum_wrangler)
 
+    enum_wrangler.set_next_wrangler(any_type_wrangler)
     any_type_wrangler.set_next_wrangler(type_wrangler)
     return root
 
@@ -173,7 +192,7 @@ class RuleSetWrangler(Wrangler):
             violation_manager (ViolationManager):   Manges the total violations
             in the chain
 
-            instructions (dict):                    A dict container references to
+            instructions (dict):                    A dict containering references to
             other rulesets
         """
         self.instructions = instructions
@@ -231,8 +250,9 @@ class RuleSetWrangler(Wrangler):
         return type(data) == dict
 
     def _retrieve_next_ruleset(self, ruleset_name: str) -> Iterable[Rule]:
-        ruleset = self.instructions['rules'].get(ruleset_name, {})
-        return ruleset.get('rules', [])
+        default_missing_ruleset = YamlerRuleSet(ruleset_name, [])
+        ruleset = self.instructions.get(ruleset_name, default_missing_ruleset)
+        return ruleset.rules
 
 
 class ListWrangler(Wrangler):
@@ -391,12 +411,71 @@ class AnyTypeWrangler(Wrangler):
         if self._is_any_type(rtype):
             return
 
-        super().wrangle(
-                key=key,
-                data=data,
-                parent=parent,
-                rtype=rtype,
-                is_required=is_required)
+        super().wrangle(key, data, parent, rtype, is_required)
 
     def _is_any_type(self, rtype: RuleType):
         return rtype.type == 'any'
+
+
+class EnumTypeWrangler(Wrangler):
+    """Wrangler to handle data that is contained in a enum as a constant"""
+
+    def __init__(self, violation_manager: ViolationManager, enums: dict):
+        """EnumTypeWrangler constructor
+
+        Args:
+            violation_manager (ViolationManager): Manges the total violations in the chain
+
+            enums                         (dict): A dict that contains references to enums
+            referenced in the rulesets.
+        """
+        super().__init__(violation_manager)
+        self.enums = enums
+
+    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
+                is_required: bool = False) -> None:
+        """Wrangle enum data in the YAML and validate that
+        there is a matching value in the rule. If a match is
+        not found then a `TypeViolation` is added to the violation
+        mamager. If the rule type is not a enum, then pass to the next
+        wrangler.
+
+        Args:
+            key         (str):      The key that owns the data
+            data        (Data):     The data to wrangler
+            parent      (str):      The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required (bool):     Is the rule required
+        """
+        if not self._is_enum_rule(rtype):
+            super().wrangle(key, data, parent, rtype, is_required)
+            return
+
+        if not self._is_enum_str_data(data):
+            self._add_enum_violation(key, parent, rtype.lookup)
+            return
+
+        if self._matches_enum_data(data, rtype.lookup):
+            return
+
+        self._add_enum_violation(key, parent, rtype.lookup)
+
+    def _is_enum_rule(self, rtype: RuleType) -> bool:
+        return rtype.type == 'enum'
+
+    def _is_enum_str_data(self, data: Data):
+        return isinstance(data, str)
+
+    def _matches_enum_data(self, data: Data, enum_name: str) -> bool:
+        target_enum = self.enums.get(enum_name, None)
+
+        if target_enum is None:
+            return False
+
+        enum_value = target_enum.items.get(data, None)
+        return enum_value is not None
+
+    def _add_enum_violation(self, key: str, parent: str, enum_name: str):
+        message = f"{key} does not match any value in enum {enum_name}"
+        violation = TypeViolation(key, parent, message)
+        self._violation_manager.add_violation(violation)

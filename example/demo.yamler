@@ -1,9 +1,23 @@
+enum Status {
+    CREATED = created
+    ACTIVE = active
+    DELETED = deleted
+}
+
+ruleset details {
+    owner str
+    team str
+    labels map(str)
+}
+
 ruleset project {
     version str
     projectId str
     displayName str
     iam_permission list(str)
     labels map(str)
+    status Status
+    project_details (details)
 }
 
 ruleset main {

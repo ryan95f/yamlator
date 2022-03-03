@@ -8,3 +8,4 @@ my_map:
 numbers:
   - name: wow
   - name: hello
+enum1: success

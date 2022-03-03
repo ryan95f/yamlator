@@ -1,7 +1,9 @@
+from enum import Enum
 from typing import Union
 from collections import namedtuple
 
 Rule = namedtuple("Rule", ["name", "rtype", "is_required"])
+EnumItem = namedtuple("EnumItem", ["name", "value"])
 
 # The support types that can be present in the YAML file
 Data = Union[dict, list, int, float, str]
@@ -16,8 +18,8 @@ class RuleType:
             type        (str | type): The expected type for a field. Use the str for
             a `ruleset` and other types will use the build in Python types
 
-            lookup      (str):        Used when type=`ruleset`, this specifies the
-            ruleset to lookup when processing the YAML file
+            lookup      (str):        Used when type=`ruleset` or type=`enum`.
+            This specifies the custom type to lookup when processing the data.
 
             sub_type    (RuleType): A nested subtype for the type. Used when there are
             nested list types e.g list(list(int))
@@ -37,3 +39,64 @@ class RuleType:
         return repr_template.format(self.__class__.__name__,
                                     self.type.__name__,
                                     self.sub_type)
+
+
+class ContainerTypes(Enum):
+    """Enum of custom types that are used when defining a ruleset"""
+    RULESET = 0
+    ENUM = 1
+
+
+class YamlerType:
+    """Base Class for custom types"""
+
+    def __init__(self, name: str, type: ContainerTypes):
+        """YamlerType constructor
+
+        Args:
+            name            (str): The object name of the type
+            type (ContainerTypes): The type of object being represented
+        """
+        self.name = name
+        self.type = type
+
+    def __repr__(self) -> str:
+        return f"{self.type}({self.name})"
+
+
+class YamlerRuleSet(YamlerType):
+    """Represent a Ruleset Type. A ruleset will contain a list of
+    rules of `RuleType` which will validated against
+    """
+
+    def __init__(self, name: str, rules: list):
+        """YamlerRuleSet constructor
+
+        Args:
+            name     (str): The name of the ruleset
+            rules   (list): A list of rules for the ruleset
+        """
+        super().__init__(name, ContainerTypes.RULESET)
+        self.rules = rules
+
+
+class YamlerEnum(YamlerType):
+    """Represents a Enum Type that will contain a dict of valid
+    values. The dict of items will be in the format: {<value>: EnumItem(<name>, <value>)}
+
+    For example:
+    {
+        "success": EnumItem("SUCCESS", "success"),
+        "failure": EnumItem("FAILURE", "failure"),
+    }
+    """
+
+    def __init__(self, name: str, items: dict):
+        """YamlerEnum constructor
+
+        Args:
+            name     (str): The name of the enum
+            items   (dict): A dict containing a lookup of the expected values in the enum
+        """
+        super().__init__(name, ContainerTypes.ENUM)
+        self.items = items
