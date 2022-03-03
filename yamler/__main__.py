@@ -5,6 +5,7 @@ from .utils import load_yaml_file
 from .utils import load_yamler_ruleset
 from .parser import YamlerParser
 from .wranglers import wrangle_data
+from .exceptions import InvalidRulesetFilenameError
 
 
 def _create_args_parser():
@@ -40,6 +41,9 @@ def main():
         sys.exit(-1)
     except FileNotFoundError:
         print(f"Yamler schema {args.ruleset_schema} was not found")
+        sys.exit(-1)
+    except InvalidRulesetFilenameError as ex:
+        print(ex)
         sys.exit(-1)
 
     parser = YamlerParser()
