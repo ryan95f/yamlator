@@ -1,15 +1,27 @@
-from yamler.utils import load_yaml_file
-from yamler.utils import load_yamler_ruleset
-from yamler.parser import YamlerParser
-from yamler.wranglers import wrangle_data
+import argparse
 
-EXAMPLE_RULESET = "example/hello.yamler"
-TEST_YAML_FILE = "example/hello.yaml"
+from .utils import load_yaml_file
+from .utils import load_yamler_ruleset
+from .parser import YamlerParser
+from .wranglers import wrangle_data
+
+
+def _create_args_parser():
+    description = "Validate if a YAML file matches a ruleset schema"
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("file", type=str,
+                        help="The file to be validated")
+    parser.add_argument("--schema", dest="ruleset_schema", required=True,
+                        help="The schama that will be used to validate the file")
+    return parser
 
 
 def main():
-    yaml_data = load_yaml_file(TEST_YAML_FILE)
-    ruleset = load_yamler_ruleset(EXAMPLE_RULESET)
+    parser = _create_args_parser()
+    args = parser.parse_args()
+
+    yaml_data = load_yaml_file(args.file)
+    ruleset = load_yamler_ruleset(args.ruleset_schema)
 
     parser = YamlerParser()
     tokens = parser.parse(ruleset)
