@@ -1,13 +1,21 @@
 import argparse
 
 from abc import ABC
+from enum import Enum
 from typing import Iterator
 from yamler.exceptions import InvalidRulesetFilenameError
 from yamler.violations import ViolationType
 
+from .types import StatusCode
 from .parser import YamlerParser
 from .wranglers import wrangle_data
 from .utils import load_yaml_file, load_yamler_ruleset
+
+
+class StatusCode(Enum):
+    """Status code for the output of running the validaton process"""
+    SUCCESS = 0
+    ERR = -1
 
 
 class ViolationOutput(ABC):
@@ -43,7 +51,7 @@ class ConsoleOutput(ViolationOutput):
         print("\n{:<4} violation(s) found".format(violation_count))
 
         if violation_count == 0:
-            return 0
+            return StatusCode.SUCCESS.value
 
         print('\n{:<30} {:<20} {:<15} {:20}'.format(
                 'Parent Key', 'Key', 'Violation', 'Message'))
@@ -55,7 +63,7 @@ class ConsoleOutput(ViolationOutput):
                 violation.violation_type,
                 violation.message))
         print('---------------------------------------------------------------------------')  # nopep8
-        return -1
+        return StatusCode.ERR.value
 
 
 def display_violations(violations: Iterator[ViolationType],
@@ -111,12 +119,12 @@ def main() -> int:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
     except FileNotFoundError as ex:
         print(ex)
-        return -1
+        return StatusCode.ERR.value
     except InvalidRulesetFilenameError as ex:
         print(ex)
-        return -1
+        return StatusCode.ERR.value
     except ValueError as ex:
         print(ex)
-        return -1
+        return StatusCode.ERR.value
 
     return display_violations(violations)
