@@ -6,7 +6,6 @@ from typing import Iterator
 from yamler.exceptions import InvalidRulesetFilenameError
 from yamler.violations import ViolationType
 
-from .types import StatusCode
 from .parser import YamlerParser
 from .wranglers import wrangle_data
 from .utils import load_yaml_file, load_yamler_ruleset
