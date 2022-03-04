@@ -110,10 +110,13 @@ def main() -> int:
     try:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
     except FileNotFoundError as ex:
+        print(ex)
         return -1
     except InvalidRulesetFilenameError as ex:
+        print(ex)
         return -1
     except ValueError as ex:
+        print(ex)
         return -1
 
     return display_violations(violations)
