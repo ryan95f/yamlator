@@ -10,12 +10,34 @@ from .utils import load_yaml_file, load_yamler_ruleset
 
 
 class ViolationOutput(ABC):
+    """Base class for displaying violations"""
+
     def display(violations: Iterator[ViolationType]) -> int:
+        """Display the violations to the user
+
+        Args:
+            violations Iterator[ViolationType]: A collection of violations
+
+        Returns:
+            The status code if violations were found. 0 = no violations were found
+            and -1 = violations were found
+        """
         pass
 
 
 class ConsoleOutput(ViolationOutput):
+    """Displays violations as a table"""
+
     def display(violations: Iterator[ViolationType]) -> int:
+        """Display the violations to the user as a table
+
+        Args:
+            violations Iterator[ViolationType]: A collection of violations
+
+        Returns:
+            The status code if violations were found. 0 = no violations were found
+            and -1 = violations were found
+        """
         violation_count = len(violations)
         print("\n{:<4} violation(s) found".format(violation_count))
 

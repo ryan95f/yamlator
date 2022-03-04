@@ -3,7 +3,7 @@ import re
 
 from .exceptions import InvalidRulesetFilenameError
 
-_YAMLER_SCHEMA_REGEX = re.compile(r'^[a-zA-Z0-9_\-\/]+.yamler$')
+_YAMLER_SCHEMA_REGEX = re.compile(r'^[.\/]?[a-zA-Z0-9_\-\/]+.yamler')
 
 
 def load_yaml_file(filename: str) -> dict:
