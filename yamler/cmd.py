@@ -2,6 +2,7 @@ import argparse
 
 from abc import ABC
 from typing import Iterator
+from yamler.exceptions import InvalidRulesetFilenameError
 from yamler.violations import ViolationType
 
 from .parser import YamlerParser
@@ -64,6 +65,22 @@ def display_violations(violations: Iterator[ViolationType],
 
 def validate_yaml_data_from_file(yaml_filepath: str,
                                  ruleset_filepath: str) -> Iterator[ViolationType]:
+    """Validate a YAML file with a ruleset
+
+    Args:
+        yaml_filepath    (str): The path to the YAML data file
+        ruleset_filepath (str): The path to the ruleset file
+
+    Returns:
+        A Iterator collection of ViolationType objects that contains
+        the violations detected in the YAML data against the rulesets.
+
+    Raises:
+        ValueError: If either argument is `None` or an empty string
+        FileNotFoundError: If either argument cannot be found on the file system
+        InvalidRulesetFilenameError: If `ruleset_filepath` does not have a valid filename
+        that ends with the `.yamler` extension.
+    """
     yaml_data = load_yaml_file(yaml_filepath)
     ruleset = load_yamler_ruleset(ruleset_filepath)
 
@@ -88,6 +105,15 @@ def _create_args_parser():
 def main() -> int:
     parser = _create_args_parser()
     args = parser.parse_args()
+    violations = []
 
-    violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
+    try:
+        violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
+    except FileNotFoundError as ex:
+        return -1
+    except InvalidRulesetFilenameError as ex:
+        return -1
+    except ValueError as ex:
+        return -1
+
     return display_violations(violations)
