@@ -16,8 +16,8 @@ class TestConsoleOutput(unittest.TestCase):
     @parameterized.expand([
         ('with_no_violations', [], 0),
         ('with_violations', [
-            RequiredViolation(key="message", parent="-"),
-            TypeViolation(key="number", parent="-", message="Invalid number")
+            RequiredViolation(key='message', parent='-'),
+            TypeViolation(key='number', parent='-', message='Invalid number')
         ], -1)
     ])
     def test_displayed_violation_outut(self, name: str,

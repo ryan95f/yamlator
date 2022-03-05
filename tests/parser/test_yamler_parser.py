@@ -8,8 +8,8 @@ from lark.exceptions import UnexpectedCharacters
 
 class TestYamlerParser(unittest.TestCase):
     def setUp(self):
-        self.valid_yamler_file = "./tests/files/hello.yamler"
-        self.invalid_yamler_file = "./tests/files/hello.yaml"
+        self.valid_yamler_file = './tests/files/hello.yamler'
+        self.invalid_yamler_file = './tests/files/hello.yaml'
         self.parser = YamlerParser()
 
     def test_parse_with_none_text(self):
@@ -17,7 +17,7 @@ class TestYamlerParser(unittest.TestCase):
             self.parser.parse(None)
 
     def test_parse_with_empty_text(self):
-        instructions = self.parser.parse("")
+        instructions = self.parser.parse('')
         self.assertIsNotNone(instructions)
 
     def test_parse_with_valid_content(self):
@@ -27,7 +27,7 @@ class TestYamlerParser(unittest.TestCase):
 
         self.assertIsNotNone(instructions)
         self.assertIsNotNone(main)
-        self.assertEqual("main", main.name)
+        self.assertEqual('main', main.name)
 
     def test_parse_with_invalid_content(self):
         yaml_content = load_yaml_file(self.invalid_yamler_file)

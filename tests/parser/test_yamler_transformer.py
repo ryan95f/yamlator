@@ -110,14 +110,14 @@ class TestYamlerTransformer(unittest.TestCase):
         self.assertEqual('any', any_type.type)
 
     def test_enum_type(self):
-        tokens = (Token("StatusCode"), )
+        tokens = (Token('StatusCode'), )
         enum_type = self.transformer.enum_type(tokens)
         self.assertEqual('enum', enum_type.type)
         self.assertEqual(tokens[0].value, enum_type.lookup)
 
     def test_enum_item(self):
-        enum_name = Token("StatusCode")
-        enum_value = Token("success")
+        enum_name = Token('StatusCode')
+        enum_value = Token('success')
         tokens = (enum_name, enum_value)
         enum_item = self.transformer.enum_item(tokens)
         self.assertEqual(enum_name.value, enum_item.name)
@@ -135,7 +135,7 @@ class TestYamlerTransformer(unittest.TestCase):
         self.assertEqual(len(enum_items), len(enum.items))
 
     def test_type(self):
-        token = Token("str")
+        token = Token('str')
         type_token = self.transformer.type((token, ))
         self.assertEqual(token, type_token)
 

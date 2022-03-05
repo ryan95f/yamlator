@@ -11,35 +11,35 @@ def create_flat_ruleset():
         Rule('number', RuleType(type=int), False),
     ]
     return {
-        "main": YamlerRuleSet('main', rules),
-        "rules": {}
+        'main': YamlerRuleSet('main', rules),
+        'rules': {}
     }
 
 
 def create_complex_ruleset():
-    person_ruleset = YamlerRuleSet("ruleset", [
+    person_ruleset = YamlerRuleSet('ruleset', [
         Rule('name', RuleType(type=str), True),
         Rule('age', RuleType(type=int), False)
     ])
 
-    status_enum = YamlerEnum("Status", {
-        "success": EnumItem("SUCCESS", "success"),
-        "error":  EnumItem("ERR", "error"),
+    status_enum = YamlerEnum('Status', {
+        'success': EnumItem('SUCCESS', 'success'),
+        'error':  EnumItem('ERR', 'error'),
     })
 
-    main_ruleset = YamlerRuleSet("main", [
-        Rule("num_lists", RuleType(type=list, sub_type=RuleType(type=list, sub_type=RuleType(type=int))), False),  # nopep8
-        Rule('personList', RuleType(type=list, sub_type=RuleType(type="ruleset", lookup="person")), False),  # nopep8
-        Rule('person', RuleType(type="ruleset", lookup="person"), False),
+    main_ruleset = YamlerRuleSet('main', [
+        Rule('num_lists', RuleType(type=list, sub_type=RuleType(type=list, sub_type=RuleType(type=int))), False),  # nopep8
+        Rule('personList', RuleType(type=list, sub_type=RuleType(type='ruleset', lookup='person')), False),  # nopep8
+        Rule('person', RuleType(type='ruleset', lookup='person'), False),
         Rule('my_map', RuleType(type=dict, sub_type=RuleType(type=str)), False),
         Rule('my_any_list', RuleType(type=list, sub_type=RuleType(type='any')), False),
-        Rule('status', RuleType(type="enum", lookup="Status"), False),
+        Rule('status', RuleType(type='enum', lookup='Status'), False),
     ])
 
     return {
         'main': main_ruleset,
-        "rules": {"person": person_ruleset},
-        "enums": {"Status": status_enum}
+        'rules': {'person': person_ruleset},
+        'enums': {'Status': status_enum}
     }
 
 
@@ -59,38 +59,38 @@ class TestWrangleData(unittest.TestCase):
             wrangle_data(data, instructions)
 
     @parameterized.expand([
-        ("empty_data_and_rules", {}, {}, 0),
-        ("empty_rules", {}, {"message": "hello"}, 0),
-        ("primitive_data_rules", FLAT_RULESET, {
-            "message": "hello", "number": 1
+        ('empty_data_and_rules', {}, {}, 0),
+        ('empty_rules', {}, {'message': 'hello'}, 0),
+        ('primitive_data_rules', FLAT_RULESET, {
+            'message': 'hello', 'number': 1
         }, 0),
-        ("primitive_data_invalid_data", FLAT_RULESET, {
-            "message": 12, "number": []
+        ('primitive_data_invalid_data', FLAT_RULESET, {
+            'message': 12, 'number': []
         }, 2),
-        ("primitive_data_missing_required", FLAT_RULESET, {
-            "number": 2
+        ('primitive_data_missing_required', FLAT_RULESET, {
+            'number': 2
         }, 1),
-        ("primitive_data_missing_optional", FLAT_RULESET, {
-            "message": "hello"
+        ('primitive_data_missing_optional', FLAT_RULESET, {
+            'message': 'hello'
         }, 0),
-        ("int_list", COMPLEX_RULESET, {
-            "num_lists": [[0, 1, 2], [3, 4, 5]]
+        ('int_list', COMPLEX_RULESET, {
+            'num_lists': [[0, 1, 2], [3, 4, 5]]
         }, 0),
-        ("invalid_list_type", COMPLEX_RULESET, {
-            "num_lists": [
-                ["hello", "world"]
+        ('invalid_list_type', COMPLEX_RULESET, {
+            'num_lists': [
+                ['hello', 'world']
             ]
         }, 2),
-        ("list_ruleset", COMPLEX_RULESET, {
-            "personList": [
-                {"name": "hello", "age": 2},
-                {"name": "world"}
+        ('list_ruleset', COMPLEX_RULESET, {
+            'personList': [
+                {'name': 'hello', 'age': 2},
+                {'name': 'world'}
             ]
         }, 0),
-        ("list_ruleset_invalid_type", COMPLEX_RULESET, {
-            "personList": [
-                {"name": 0},
-                {"age": 2}
+        ('list_ruleset_invalid_type', COMPLEX_RULESET, {
+            'personList': [
+                {'name': 0},
+                {'age': 2}
             ]
         }, 2),
         ('valid_ruleset_type', COMPLEX_RULESET, {
@@ -104,26 +104,26 @@ class TestWrangleData(unittest.TestCase):
                 'name': 'Test'
             }
         }, 0),
-        ("invald_ruleset_type", COMPLEX_RULESET, {
+        ('invald_ruleset_type', COMPLEX_RULESET, {
             'person': 3
         }, 1),
-        ("invalid_list_ruleset_type", COMPLEX_RULESET, {
-            "personList": [0, 2, 3]
+        ('invalid_list_ruleset_type', COMPLEX_RULESET, {
+            'personList': [0, 2, 3]
         }, 3),
         ('valid_dict_type', COMPLEX_RULESET, {
-            "my_map": {
-                "val1": "Hello",
-                "val2": "World"
+            'my_map': {
+                'val1': 'Hello',
+                'val2': 'World'
             }
         }, 0),
         ('invalid_subtype_map_type', COMPLEX_RULESET, {
-            "my_map": {
-                "val1": 1,
-                "val2": []
+            'my_map': {
+                'val1': 1,
+                'val2': []
             }
         }, 2),
         ('invalid_map_type', COMPLEX_RULESET, {
-            "my_map": []
+            'my_map': []
         }, 1),
         ('valid_empty_map_type', COMPLEX_RULESET, {
             'my_map': {}
@@ -132,10 +132,10 @@ class TestWrangleData(unittest.TestCase):
             'my_any_list': [1, 2, None, 'hello']
         }, 0),
         ('enum_value_matches_rule', COMPLEX_RULESET, {
-            'status': "error",
+            'status': 'error',
         }, 0),
         ('enum_value_does_not_matche_rule', COMPLEX_RULESET, {
-            'status': "not_found",
+            'status': 'not_found',
         }, 1),
         ('enum_value_wrong_type', COMPLEX_RULESET, {
             'status': [],

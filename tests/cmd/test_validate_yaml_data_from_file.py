@@ -5,8 +5,8 @@ from collections import namedtuple
 from yamler.cmd import validate_yaml_data_from_file
 from yamler.exceptions import InvalidRulesetFilenameError
 
-VALID_YAML_DATA_FILE_PATH = "./tests/files/hello.yaml"
-VALID_RULESET_FILE_PATH = "./tests/files/hello.yamler"
+VALID_YAML_DATA_FILE_PATH = './tests/files/hello.yaml'
+VALID_RULESET_FILE_PATH = './tests/files/hello.yamler'
 
 ValidateArgs = namedtuple('ValidateArgs', ['yaml_filepath', 'ruleset_filepath'])
 
@@ -21,11 +21,11 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
         ), FileNotFoundError),
         ('ruleset_file_not_found', ValidateArgs(
             VALID_YAML_DATA_FILE_PATH,
-            "not_found.yamler"
+            'not_found.yamler'
         ), FileNotFoundError),
         ('ruleset_invalid_file_extension', ValidateArgs(
             VALID_YAML_DATA_FILE_PATH,
-            "./tests/files/hello.ruleset"
+            './tests/files/hello.ruleset'
         ), InvalidRulesetFilenameError)
     ])
     def test_validate_yaml_data_from_file_with_invalid_args(self, name: str,
