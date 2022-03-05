@@ -28,18 +28,18 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
         ValueError if the parameters `yaml_data` or `instructions` are `None`.
     """
     if yaml_data is None:
-        raise ValueError("yaml_data should not be None")
+        raise ValueError('yaml_data should not be None')
 
     if instructions is None:
-        raise ValueError("instructions should not be None")
+        raise ValueError('instructions should not be None')
 
-    entry_parent = "-"
+    entry_parent = '-'
     violation_mgnr = ViolationManager()
     entry_point: YamlerRuleSet = instructions.get('main', YamlerRuleSet('main', []))
 
     wranglers = _create_wrangler_chain(
-        ruleset_lookups=instructions.get("rules", {}),
-        enum_looksups=instructions.get("enums", {}),
+        ruleset_lookups=instructions.get('rules', {}),
+        enum_looksups=instructions.get('enums', {}),
         violation_manager=violation_mgnr
     )
 
@@ -343,7 +343,7 @@ class BuildInTypeWrangler(Wrangler):
             return
 
         if not self._is_ruleset_type(rtype):
-            message = f"{key} should be of type {rtype.type.__name__}"
+            message = f'{key} should be of type {rtype.type.__name__}'
             violation = TypeViolation(key, parent, message)
             self._violation_manager.add_violation(violation)
         else:
@@ -476,6 +476,6 @@ class EnumTypeWrangler(Wrangler):
         return enum_value is not None
 
     def _add_enum_violation(self, key: str, parent: str, enum_name: str):
-        message = f"{key} does not match any value in enum {enum_name}"
+        message = f'{key} does not match any value in enum {enum_name}'
         violation = TypeViolation(key, parent, message)
         self._violation_manager.add_violation(violation)

@@ -69,7 +69,7 @@ class YamlerTransformer(Transformer):
 
     def main_ruleset(self, tokens):
         rules = tokens
-        return YamlerRuleSet("main", rules)
+        return YamlerRuleSet('main', rules)
 
     def start(self, instructions: Iterator[YamlerType]):
         root = None
@@ -100,7 +100,7 @@ class YamlerTransformer(Transformer):
 
     def ruleset_type(self, tokens):
         (name, ) = tokens
-        return RuleType(type="ruleset", lookup=name.value)
+        return RuleType(type='ruleset', lookup=name.value)
 
     def list_type(self, tokens):
         return RuleType(type=list, sub_type=tokens[0])

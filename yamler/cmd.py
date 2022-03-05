@@ -38,8 +38,8 @@ def _create_args_parser():
     parser.add_argument('file', type=str,
                         help='The file to be validated')
 
-    parser.add_argument("-schema", type=str, required=True, dest='ruleset_schema',
-                        help="The schama that will be used to validate the file")
+    parser.add_argument('-schema', type=str, required=True, dest='ruleset_schema',
+                        help='The schama that will be used to validate the file')
     return parser
 
 

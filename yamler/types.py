@@ -1,9 +1,10 @@
+from __future__ import annotations
 from enum import Enum
 from typing import Union
 from collections import namedtuple
 
-Rule = namedtuple("Rule", ["name", "rtype", "is_required"])
-EnumItem = namedtuple("EnumItem", ["name", "value"])
+Rule = namedtuple('Rule', ['name', 'rtype', 'is_required'])
+EnumItem = namedtuple('EnumItem', ['name', 'value'])
 
 # The support types that can be present in the YAML file
 Data = Union[dict, list, int, float, str]
@@ -11,7 +12,7 @@ Data = Union[dict, list, int, float, str]
 
 class RuleType:
     def __init__(self, type: Union[str, type], lookup: str = None,
-                 sub_type: 'RuleType' = None):
+                 sub_type: RuleType = None):
         """RuleType constructor
 
         Args:
@@ -29,13 +30,13 @@ class RuleType:
         self.sub_type = sub_type
 
     def __repr__(self) -> str:
-        if self.type == "ruleset":
-            repr_template = "{}(type=ruleset, lookup={}, sub_type={})"
+        if self.type == 'ruleset':
+            repr_template = '{}(type=ruleset, lookup={}, sub_type={})'
             return repr_template.format(self.__class__.__name__,
                                         self.lookup,
                                         self.sub_type)
 
-        repr_template = "{}(type={}, sub_type={})"
+        repr_template = '{}(type={}, sub_type={})'
         return repr_template.format(self.__class__.__name__,
                                     self.type.__name__,
                                     self.sub_type)
@@ -86,8 +87,8 @@ class YamlerEnum(YamlerType):
 
     For example:
     {
-        "success": EnumItem("SUCCESS", "success"),
-        "failure": EnumItem("FAILURE", "failure"),
+        'success': EnumItem('SUCCESS', 'success'),
+        'failure': EnumItem('FAILURE', 'failure'),
     }
     """
 
