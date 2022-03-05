@@ -19,7 +19,7 @@ def main() -> int:
     try:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
     except FileNotFoundError as ex:
-        print(f"{args.ruleset_schema} was not found!")
+        print(ex)
         return StatusCode.ERR.value
     except InvalidRulesetFilenameError as ex:
         print(ex)

@@ -26,5 +26,5 @@ setuptools.setup(
     entry_points={
         'console_scripts': ['yamler=yamler.cmd:main']
     },
-    package_data={'yamler': ['lark/grammer.lark']}
+    package_data={'yamler': ['grammer/grammer.lark']}
 )
