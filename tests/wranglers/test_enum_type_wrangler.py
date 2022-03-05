@@ -10,19 +10,19 @@ class TestEnumTypeWrangler(BaseWranglerTest):
     def setUp(self):
         super().setUp()
         self.enums = {
-            'message': YamlerEnum("message", {
-                "success": EnumItem('VALID', "success"),
-                "failure": EnumItem('INVALID', "failure")
+            'message': YamlerEnum('message', {
+                'success': EnumItem('VALID', 'success'),
+                'failure': EnumItem('INVALID', 'failure')
             })
         }
 
     @parameterized.expand([
-        ('with_valid_enum_value', "success", RuleType(type="enum", lookup='message'), 0),
-        ('with_invalid_enum_value', "not_found",
-            RuleType(type="enum", lookup='message'), 1),
-        ('with_str_rule_type', "success", RuleType(type=str), 0),
-        ('with_enum_not_found', "success", RuleType(type="enum", lookup='errors'), 1),
-        ('with_non_str_data_type', [0, 1, 2], RuleType(type="enum", lookup='message'), 1)
+        ('with_valid_enum_value', 'success', RuleType(type='enum', lookup='message'), 0),
+        ('with_invalid_enum_value', 'not_found',
+            RuleType(type='enum', lookup='message'), 1),
+        ('with_str_rule_type', 'success', RuleType(type=str), 0),
+        ('with_enum_not_found', 'success', RuleType(type='enum', lookup='errors'), 1),
+        ('with_non_str_data_type', [0, 1, 2], RuleType(type='enum', lookup='message'), 1)
     ])
     def test_enum_wrangler(self, name, data: Data, rtype: RuleType,
                            expected_violation_count: int):

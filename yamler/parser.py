@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+import os
+from pathlib import Path
 from typing import Iterator
 from lark import Lark
 from lark import Transformer
@@ -13,7 +16,8 @@ from .types import RuleType
 from .types import EnumItem
 
 
-_GRAMMER_FILE = "grammer.lark"
+_package_dir = Path(__file__).parent.absolute()
+_GRAMMER_FILE = os.path.join(_package_dir, 'grammer/grammer.lark')
 
 
 class YamlerParser:
@@ -65,7 +69,7 @@ class YamlerTransformer(Transformer):
 
     def main_ruleset(self, tokens):
         rules = tokens
-        return YamlerRuleSet("main", rules)
+        return YamlerRuleSet('main', rules)
 
     def start(self, instructions: Iterator[YamlerType]):
         root = None
@@ -96,7 +100,7 @@ class YamlerTransformer(Transformer):
 
     def ruleset_type(self, tokens):
         (name, ) = tokens
-        return RuleType(type="ruleset", lookup=name.value)
+        return RuleType(type='ruleset', lookup=name.value)
 
     def list_type(self, tokens):
         return RuleType(type=list, sub_type=tokens[0])

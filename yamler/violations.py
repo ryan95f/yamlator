@@ -22,8 +22,8 @@ class ViolationManager:
 
 
 class ViolationType(Enum):
-    REQUIRED = "required"
-    TYPE = "type"
+    REQUIRED = 'required'
+    TYPE = 'type'
 
 
 class Violation:
@@ -48,7 +48,7 @@ class Violation:
         return self._violation_type.value
 
     def __repr__(self) -> str:
-        message_template = "{}(parent={}, key={}, message={}"
+        message_template = '{}(parent={}, key={}, message={}'
         return message_template.format(__class__.__name__,
                                        self.parent, self.key, self.message)
 
@@ -63,7 +63,7 @@ class RequiredViolation(Violation):
             key     (str):  The key name in the YAML file
             parent  (str):  The parent key in the YAML file
         """
-        message = f"{key} is missing"
+        message = f'{key} is missing'
         super().__init__(key, parent, message, ViolationType.REQUIRED)
 
 
@@ -108,5 +108,5 @@ class RulesetTypeViolation(TypeViolation):
             key     (str):  The key name in the YAML file
             parent  (str):  The parent key in the YAML file
         """
-        message = f"{key} should be a ruleset"
+        message = f'{key} should be a ruleset'
         super().__init__(key, parent, message)
