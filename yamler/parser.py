@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+import os
+from pathlib import Path
 from typing import Iterator
 from lark import Lark
 from lark import Transformer
@@ -13,7 +16,8 @@ from .types import RuleType
 from .types import EnumItem
 
 
-_GRAMMER_FILE = "grammer.lark"
+_package_dir = Path(__file__).parent.absolute()
+_GRAMMER_FILE = os.path.join(_package_dir, 'grammer/grammer.lark')
 
 
 class YamlerParser:

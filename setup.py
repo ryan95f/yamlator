@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from importlib.metadata import entry_points
 import setuptools
 
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -19,7 +18,13 @@ setuptools.setup(
         "PyYAML==6.0"
     ],
     python_requires=">=3.6",
+    classifiers=[
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+    ],
     entry_points={
         'console_scripts': ['yamler=yamler.cmd:main']
-    }
+    },
+    package_data={'yamler': ['lark/grammer.lark']}
 )
