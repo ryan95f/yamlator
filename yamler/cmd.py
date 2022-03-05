@@ -11,6 +11,69 @@ from .wranglers import wrangle_data
 from .utils import load_yaml_file, load_yamler_ruleset
 
 
+def main() -> int:
+    parser = _create_args_parser()
+    args = parser.parse_args()
+    violations = []
+
+    try:
+        violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
+    except FileNotFoundError as ex:
+        print(f"{args.ruleset_schema} was not found!")
+        return StatusCode.ERR.value
+    except InvalidRulesetFilenameError as ex:
+        print(ex)
+        return StatusCode.ERR.value
+    except ValueError as ex:
+        print(ex)
+        return StatusCode.ERR.value
+
+    return display_violations(violations)
+
+
+def _create_args_parser():
+    description = 'A YAML validation tool that determines if a YAML file matches a given ruleset schema'  # nopep8
+
+    parser = argparse.ArgumentParser(prog="yamler", description=description)
+    parser.add_argument('file', type=str,
+                        help='The file to be validated')
+
+    parser.add_argument("-schema", type=str, required=True, dest='ruleset_schema',
+                        help="The schama that will be used to validate the file")
+    return parser
+
+
+def validate_yaml_data_from_file(yaml_filepath: str,
+                                 ruleset_filepath: str) -> Iterator[ViolationType]:
+    """Validate a YAML file with a ruleset
+
+    Args:
+        yaml_filepath    (str): The path to the YAML data file
+        ruleset_filepath (str): The path to the ruleset file
+
+    Returns:
+        A Iterator collection of ViolationType objects that contains
+        the violations detected in the YAML data against the rulesets.
+
+    Raises:
+        ValueError: If either argument is `None` or an empty string
+        FileNotFoundError: If either argument cannot be found on the file system
+        InvalidRulesetFilenameError: If `ruleset_filepath` does not have a valid filename
+        that ends with the `.yamler` extension.
+    """
+    yaml_data = load_yaml_file(yaml_filepath)
+    ruleset = load_yamler_ruleset(ruleset_filepath)
+
+    parser = YamlerParser()
+    tokens = parser.parse(ruleset)
+
+    return wrangle_data(yaml_data, tokens)
+
+
+def display_violations(violations: Iterator[ViolationType]) -> int:
+    return ConsoleOutput.display(violations)
+
+
 class StatusCode(Enum):
     """Status code for the output of running the validaton process"""
     SUCCESS = 0
@@ -63,67 +126,3 @@ class ConsoleOutput(ViolationOutput):
                 violation.message))
         print('---------------------------------------------------------------------------')  # nopep8
         return StatusCode.ERR.value
-
-
-def display_violations(violations: Iterator[ViolationType],
-                       method: str = "console") -> int:
-    return ConsoleOutput.display(violations)
-
-
-def validate_yaml_data_from_file(yaml_filepath: str,
-                                 ruleset_filepath: str) -> Iterator[ViolationType]:
-    """Validate a YAML file with a ruleset
-
-    Args:
-        yaml_filepath    (str): The path to the YAML data file
-        ruleset_filepath (str): The path to the ruleset file
-
-    Returns:
-        A Iterator collection of ViolationType objects that contains
-        the violations detected in the YAML data against the rulesets.
-
-    Raises:
-        ValueError: If either argument is `None` or an empty string
-        FileNotFoundError: If either argument cannot be found on the file system
-        InvalidRulesetFilenameError: If `ruleset_filepath` does not have a valid filename
-        that ends with the `.yamler` extension.
-    """
-    yaml_data = load_yaml_file(yaml_filepath)
-    ruleset = load_yamler_ruleset(ruleset_filepath)
-
-    parser = YamlerParser()
-    tokens = parser.parse(ruleset)
-
-    return wrangle_data(yaml_data, tokens)
-
-
-def _create_args_parser():
-    description = 'A YAML validation tool that determines if a YAML file matches a given ruleset schema'  # nopep8
-
-    parser = argparse.ArgumentParser(prog="yamler", description=description)
-    parser.add_argument('file', type=str,
-                        help='The file to be validated')
-
-    parser.add_argument("-schema", type=str, required=True, dest='ruleset_schema',
-                        help="The schama that will be used to validate the file")
-    return parser
-
-
-def main() -> int:
-    parser = _create_args_parser()
-    args = parser.parse_args()
-    violations = []
-
-    try:
-        violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
-    except FileNotFoundError as ex:
-        print(ex)
-        return StatusCode.ERR.value
-    except InvalidRulesetFilenameError as ex:
-        print(ex)
-        return StatusCode.ERR.value
-    except ValueError as ex:
-        print(ex)
-        return StatusCode.ERR.value
-
-    return display_violations(violations)
