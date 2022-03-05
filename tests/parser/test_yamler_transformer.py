@@ -93,6 +93,36 @@ class TestYamlerTransformer(unittest.TestCase):
         self.assertEqual('ruleset', ruleset_type.type)
         self.assertEqual(name.value, ruleset_type.lookup)
 
+    def test_list_type(self):
+        tokens = (RuleType(type=str), )
+        list_type = self.transformer.list_type(tokens)
+        self.assertEqual(list, list_type.type)
+        self.assertEqual(tokens[0], list_type.sub_type)
+
+    def test_map_type(self):
+        tokens = (RuleType(type=str), )
+        map_type = self.transformer.map_type(tokens)
+        self.assertEqual(dict, map_type.type)
+        self.assertEqual(tokens[0], map_type.sub_type)
+
+    def test_any_type(self):
+        any_type = self.transformer.any_type(())
+        self.assertEqual('any', any_type.type)
+
+    def test_enum_type(self):
+        tokens = (Token("StatusCode"), )
+        enum_type = self.transformer.enum_type(tokens)
+        self.assertEqual('enum', enum_type.type)
+        self.assertEqual(tokens[0].value, enum_type.lookup)
+
+    def test_enum_item(self):
+        enum_name = Token("StatusCode")
+        enum_value = Token("success")
+        tokens = (enum_name, enum_value)
+        enum_item = self.transformer.enum_item(tokens)
+        self.assertEqual(enum_name.value, enum_item.name)
+        self.assertEqual(enum_value.value, enum_item.value)
+
     def test_enum(self):
         enum_items = [
             EnumItem('SUCCESS', 'success'),
@@ -103,6 +133,11 @@ class TestYamlerTransformer(unittest.TestCase):
         self.assertIsNotNone(enum)
         self.assertEqual('StatusCode', enum.name)
         self.assertEqual(len(enum_items), len(enum.items))
+
+    def test_type(self):
+        token = Token("str")
+        type_token = self.transformer.type((token, ))
+        self.assertEqual(token, type_token)
 
 
 if __name__ == '__main__':
