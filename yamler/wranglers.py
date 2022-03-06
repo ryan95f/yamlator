@@ -1,6 +1,5 @@
 from __future__ import annotations
 from abc import ABC
-from asyncio.log import logger
 from typing import Iterable
 from collections import deque
 
@@ -9,7 +8,11 @@ from yamler.violations import RulesetTypeViolation
 from yamler.violations import TypeViolation
 from yamler.violations import ViolationManager
 
-from .types import Data, Rule, RuleType, YamlerRuleSet, SchemaTypes
+from yamler.types import Data
+from yamler.types import Rule
+from yamler.types import RuleType
+from yamler.types import YamlerRuleSet
+from yamler.types import SchemaTypes
 
 
 _built_in_lookups = {
