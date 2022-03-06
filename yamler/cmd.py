@@ -10,6 +10,9 @@ from .parser import YamlerParser
 from .wranglers import wrangle_data
 from .utils import load_yaml_file, load_yamler_ruleset
 
+SUCCESS = 0
+ERR = -1
+
 
 def main() -> int:
     parser = _create_args_parser()
@@ -20,13 +23,13 @@ def main() -> int:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
     except FileNotFoundError as ex:
         print(ex)
-        return StatusCode.ERR.value
+        return ERR
     except InvalidRulesetFilenameError as ex:
         print(ex)
-        return StatusCode.ERR.value
+        return ERR
     except ValueError as ex:
         print(ex)
-        return StatusCode.ERR.value
+        return ERR
 
     return display_violations(violations)
 
@@ -74,12 +77,6 @@ def display_violations(violations: Iterator[ViolationType]) -> int:
     return ConsoleOutput.display(violations)
 
 
-class StatusCode(Enum):
-    """Status code for the output of running the validaton process"""
-    SUCCESS = 0
-    ERR = -1
-
-
 class ViolationOutput(ABC):
     """Base class for displaying violations"""
 
@@ -112,8 +109,9 @@ class ConsoleOutput(ViolationOutput):
         violation_count = len(violations)
         print("\n{:<4} violation(s) found".format(violation_count))
 
-        if violation_count == 0:
-            return StatusCode.SUCCESS.value
+        has_violations = violation_count != 0
+        if not has_violations:
+            return SUCCESS
 
         print('\n{:<30} {:<20} {:<15} {:20}'.format(
                 'Parent Key', 'Key', 'Violation', 'Message'))
@@ -125,4 +123,4 @@ class ConsoleOutput(ViolationOutput):
                 violation.violation_type,
                 violation.message))
         print('---------------------------------------------------------------------------')  # nopep8
-        return StatusCode.ERR.value
+        return ERR
