@@ -19,8 +19,8 @@ def create_flat_ruleset():
 
 def create_complex_ruleset():
     person_ruleset = YamlerRuleSet('ruleset', [
-        Rule('name', RuleType(type=str), True),
-        Rule('age', RuleType(type=int), False)
+        Rule('name', RuleType(type=SchemaTypes.STR), True),
+        Rule('age', RuleType(type=SchemaTypes.INT), False)
     ])
 
     status_enum = YamlerEnum('Status', {
