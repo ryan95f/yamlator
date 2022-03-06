@@ -2,7 +2,8 @@ import unittest
 
 from collections import namedtuple
 from yamler.parser import YamlerTransformer
-from yamler.types import EnumItem, Rule, RuleType, YamlerEnum, YamlerRuleSet
+from yamler.types import EnumItem, Rule, RuleType
+from yamler.types import YamlerEnum, YamlerRuleSet, SchemaTypes
 
 
 Token = namedtuple('Token', ['value'])
@@ -13,7 +14,7 @@ class TestYamlerTransformer(unittest.TestCase):
         self.transformer = YamlerTransformer()
 
     def test_required_rule(self):
-        rtype = RuleType(type=str)
+        rtype = RuleType(type=SchemaTypes.STR)
         name = Token('message')
         tokens = (name, rtype)
 
@@ -22,7 +23,7 @@ class TestYamlerTransformer(unittest.TestCase):
         self.assertTrue(required_rule.is_required)
 
     def test_optional_rule(self):
-        rtype = RuleType(type=str)
+        rtype = RuleType(type=SchemaTypes.STR)
         name = Token('message')
         tokens = (name, rtype)
 
@@ -33,8 +34,8 @@ class TestYamlerTransformer(unittest.TestCase):
     def test_ruleset(self):
         name = Token('person')
         rules = [
-            Rule('name', RuleType(type=str), True),
-            Rule('age', RuleType(type=int), True),
+            Rule('name', RuleType(type=SchemaTypes.STR), True),
+            Rule('age', RuleType(type=SchemaTypes.INT), True),
         ]
         tokens = (name, *rules)
 
@@ -45,8 +46,8 @@ class TestYamlerTransformer(unittest.TestCase):
     def test_main_ruleset(self):
         expected_ruleset_name = 'main'
         rules = [
-            Rule('name', RuleType(type=str), True),
-            Rule('age', RuleType(type=int), True),
+            Rule('name', RuleType(type=SchemaTypes.STR), True),
+            Rule('age', RuleType(type=SchemaTypes.INT), True),
         ]
         tokens = (*rules, )
         ruleset = self.transformer.main_ruleset(tokens)
@@ -65,7 +66,7 @@ class TestYamlerTransformer(unittest.TestCase):
                 'error': EnumItem('ERR', 'error')
             }),
             YamlerRuleSet('main', [
-                Rule('message', RuleType(type=str), True)
+                Rule('message', RuleType(type=SchemaTypes.STR), True)
             ])
         ]
 
@@ -81,38 +82,38 @@ class TestYamlerTransformer(unittest.TestCase):
 
     def test_str_type(self):
         str_rule_type = self.transformer.str_type(())
-        self.assertEqual(str, str_rule_type.type)
+        self.assertEqual(SchemaTypes.STR, str_rule_type.type)
 
     def test_int_type(self):
         int_rule_type = self.transformer.int_type(())
-        self.assertEqual(int, int_rule_type.type)
+        self.assertEqual(SchemaTypes.INT, int_rule_type.type)
 
     def test_ruleset_type(self):
         name = Token('message')
         ruleset_type = self.transformer.ruleset_type((name, ))
-        self.assertEqual('ruleset', ruleset_type.type)
+        self.assertEqual(SchemaTypes.RULESET, ruleset_type.type)
         self.assertEqual(name.value, ruleset_type.lookup)
 
     def test_list_type(self):
-        tokens = (RuleType(type=str), )
+        tokens = (RuleType(type=SchemaTypes.STR), )
         list_type = self.transformer.list_type(tokens)
-        self.assertEqual(list, list_type.type)
+        self.assertEqual(SchemaTypes.LIST, list_type.type)
         self.assertEqual(tokens[0], list_type.sub_type)
 
     def test_map_type(self):
-        tokens = (RuleType(type=str), )
+        tokens = (RuleType(type=SchemaTypes.STR), )
         map_type = self.transformer.map_type(tokens)
-        self.assertEqual(dict, map_type.type)
+        self.assertEqual(SchemaTypes.MAP, map_type.type)
         self.assertEqual(tokens[0], map_type.sub_type)
 
     def test_any_type(self):
         any_type = self.transformer.any_type(())
-        self.assertEqual('any', any_type.type)
+        self.assertEqual(SchemaTypes.ANY, any_type.type)
 
     def test_enum_type(self):
         tokens = (Token('StatusCode'), )
         enum_type = self.transformer.enum_type(tokens)
-        self.assertEqual('enum', enum_type.type)
+        self.assertEqual(SchemaTypes.ENUM, enum_type.type)
         self.assertEqual(tokens[0].value, enum_type.lookup)
 
     def test_enum_item(self):

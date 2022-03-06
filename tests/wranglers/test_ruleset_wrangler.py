@@ -3,7 +3,7 @@ import unittest
 from .base import BaseWranglerTest
 from parameterized import parameterized
 from yamler.wranglers import RuleSetWrangler
-from yamler.types import Data, Rule, RuleType, YamlerRuleSet
+from yamler.types import Data, Rule, RuleType, YamlerRuleSet, SchemaTypes
 
 
 class TestRuleSetWrangler(BaseWranglerTest):
@@ -13,8 +13,8 @@ class TestRuleSetWrangler(BaseWranglerTest):
 
     def _create_flat_ruleset(self):
         message_ruleset = YamlerRuleSet('message', [
-            Rule('message', RuleType(type=str), True),
-            Rule('number', RuleType(type=int), False)
+            Rule('message', RuleType(type=SchemaTypes.STR), True),
+            Rule('number', RuleType(type=SchemaTypes.INT), False)
         ])
         return {
             'rules': {
@@ -23,12 +23,14 @@ class TestRuleSetWrangler(BaseWranglerTest):
         }
 
     @parameterized.expand([
-        ('str_type_data', RuleType(type=str), 'hello world', False),
-        ('ruleset_type_with_invalid_data', RuleType(type='ruleset'), 'hello world', True),
-        ('valid_ruleset', RuleType(type='ruleset', lookup='message'), {
+        ('str_type_data', RuleType(type=SchemaTypes.STR), 'hello world', False),
+        ('ruleset_type_with_invalid_data', RuleType(
+            type=SchemaTypes.RULESET
+        ), 'hello world', True),
+        ('valid_ruleset', RuleType(type=SchemaTypes.RULESET, lookup='message'), {
             'msg': {'message': 'hello', 'number': 1}
         }, False),
-        ('ruleset_with_no_rules', RuleType(type='ruleset', lookup='not_real'), {
+        ('ruleset_with_no_rules', RuleType(type=SchemaTypes.RULESET, lookup='not_real'), {
             'msg': {'message': 'hello', 'number': 1}
         }, False)
     ])

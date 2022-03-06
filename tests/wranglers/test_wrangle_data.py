@@ -2,13 +2,14 @@ import unittest
 
 from parameterized import parameterized
 from yamler.wranglers import wrangle_data
-from yamler.types import Data, EnumItem, Rule, RuleType, YamlerEnum, YamlerRuleSet
+from yamler.types import Data, EnumItem, Rule, RuleType
+from yamler.types import YamlerEnum, YamlerRuleSet, SchemaTypes
 
 
 def create_flat_ruleset():
     rules = [
-        Rule('message', RuleType(type=str), True),
-        Rule('number', RuleType(type=int), False),
+        Rule('message', RuleType(type=SchemaTypes.STR), True),
+        Rule('number', RuleType(type=SchemaTypes.INT), False),
     ]
     return {
         'main': YamlerRuleSet('main', rules),
@@ -28,12 +29,26 @@ def create_complex_ruleset():
     })
 
     main_ruleset = YamlerRuleSet('main', [
-        Rule('num_lists', RuleType(type=list, sub_type=RuleType(type=list, sub_type=RuleType(type=int))), False),  # nopep8
-        Rule('personList', RuleType(type=list, sub_type=RuleType(type='ruleset', lookup='person')), False),  # nopep8
-        Rule('person', RuleType(type='ruleset', lookup='person'), False),
-        Rule('my_map', RuleType(type=dict, sub_type=RuleType(type=str)), False),
-        Rule('my_any_list', RuleType(type=list, sub_type=RuleType(type='any')), False),
-        Rule('status', RuleType(type='enum', lookup='Status'), False),
+        Rule('num_lists', RuleType(
+            type=SchemaTypes.LIST,
+            sub_type=RuleType(
+                type=SchemaTypes.LIST,
+                sub_type=RuleType(type=SchemaTypes.INT))
+        ), False),
+        Rule('personList', RuleType(
+            type=SchemaTypes.LIST,
+            sub_type=RuleType(type=SchemaTypes.RULESET, lookup='person')
+        ), False),
+        Rule('person', RuleType(type=SchemaTypes.RULESET, lookup='person'), False),
+        Rule('my_map', RuleType(
+            type=SchemaTypes.MAP,
+            sub_type=RuleType(type=SchemaTypes.STR)
+        ), False),
+        Rule('my_any_list', RuleType(
+            type=SchemaTypes.LIST,
+            sub_type=RuleType(type=SchemaTypes.ANY)
+        ), False),
+        Rule('status', RuleType(type=SchemaTypes.ENUM, lookup='Status'), False),
     ])
 
     return {

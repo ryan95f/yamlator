@@ -4,7 +4,7 @@ from .base import BaseWranglerTest
 from unittest.mock import MagicMock
 from parameterized import parameterized
 from yamler.wranglers import ListWrangler
-from yamler.types import RuleType
+from yamler.types import RuleType, SchemaTypes
 
 
 class TestListWrangler(BaseWranglerTest):
@@ -14,17 +14,19 @@ class TestListWrangler(BaseWranglerTest):
         self.mock_ruleset_wrangler.wrangle.return_value = None
 
     @parameterized.expand([
-        ('with_non_list_type', RuleType(type=str), 'hello', 0),
-        ('with_list_type', RuleType(type=list, sub_type=RuleType(int)), [0, 1, 2, 3], 0),
+        ('with_non_list_type', RuleType(type=SchemaTypes.STR), 'hello', 0),
+        ('with_list_type', RuleType(
+            type=SchemaTypes.LIST,
+            sub_type=RuleType(type=SchemaTypes.INT)), [0, 1, 2, 3], 0),
         ('with_ruleset_list_type', RuleType(
-            type=list, sub_type=RuleType(
-                type='ruleset', lookup='message'
+            type=SchemaTypes.LIST, sub_type=RuleType(
+                type=SchemaTypes.RULESET, lookup='message'
             )
         ), [{'msg': 'hello'}, {'msg': 'world'}], 2),
         ('with_nested_list', RuleType(
-            type=list, sub_type=RuleType(
-                type=list, sub_type=RuleType(
-                    type=int)
+            type=SchemaTypes.LIST, sub_type=RuleType(
+                type=SchemaTypes.LIST, sub_type=RuleType(
+                    type=SchemaTypes.INT)
                 )
         ), [[0, 1, 2], [3, 4, 5]], 0)
     ])

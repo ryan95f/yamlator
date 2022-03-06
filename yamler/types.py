@@ -1,5 +1,5 @@
 from __future__ import annotations
-from enum import Enum
+from enum import Enum, auto
 from typing import Union
 from collections import namedtuple
 
@@ -10,13 +10,23 @@ EnumItem = namedtuple('EnumItem', ['name', 'value'])
 Data = Union[dict, list, int, float, str]
 
 
+class SchemaTypes(Enum):
+    STR = auto()
+    INT = auto()
+    MAP = auto()
+    LIST = auto()
+    ENUM = auto()
+    RULESET = auto()
+    ANY = auto()
+
+
 class RuleType:
-    def __init__(self, type: Union[str, type], lookup: str = None,
+    def __init__(self, type: SchemaTypes, lookup: str = None,
                  sub_type: RuleType = None):
         """RuleType constructor
 
         Args:
-            type        (str | type): The expected type for a field. Use the str for
+            type        (SchemaTypes): The expected type for a field. Use the str for
             a `ruleset` and other types will use the build in Python types
 
             lookup      (str):        Used when type=`ruleset` or type=`enum`.

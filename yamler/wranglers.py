@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import ABC
+from asyncio.log import logger
 from typing import Iterable
 from collections import deque
 
@@ -8,7 +9,15 @@ from yamler.violations import RulesetTypeViolation
 from yamler.violations import TypeViolation
 from yamler.violations import ViolationManager
 
-from .types import Data, Rule, RuleType, YamlerRuleSet
+from .types import Data, Rule, RuleType, YamlerRuleSet, SchemaTypes
+
+
+_built_in_lookups = {
+    SchemaTypes.INT: int,
+    SchemaTypes.STR: str,
+    SchemaTypes.LIST: list,
+    SchemaTypes.MAP: dict,
+}
 
 
 def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
@@ -244,7 +253,7 @@ class RuleSetWrangler(Wrangler):
                 )
 
     def _is_ruleset_rule(self, rtype: RuleType) -> bool:
-        return rtype.type == 'ruleset'
+        return rtype.type == SchemaTypes.RULESET
 
     def _is_ruleset(self, data: Data) -> bool:
         return type(data) == dict
@@ -307,11 +316,11 @@ class ListWrangler(Wrangler):
             )
 
     def _is_list_rule(self, rtype: RuleType):
-        return rtype.type == list
+        return rtype.type == SchemaTypes.LIST
 
     def _run_ruleset_wrangler(self, key: str, parent: str, data: Data, rtype: RuleType):
         has_ruleset_wrangler = self.ruleset_wrangler is not None
-        is_ruleset_rule = rtype.type == 'ruleset'
+        is_ruleset_rule = rtype.type == SchemaTypes.RULESET
 
         if has_ruleset_wrangler and is_ruleset_rule:
             self.ruleset_wrangler.wrangle(
@@ -338,19 +347,21 @@ class BuildInTypeWrangler(Wrangler):
             rtype       (RuleType): The type assigned to the rule
             is_required (bool):     Is the rule required
         """
-        if type(data) == rtype.type:
+        build_in_type = _built_in_lookups.get(rtype.type)
+        if build_in_type is None:
             super().wrangle(key, data, parent, rtype, is_required)
             return
 
-        if not self._is_ruleset_type(rtype):
-            message = f'{key} should be of type {rtype.type.__name__}'
+        if type(data) != build_in_type:
+            message = f'{key} should be of type {rtype.type}'
             violation = TypeViolation(key, parent, message)
             self._violation_manager.add_violation(violation)
-        else:
-            super().wrangle(key, data, parent, rtype, is_required)
+            return
+
+        super().wrangle(key, data, parent, rtype, is_required)
 
     def _is_ruleset_type(self, rtype: RuleType) -> bool:
-        return rtype.type == 'ruleset'
+        return rtype.type == SchemaTypes.RULESET
 
 
 class MapWrangler(Wrangler):
@@ -383,7 +394,7 @@ class MapWrangler(Wrangler):
                 rtype=rtype.sub_type)
 
     def _is_map_rule(self, rtype: RuleType):
-        return rtype.type == dict
+        return rtype.type == SchemaTypes.MAP
 
     def _is_map_type(self, data: Data):
         return type(data) == dict
@@ -414,7 +425,7 @@ class AnyTypeWrangler(Wrangler):
         super().wrangle(key, data, parent, rtype, is_required)
 
     def _is_any_type(self, rtype: RuleType):
-        return rtype.type == 'any'
+        return rtype.type == SchemaTypes.ANY
 
 
 class EnumTypeWrangler(Wrangler):
@@ -461,7 +472,7 @@ class EnumTypeWrangler(Wrangler):
         self._add_enum_violation(key, parent, rtype.lookup)
 
     def _is_enum_rule(self, rtype: RuleType) -> bool:
-        return rtype.type == 'enum'
+        return rtype.type == SchemaTypes.ENUM
 
     def _is_enum_str_data(self, data: Data):
         return isinstance(data, str)

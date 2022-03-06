@@ -3,7 +3,7 @@ import unittest
 
 from unittest.mock import patch, Mock
 from parameterized import parameterized
-from yamler.types import Data, RuleType
+from yamler.types import Data, RuleType, SchemaTypes
 
 from .base import BaseWranglerTest
 from yamler.wranglers import MapWrangler
@@ -11,14 +11,19 @@ from yamler.wranglers import MapWrangler
 
 class TestMapWrangler(BaseWranglerTest):
     @parameterized.expand([
-        ('with_str_rule_type', 'hello', RuleType(type=str), 1),
+        ('with_str_rule_type', 'hello', RuleType(type=SchemaTypes.STR), 1),
         ('with_ruleset_rule_type', {'message': 'hello'}, RuleType(
-            type='ruleset', lookup='message'), 1),
+            type=SchemaTypes.RULESET, lookup='message'
+        ), 1),
         ('with_map_rule_type', {'message1': 'wow', 'message2': 'wow'}, RuleType(
-            type=dict, sub_type=RuleType(type=str)
+            type=SchemaTypes.MAP, sub_type=RuleType(type=SchemaTypes.STR)
         ), 2),
         ('with_nested_map_rule_type', {'hello': {'message1': 'test'}}, RuleType(
-            type=dict, sub_type=RuleType(type=dict, sub_type=RuleType(type=str))
+            type=SchemaTypes.MAP,
+            sub_type=RuleType(
+                type=SchemaTypes.MAP,
+                sub_type=RuleType(type=SchemaTypes.STR)
+            )
         ), 1)
     ])
     @patch('yamler.wranglers.Wrangler.wrangle')

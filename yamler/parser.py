@@ -14,6 +14,7 @@ from .types import YamlerEnum
 from .types import YamlerType
 from .types import RuleType
 from .types import EnumItem
+from .types import SchemaTypes
 
 
 _package_dir = Path(__file__).parent.absolute()
@@ -93,27 +94,27 @@ class YamlerTransformer(Transformer):
         }
 
     def str_type(self, _):
-        return RuleType(type=str)
+        return RuleType(type=SchemaTypes.STR)
 
     def int_type(self, _):
-        return RuleType(type=int)
+        return RuleType(type=SchemaTypes.INT)
 
     def ruleset_type(self, tokens):
         (name, ) = tokens
-        return RuleType(type='ruleset', lookup=name.value)
+        return RuleType(type=SchemaTypes.RULESET, lookup=name.value)
 
     def list_type(self, tokens):
-        return RuleType(type=list, sub_type=tokens[0])
+        return RuleType(type=SchemaTypes.LIST, sub_type=tokens[0])
 
     def map_type(self, tokens):
-        return RuleType(type=dict, sub_type=tokens[0])
+        return RuleType(type=SchemaTypes.MAP, sub_type=tokens[0])
 
     def any_type(self, tokens):
-        return RuleType(type='any')
+        return RuleType(type=SchemaTypes.ANY)
 
     def enum_type(self, tokens):
         (name, ) = tokens
-        return RuleType(type='enum', lookup=name.value)
+        return RuleType(type=SchemaTypes.ENUM, lookup=name.value)
 
     def enum_item(self, tokens):
         name, value = tokens

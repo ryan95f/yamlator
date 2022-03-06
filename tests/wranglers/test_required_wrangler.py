@@ -1,10 +1,9 @@
 import unittest
 from yamler.types import Data
-
 from yamler.wranglers import RequiredWrangler
+from parameterized import parameterized
 
 from .base import BaseWranglerTest
-from parameterized import parameterized
 
 
 class TestRequiredWrangler(BaseWranglerTest):
