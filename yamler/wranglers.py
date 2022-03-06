@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC
 from typing import Iterable
-from collections import deque
+from collections import deque, namedtuple
 
 from yamler.violations import RequiredViolation
 from yamler.violations import RulesetTypeViolation
@@ -13,14 +13,6 @@ from yamler.types import Rule
 from yamler.types import RuleType
 from yamler.types import YamlerRuleSet
 from yamler.types import SchemaTypes
-
-
-_built_in_lookups = {
-    SchemaTypes.INT: int,
-    SchemaTypes.STR: str,
-    SchemaTypes.LIST: list,
-    SchemaTypes.MAP: dict,
-}
 
 
 def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
@@ -334,8 +326,20 @@ class ListWrangler(Wrangler):
             )
 
 
+_SchemaTypeDecoder = namedtuple("SchemaTypeDecoder", ["type", "friendly_name"])
+
+
 class BuildInTypeWrangler(Wrangler):
     """Wrangler to handle the build in types. e.g `int`, `list` & `str`"""
+
+    def __init__(self, violation_manager: ViolationManager) -> None:
+        super().__init__(violation_manager)
+        self._built_in_lookups = {
+            SchemaTypes.INT: _SchemaTypeDecoder(int, "int"),
+            SchemaTypes.STR: _SchemaTypeDecoder(str, "str"),
+            SchemaTypes.LIST: _SchemaTypeDecoder(list, "list"),
+            SchemaTypes.MAP: _SchemaTypeDecoder(dict, "map"),
+        }
 
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
                 is_required: bool = False) -> None:
@@ -350,13 +354,13 @@ class BuildInTypeWrangler(Wrangler):
             rtype       (RuleType): The type assigned to the rule
             is_required (bool):     Is the rule required
         """
-        build_in_type = _built_in_lookups.get(rtype.type)
-        if build_in_type is None:
+        buildin_type = self._built_in_lookups.get(rtype.type)
+        if buildin_type is None:
             super().wrangle(key, data, parent, rtype, is_required)
             return
 
-        if type(data) != build_in_type:
-            message = f'{key} should be of type {rtype.type}'
+        if type(data) != buildin_type.type:
+            message = f'{key} should be of type {buildin_type.friendly_name}'
             violation = TypeViolation(key, parent, message)
             self._violation_manager.add_violation(violation)
             return
