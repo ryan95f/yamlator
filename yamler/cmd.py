@@ -1,3 +1,4 @@
+import logging
 import argparse
 
 from abc import ABC
@@ -13,11 +14,16 @@ from yamler.utils import load_yamler_ruleset
 SUCCESS = 0
 ERR = -1
 
+logger = logging.getLogger('yamler')
+
 
 def main() -> int:
     parser = _create_args_parser()
     args = parser.parse_args()
     violations = []
+
+    if args.log_level != 'NONE':
+        logging.basicConfig(level=args.log_level)
 
     try:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
@@ -43,6 +49,9 @@ def _create_args_parser():
 
     parser.add_argument('-schema', type=str, required=True, dest='ruleset_schema',
                         help='The schama that will be used to validate the file')
+    parser.add_argument('-log', type=str, dest='log_level', default='NONE',
+                        help='log level for Yamler',
+                        choices=['DEBUG', 'INFO', 'ERROR', 'CRITICAL', 'NONE'])
     return parser
 
 
@@ -64,7 +73,10 @@ def validate_yaml_data_from_file(yaml_filepath: str,
         InvalidRulesetFilenameError: If `ruleset_filepath` does not have a valid filename
         that ends with the `.yamler` extension.
     """
+    logger.debug(f"Loading YAML data file: {yaml_filepath}")
     yaml_data = load_yaml_file(yaml_filepath)
+
+    logger.debug(f"Loading ruleset file: {ruleset_filepath}")
     ruleset = load_yamler_ruleset(ruleset_filepath)
 
     parser = YamlerParser()
