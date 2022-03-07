@@ -332,7 +332,7 @@ _SchemaTypeDecoder = namedtuple("SchemaTypeDecoder", ["type", "friendly_name"])
 class BuildInTypeWrangler(Wrangler):
     """Wrangler to handle the build in types. e.g `int`, `list` & `str`"""
 
-    def __init__(self, violations: ViolationManager) -> None:
+    def __init__(self, violations: deque) -> None:
         super().__init__(violations)
         self._built_in_lookups = {
             SchemaTypes.INT: _SchemaTypeDecoder(int, "int"),
@@ -438,7 +438,7 @@ class AnyTypeWrangler(Wrangler):
 class EnumTypeWrangler(Wrangler):
     """Wrangler to handle data that is contained in a enum as a constant"""
 
-    def __init__(self, violations: ViolationManager, enums: dict):
+    def __init__(self, violations: deque, enums: dict):
         """EnumTypeWrangler constructor
 
         Args:
