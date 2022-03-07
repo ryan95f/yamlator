@@ -29,7 +29,7 @@ class TestMapWrangler(BaseWranglerTest):
     @patch('yamler.wranglers.Wrangler.wrangle')
     def test_map_wrangler(self, name: str, data: Data, rtype: RuleType,
                           expected_parent_call_count: int, mock_parent_wrangler: Mock):
-        wrangler = MapWrangler(self.violation_manager)
+        wrangler = MapWrangler(self.violations)
         wrangler.wrangle(
             key=self.key,
             data=data,

@@ -36,15 +36,14 @@ class TestRuleSetWrangler(BaseWranglerTest):
     ])
     def test_rule_set_wrangler(self, name: str, rtype: RuleType, data: Data,
                                expect_violations: bool):
-        wrangler = RuleSetWrangler(self.violation_manager, self.instructions)
+        wrangler = RuleSetWrangler(self.violations, self.instructions)
         wrangler.wrangle(
             key=self.key,
             data=data,
             parent=self.parent,
             rtype=rtype)
 
-        violations = self.violation_manager.violations
-        has_violations = len(violations) == 1
+        has_violations = len(self.violations) == 1
         self.assertEqual(expect_violations, has_violations)
 
 

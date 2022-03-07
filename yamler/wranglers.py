@@ -6,7 +6,6 @@ from collections import deque, namedtuple
 from yamler.violations import RequiredViolation
 from yamler.violations import RulesetTypeViolation
 from yamler.violations import TypeViolation
-from yamler.violations import ViolationManager
 
 from yamler.types import Data
 from yamler.types import Rule
@@ -38,13 +37,13 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
         raise ValueError('instructions should not be None')
 
     entry_parent = '-'
-    violation_mgnr = ViolationManager()
+    violations = deque()
     entry_point: YamlerRuleSet = instructions.get('main', YamlerRuleSet('main', []))
 
     wranglers = _create_wrangler_chain(
         ruleset_lookups=instructions.get('rules', {}),
         enum_looksups=instructions.get('enums', {}),
-        violation_manager=violation_mgnr
+        violations=violations
     )
 
     entry_point_rules: Iterable[Rule] = entry_point.rules
@@ -59,21 +58,21 @@ def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
             is_required=rule.is_required
         )
 
-    return violation_mgnr.violations
+    return violations
 
 
 def _create_wrangler_chain(ruleset_lookups: dict,
                            enum_looksups: dict,
-                           violation_manager: ViolationManager) -> Wrangler:
+                           violations: deque) -> Wrangler:
 
-    root = OptionalWrangler(violation_manager)
-    any_type_wrangler = AnyTypeWrangler(violation_manager)
-    required_wrangler = RequiredWrangler(violation_manager)
-    map_wrangler = MapWrangler(violation_manager)
-    ruleset_wrangler = RuleSetWrangler(violation_manager, ruleset_lookups)
-    list_wrangler = ListWrangler(violation_manager)
-    enum_wrangler = EnumTypeWrangler(violation_manager, enum_looksups)
-    type_wrangler = BuildInTypeWrangler(violation_manager)
+    root = OptionalWrangler(violations)
+    any_type_wrangler = AnyTypeWrangler(violations)
+    required_wrangler = RequiredWrangler(violations)
+    map_wrangler = MapWrangler(violations)
+    ruleset_wrangler = RuleSetWrangler(violations, ruleset_lookups)
+    list_wrangler = ListWrangler(violations)
+    enum_wrangler = EnumTypeWrangler(violations, enum_looksups)
+    type_wrangler = BuildInTypeWrangler(violations)
 
     root.set_next_wrangler(required_wrangler)
     required_wrangler.set_next_wrangler(map_wrangler)
@@ -93,13 +92,14 @@ def _create_wrangler_chain(ruleset_lookups: dict,
 class Wrangler(ABC):
     _next_wrangler = None
 
-    def __init__(self, violation_manager: ViolationManager) -> None:
+    def __init__(self, violations: deque) -> None:
         """Wrangler constructor
 
         Args:
-            violation_manager (ViolationManager): Manges the total violations in the chain
+            violations (deque): Contains violations that have been detected
+            whilst processing the data
         """
-        self._violation_manager = violation_manager
+        self._violations = violations
 
     def set_next_wrangler(self, wrangler: Wrangler) -> Wrangler:
         """Set the next wrangler in the chain
@@ -178,7 +178,7 @@ class RequiredWrangler(Wrangler):
         missing_data = data is None
         if is_required and missing_data:
             violation = RequiredViolation(key, parent)
-            self._violation_manager.add_violation(violation)
+            self._violations.append(violation)
             return
 
         super().wrangle(key, data, parent, rtype, is_required)
@@ -189,18 +189,18 @@ class RuleSetWrangler(Wrangler):
 
     _ruleset_wrangler: Wrangler = None
 
-    def __init__(self, violation_manager: ViolationManager, instructions: dict):
+    def __init__(self, violations: deque, instructions: dict):
         """RuleSetWrangler Constructor
 
         Args:
-            violation_manager (ViolationManager):   Manges the total violations
-            in the chain
+            violations (deque):  Contains violations that have been detected
+            whilst processing the data
 
-            instructions (dict):                    A dict containering references to
+            instructions (dict): A dict containering references to
             other rulesets
         """
         self.instructions = instructions
-        super().__init__(violation_manager)
+        super().__init__(violations)
 
     def set_next_ruleset_wrangler(self, wrangler: Wrangler) -> None:
         """Set the next wrangler for handling nested rulesets in the data
@@ -230,7 +230,7 @@ class RuleSetWrangler(Wrangler):
 
         if not self._is_ruleset(data):
             violation = RulesetTypeViolation(key, parent)
-            self._violation_manager.add_violation(violation)
+            self._violations.append(violation)
             return
 
         ruleset_rules = self._retrieve_next_ruleset(rtype.lookup)
@@ -332,8 +332,8 @@ _SchemaTypeDecoder = namedtuple("SchemaTypeDecoder", ["type", "friendly_name"])
 class BuildInTypeWrangler(Wrangler):
     """Wrangler to handle the build in types. e.g `int`, `list` & `str`"""
 
-    def __init__(self, violation_manager: ViolationManager) -> None:
-        super().__init__(violation_manager)
+    def __init__(self, violations: ViolationManager) -> None:
+        super().__init__(violations)
         self._built_in_lookups = {
             SchemaTypes.INT: _SchemaTypeDecoder(int, "int"),
             SchemaTypes.STR: _SchemaTypeDecoder(str, "str"),
@@ -362,7 +362,7 @@ class BuildInTypeWrangler(Wrangler):
         if type(data) != buildin_type.type:
             message = f'{key} should be of type {buildin_type.friendly_name}'
             violation = TypeViolation(key, parent, message)
-            self._violation_manager.add_violation(violation)
+            self._violations.append(violation)
             return
 
         super().wrangle(key, data, parent, rtype, is_required)
@@ -438,16 +438,17 @@ class AnyTypeWrangler(Wrangler):
 class EnumTypeWrangler(Wrangler):
     """Wrangler to handle data that is contained in a enum as a constant"""
 
-    def __init__(self, violation_manager: ViolationManager, enums: dict):
+    def __init__(self, violations: ViolationManager, enums: dict):
         """EnumTypeWrangler constructor
 
         Args:
-            violation_manager (ViolationManager): Manges the total violations in the chain
+            violations (deque): Contains violations that have been detected
+            whilst processing the data
 
-            enums                         (dict): A dict that contains references to enums
+            enums       (dict): A dict that contains references to enums
             referenced in the rulesets.
         """
-        super().__init__(violation_manager)
+        super().__init__(violations)
         self.enums = enums
 
     def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
@@ -496,4 +497,4 @@ class EnumTypeWrangler(Wrangler):
     def _add_enum_violation(self, key: str, parent: str, enum_name: str):
         message = f'{key} does not match any value in enum {enum_name}'
         violation = TypeViolation(key, parent, message)
-        self._violation_manager.add_violation(violation)
+        self._violations.append(violation)

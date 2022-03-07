@@ -32,7 +32,7 @@ class TestListWrangler(BaseWranglerTest):
     ])
     def test_list_wrangler(self, name: str, rtype: RuleType, data: str,
                            ruleset_wrangler_call_count: int):
-        wrangler = ListWrangler(self.violation_manager)
+        wrangler = ListWrangler(self.violations)
         wrangler.set_ruleset_wrangler(self.mock_ruleset_wrangler)
 
         wrangler.wrangle(

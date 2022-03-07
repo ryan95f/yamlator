@@ -19,13 +19,14 @@ class TestOptionalWrangler(BaseWranglerTest):
     @patch('yamler.wranglers.Wrangler.wrangle')
     def test_optional_wrangler(self, name: str, is_required: bool, data: Data,
                                next_wrangler_call_count: int, mock_parent_wrangler: Mock):
-        wrangler = OptionalWrangler(self.violation_manager)
+        wrangler = OptionalWrangler(self.violations)
         wrangler.wrangle(
             key=self.key,
             data=data,
             parent=self.parent,
             rtype=self.rtype,
             is_required=is_required)
+
         self.assertEqual(next_wrangler_call_count, mock_parent_wrangler.call_count)
 
 

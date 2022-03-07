@@ -29,13 +29,14 @@ class TestEnumTypeWrangler(BaseWranglerTest):
     ])
     def test_enum_wrangler(self, name, data: Data, rtype: RuleType,
                            expected_violation_count: int):
-        wrangler = EnumTypeWrangler(self.violation_manager, self.enums)
+        wrangler = EnumTypeWrangler(self.violations, self.enums)
         wrangler.wrangle(
             key=self.key,
             data=data,
             parent=self.parent,
             rtype=rtype)
-        violation_count = len(self.violation_manager.violations)
+
+        violation_count = len(self.violations)
         self.assertEqual(expected_violation_count, violation_count)
 
 

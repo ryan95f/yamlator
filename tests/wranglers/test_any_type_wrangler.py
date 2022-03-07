@@ -19,7 +19,7 @@ class TestAnyTypeWrangler(BaseWranglerTest):
     def test_any_type_wrangler(self, name: str, data: Data, rtype: RuleType,
                                expected_wrangler_call_count: int,
                                mock_parent_wrangler: Mock):
-        wrangler = AnyTypeWrangler(self.violation_manager)
+        wrangler = AnyTypeWrangler(self.violations)
         wrangler.wrangle(
             key=self.key,
             parent=self.parent,

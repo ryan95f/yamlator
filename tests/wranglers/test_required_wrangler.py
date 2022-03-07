@@ -16,7 +16,7 @@ class TestRequiredWrangler(BaseWranglerTest):
     ])
     def test_required_wrangler(self, name: str, data: Data, is_required: bool,
                                expect_violation: bool):
-        wrangler = RequiredWrangler(self.violation_manager)
+        wrangler = RequiredWrangler(self.violations)
         wrangler.wrangle(
             key=self.key,
             data=data,
@@ -24,8 +24,7 @@ class TestRequiredWrangler(BaseWranglerTest):
             rtype=self.rtype,
             is_required=is_required)
 
-        violations = self.violation_manager.violations
-        has_violations = len(violations) == 1
+        has_violations = len(self.violations) == 1
         self.assertEqual(expect_violation, has_violations)
 
 
