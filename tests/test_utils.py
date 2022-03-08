@@ -1,15 +1,18 @@
 import unittest
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
+from parameterized import parameterized
 
 
 class TestLoadYamlFile(unittest.TestCase):
-    def test_yaml_file_invalid_filename(self):
-        filenames = [None, '']
 
-        for filename in filenames:
-            with self.assertRaises(ValueError):
-                load_yaml_file(filename)
+    @parameterized.expand([
+        ('with_empty_str', ''),
+        ('with_none', None)
+    ])
+    def test_yaml_file_invalid_filename(self, name, filename):
+        with self.assertRaises(ValueError):
+            load_yaml_file(filename)
 
     def test_successfully_load_yaml_file(self):
         yaml_file_path = 'tests/files/hello.yaml'
@@ -18,12 +21,13 @@ class TestLoadYamlFile(unittest.TestCase):
 
 
 class TestLoadYamlerRuleset(unittest.TestCase):
-    def test_load_yamler_ruleset_invalid_filename(self):
-        filenames = [None, '']
-
-        for filename in filenames:
-            with self.assertRaises(ValueError):
-                load_yamler_ruleset(filename)
+    @parameterized.expand([
+        ('with_empty_str', ''),
+        ('with_none', None)
+    ])
+    def test_load_yamler_ruleset_invalid_filename(self, name, filename):
+        with self.assertRaises(ValueError):
+            load_yamler_ruleset(filename)
 
     def test_successfully_load_yamler_file(self):
         yamler_file_path = 'tests/files/hello.yamler'

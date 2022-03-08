@@ -51,6 +51,7 @@ class TestMain(unittest.TestCase):
         mock_parser.parse_args.return_value = args
         mock_args_parser.return_value = mock_parser
 
+        # Suppress the print statements
         with patch('sys.stdout', new=io.StringIO()):
             status_code = main()
             self.assertEqual(expected_status_code, status_code)
