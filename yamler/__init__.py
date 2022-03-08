@@ -1,1 +1,1 @@
-from .wranglers import wrangle_data
+from yamler.wranglers import wrangle_data
