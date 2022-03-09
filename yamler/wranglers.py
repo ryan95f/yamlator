@@ -14,9 +14,9 @@ from yamler.types import YamlerRuleSet
 from yamler.types import SchemaTypes
 
 
-def wrangle_data(yaml_data: Data, instructions: dict) -> deque:
-    """Traverse through the data to find any violations against the provided
-    instructions.
+def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
+    """Validate YAML data by comparing the data against a set of instructions.
+    Any violations will be collected and returned in a `deque`
 
     Args:
         yaml_data (dict | list | int | float | str): The yaml data to validate

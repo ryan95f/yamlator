@@ -1,1 +1,1 @@
-from yamler.wranglers import wrangle_data
+from yamler.wranglers import validate_yaml

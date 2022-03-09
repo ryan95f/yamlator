@@ -1,7 +1,7 @@
 import unittest
 
 from parameterized import parameterized
-from yamler.wranglers import wrangle_data
+from yamler.wranglers import validate_yaml
 from yamler.types import Data, EnumItem, Rule, RuleType
 from yamler.types import YamlerEnum, YamlerRuleSet, SchemaTypes
 
@@ -71,7 +71,7 @@ class TestWrangleData(unittest.TestCase):
     ])
     def test_wrangler_invalid_parameters(self, name: str, data: Data, instructions: dict):
         with self.assertRaises(ValueError):
-            wrangle_data(data, instructions)
+            validate_yaml(data, instructions)
 
     @parameterized.expand([
         ('empty_data_and_rules', {}, {}, 0),
@@ -157,7 +157,7 @@ class TestWrangleData(unittest.TestCase):
         }, 1),
     ])
     def test_wrangler(self, name, ruleset, data, expected_violations_count):
-        violations = wrangle_data(data, ruleset)
+        violations = validate_yaml(data, ruleset)
         self.assertEqual(expected_violations_count, len(violations))
 
 
