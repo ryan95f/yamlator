@@ -21,34 +21,30 @@ _package_dir = Path(__file__).parent.absolute()
 _GRAMMER_FILE = os.path.join(_package_dir, 'grammer/grammer.lark')
 
 
-class YamlerParser:
-    """Parsers a YAML file to generate the rules that will be
-    applied against a YAML file
+def parse_rulesets(ruleset_content: str) -> dict:
+    """Parses a ruleset into a set of instructions that can be
+    used to validate a YAML file.
+
+    Args:
+        ruleset_content (str): The string contnet of a ruleset schema
+
+    Returns:
+        A `dict` that contains the instructions to validate the YAML file
+
+    Raises:
+        ValueError: Raised when `ruleset_content` is `None`
     """
+    if ruleset_content is None:
+        raise ValueError("ruleset_content should not be None")
 
-    def __init__(self):
-        """YamlerParser Constructor"""
-        self._parser = Lark.open(_GRAMMER_FILE)
-        self._transfomer = YamlerTransformer()
+    lark_parser = Lark.open(_GRAMMER_FILE)
+    transformer = YamlerTransformer()
 
-    def parse(self, text: str) -> dict:
-        """Parses the yamler file contents to generate the rules
-
-        Args:
-            text (str): The content of the yamler file
-
-        Returns:
-            dict of the rules in a format that can be used
-            to validate a YAML file
-        """
-        if text is None:
-            raise ValueError("text cannot be None")
-
-        try:
-            tokens = self._parser.parse(text)
-            return self._transfomer.transform(tokens)
-        except UnexpectedEOF:
-            return {}
+    try:
+        tokens = lark_parser.parse(ruleset_content)
+        return transformer.transform(tokens)
+    except UnexpectedEOF:
+        return {}
 
 
 class YamlerTransformer(Transformer):

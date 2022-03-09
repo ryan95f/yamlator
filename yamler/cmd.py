@@ -5,7 +5,7 @@ from typing import Iterator
 from yamler.exceptions import InvalidRulesetFilenameError
 from yamler.violations import ViolationType
 
-from yamler.parser import YamlerParser
+from yamler.parser import parse_rulesets
 from yamler.wranglers import wrangle_data
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
@@ -65,12 +65,10 @@ def validate_yaml_data_from_file(yaml_filepath: str,
         that ends with the `.yamler` extension.
     """
     yaml_data = load_yaml_file(yaml_filepath)
-    ruleset = load_yamler_ruleset(ruleset_filepath)
+    ruleset_data = load_yamler_ruleset(ruleset_filepath)
 
-    parser = YamlerParser()
-    tokens = parser.parse(ruleset)
-
-    return wrangle_data(yaml_data, tokens)
+    instructions = parse_rulesets(ruleset_data)
+    return wrangle_data(yaml_data, instructions)
 
 
 def display_violations(violations: Iterator[ViolationType]) -> int:
