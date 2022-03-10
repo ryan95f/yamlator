@@ -1,7 +1,7 @@
 import unittest
 
 from parameterized import parameterized
-from yamler.wranglers import validate_yaml
+from yamler.validators import validate_yaml
 from yamler.types import Data, EnumItem, Rule, RuleType
 from yamler.types import YamlerEnum, YamlerRuleSet, SchemaTypes
 

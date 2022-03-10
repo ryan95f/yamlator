@@ -2,7 +2,7 @@ import unittest
 
 from .base import BaseWranglerTest
 from parameterized import parameterized
-from yamler.wranglers import BuildInTypeWrangler
+from yamler.validators import BuildInTypeValidator
 from yamler.types import Data, RuleType, SchemaTypes
 
 
@@ -19,10 +19,10 @@ class TestBuildInTypeWrangler(BaseWranglerTest):
         ('int_type_mismatch', RuleType(type=SchemaTypes.INT), 'hello', True),
         ('str_type_mismatch', RuleType(type=SchemaTypes.STR), None, True)
     ])
-    def test_build_in_type_wrangler(self, name: str, rtype: RuleType, data: Data,
-                                    expect_violations: bool):
-        wrangler = BuildInTypeWrangler(self.violations)
-        wrangler.wrangle(
+    def test_build_in_type_validator(self, name: str, rtype: RuleType, data: Data,
+                                     expect_violations: bool):
+        wrangler = BuildInTypeValidator(self.violations)
+        wrangler.validate(
             key=self.key,
             data=data,
             parent=self.parent,

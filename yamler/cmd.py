@@ -6,7 +6,7 @@ from yamler.exceptions import InvalidRulesetFilenameError
 from yamler.violations import ViolationType
 
 from yamler.parser import parse_rulesets
-from yamler.wranglers import validate_yaml
+from yamler.validators import validate_yaml
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
 

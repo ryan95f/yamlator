@@ -1,1 +1,1 @@
-from yamler.wranglers import validate_yaml
+from yamler.validators import validate_yaml

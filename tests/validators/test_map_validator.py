@@ -6,7 +6,7 @@ from parameterized import parameterized
 from yamler.types import Data, RuleType, SchemaTypes
 
 from .base import BaseWranglerTest
-from yamler.wranglers import MapWrangler
+from yamler.validators import MapValidator
 
 
 class TestMapWrangler(BaseWranglerTest):
@@ -26,11 +26,11 @@ class TestMapWrangler(BaseWranglerTest):
             )
         ), 1)
     ])
-    @patch('yamler.wranglers.Wrangler.wrangle')
-    def test_map_wrangler(self, name: str, data: Data, rtype: RuleType,
-                          expected_parent_call_count: int, mock_parent_wrangler: Mock):
-        wrangler = MapWrangler(self.violations)
-        wrangler.wrangle(
+    @patch('yamler.validators.Validator.validate')
+    def test_map_validator(self, name: str, data: Data, rtype: RuleType,
+                           expected_parent_call_count: int, mock_parent_wrangler: Mock):
+        wrangler = MapValidator(self.violations)
+        wrangler.validate(
             key=self.key,
             data=data,
             parent=self.parent,

@@ -40,7 +40,7 @@ def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
     violations = deque()
     entry_point: YamlerRuleSet = instructions.get('main', YamlerRuleSet('main', []))
 
-    wranglers = _create_wrangler_chain(
+    validators = _create_wrangler_chain(
         ruleset_lookups=instructions.get('rules', {}),
         enum_looksups=instructions.get('enums', {}),
         violations=violations
@@ -50,7 +50,7 @@ def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
     for rule in entry_point_rules:
         sub_data = yaml_data.get(rule.name, None)
 
-        wranglers.wrangle(
+        validators.validate(
             key=rule.name,
             data=sub_data,
             parent=entry_parent,
@@ -63,34 +63,34 @@ def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
 
 def _create_wrangler_chain(ruleset_lookups: dict,
                            enum_looksups: dict,
-                           violations: deque) -> Wrangler:
+                           violations: deque) -> Validator:
 
-    root = OptionalWrangler(violations)
-    any_type_wrangler = AnyTypeWrangler(violations)
-    required_wrangler = RequiredWrangler(violations)
-    map_wrangler = MapWrangler(violations)
-    ruleset_wrangler = RuleSetWrangler(violations, ruleset_lookups)
-    list_wrangler = ListWrangler(violations)
-    enum_wrangler = EnumTypeWrangler(violations, enum_looksups)
-    type_wrangler = BuildInTypeWrangler(violations)
+    root = OptionalValidator(violations)
+    any_type_wrangler = AnyTypeValidator(violations)
+    required_wrangler = RequiredValidator(violations)
+    map_wrangler = MapValidator(violations)
+    ruleset_wrangler = RuleSetValidator(violations, ruleset_lookups)
+    list_wrangler = ListValidator(violations)
+    enum_wrangler = EnumTypeValidator(violations, enum_looksups)
+    type_wrangler = BuildInTypeValidator(violations)
 
-    root.set_next_wrangler(required_wrangler)
-    required_wrangler.set_next_wrangler(map_wrangler)
-    map_wrangler.set_next_wrangler(ruleset_wrangler)
+    root.set_next_validator(required_wrangler)
+    required_wrangler.set_next_validator(map_wrangler)
+    map_wrangler.set_next_validator(ruleset_wrangler)
 
-    ruleset_wrangler.set_next_ruleset_wrangler(root)
-    ruleset_wrangler.set_next_wrangler(list_wrangler)
+    ruleset_wrangler.set_next_ruleset_validator(root)
+    ruleset_wrangler.set_next_validator(list_wrangler)
 
-    list_wrangler.set_ruleset_wrangler(ruleset_wrangler)
-    list_wrangler.set_next_wrangler(enum_wrangler)
+    list_wrangler.set_ruleset_validator(ruleset_wrangler)
+    list_wrangler.set_next_validator(enum_wrangler)
 
-    enum_wrangler.set_next_wrangler(any_type_wrangler)
-    any_type_wrangler.set_next_wrangler(type_wrangler)
+    enum_wrangler.set_next_validator(any_type_wrangler)
+    any_type_wrangler.set_next_validator(type_wrangler)
     return root
 
 
-class Wrangler(ABC):
-    _next_wrangler = None
+class Validator(ABC):
+    _next_validator = None
 
     def __init__(self, violations: deque) -> None:
         """Wrangler constructor
@@ -101,21 +101,21 @@ class Wrangler(ABC):
         """
         self._violations = violations
 
-    def set_next_wrangler(self, wrangler: Wrangler) -> Wrangler:
-        """Set the next wrangler in the chain
+    def set_next_validator(self, validator: Validator) -> Validator:
+        """Set the next validator in the chain
 
         Args:
-            wrangler (Wrangler): The next wrangler in the chain
+            validator (Validator): The next validator in the chain
 
         Returns:
-            The object that was provided in the `wrangler` parameter
+            The object that was provided in the `validator` parameter
         """
-        self._next_wrangler = wrangler
-        return wrangler
+        self._next_validator = validator
+        return validator
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False):
-        """Wrangler the data to detect violations
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False):
+        """Validate the data against the next validator
 
         Args:
             key         (str):      The key that owns the data
@@ -125,8 +125,8 @@ class Wrangler(ABC):
             is_required (bool):     Is the rule required
         """
 
-        if self._next_wrangler is not None:
-            self._next_wrangler.wrangle(
+        if self._next_validator is not None:
+            self._next_validator.validate(
                 key=key,
                 data=data,
                 parent=parent,
@@ -135,11 +135,11 @@ class Wrangler(ABC):
             )
 
 
-class OptionalWrangler(Wrangler):
+class OptionalValidator(Validator):
     """Wrangler for handling optional rules"""
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False) -> None:
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False) -> None:
         """Wrangle the data to find any optional rules. If an optional rule is
         found and is None, then the next stage in the chain is not called otherwise
         it will be called.
@@ -156,14 +156,14 @@ class OptionalWrangler(Wrangler):
         if not is_required and missing_data:
             return
 
-        super().wrangle(key, data, parent, rtype, is_required)
+        super().validate(key, data, parent, rtype, is_required)
 
 
-class RequiredWrangler(Wrangler):
+class RequiredValidator(Validator):
     """Wrangler for handling data that is required"""
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False) -> None:
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False) -> None:
         """Wrangle the data for required fields. If a required value
         is None, then it is added to the violation manager.
 
@@ -181,13 +181,13 @@ class RequiredWrangler(Wrangler):
             self._violations.append(violation)
             return
 
-        super().wrangle(key, data, parent, rtype, is_required)
+        super().validate(key, data, parent, rtype, is_required)
 
 
-class RuleSetWrangler(Wrangler):
+class RuleSetValidator(Validator):
     """Wrangler for handling rulesets"""
 
-    _ruleset_wrangler: Wrangler = None
+    _ruleset_validator: Validator = None
 
     def __init__(self, violations: deque, instructions: dict):
         """RuleSetWrangler Constructor
@@ -202,16 +202,16 @@ class RuleSetWrangler(Wrangler):
         self.instructions = instructions
         super().__init__(violations)
 
-    def set_next_ruleset_wrangler(self, wrangler: Wrangler) -> None:
+    def set_next_ruleset_validator(self, wrangler: Validator) -> None:
         """Set the next wrangler for handling nested rulesets in the data
 
         Args:
             wrangler (Wrangler): The wrangler to add to the chain
         """
-        self._ruleset_wrangler = wrangler
+        self._ruleset_validator = wrangler
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False):
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False):
         """Wrangle the data rulesets and call the chain on the data itself to validate it.
         If the current rule is not a ruleset then the next wrangler is called
         in the chain. If the data is not in a dict format then a type violation is added.
@@ -225,7 +225,7 @@ class RuleSetWrangler(Wrangler):
         """
 
         if not self._is_ruleset_rule(rtype):
-            super().wrangle(key, data, parent, rtype, is_required)
+            super().validate(key, data, parent, rtype, is_required)
             return
 
         if not self._is_ruleset(data):
@@ -238,8 +238,8 @@ class RuleSetWrangler(Wrangler):
         for ruleset_rule in ruleset_rules:
             sub_data = data.get(ruleset_rule.name, None)
 
-            if self._ruleset_wrangler is not None:
-                self._ruleset_wrangler.wrangle(
+            if self._ruleset_validator is not None:
+                self._ruleset_validator.validate(
                     key=ruleset_rule.name,
                     data=sub_data,
                     parent=key,
@@ -259,12 +259,12 @@ class RuleSetWrangler(Wrangler):
         return ruleset.rules
 
 
-class ListWrangler(Wrangler):
+class ListValidator(Validator):
     """Wrangler for handling list types"""
 
-    ruleset_wrangler: Wrangler = None
+    ruleset_wrangler: Validator = None
 
-    def set_ruleset_wrangler(self, wrangler: Wrangler) -> None:
+    def set_ruleset_validator(self, wrangler: Validator) -> None:
         """Set a wrangler for when nested rulesets are within the list
 
         Args:
@@ -272,11 +272,11 @@ class ListWrangler(Wrangler):
         """
         self.ruleset_wrangler = wrangler
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False) -> None:
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False) -> None:
         """Wrangle the list data. If there is nested lists then this method
         will be recursively called. Any rulesets that are within the list will
-        be handled by an additional wrangler that can be set with `set_ruleset_wrangler`.
+        be handled by an additional wrangler that can be set with `set_ruleset_validator`.
         Any data type that is not a list is sent to the next wrangler.
 
         Args:
@@ -287,14 +287,14 @@ class ListWrangler(Wrangler):
             is_required (bool):     Is the rule required
         """
         if not self._is_list_rule(rtype) or type(data) != list:
-            super().wrangle(key, data, parent, rtype, is_required)
+            super().validate(key, data, parent, rtype, is_required)
             return
 
         for idx, item in enumerate(data):
             current_key = f"{key}[{idx}]"
 
             # loop over any nested lists
-            self.wrangle(
+            self.validate(
                 key=current_key,
                 parent=key,
                 data=item,
@@ -303,7 +303,7 @@ class ListWrangler(Wrangler):
 
             # a list could contain ruleset items
             # so need to run each item through that wrangler
-            self._run_ruleset_wrangler(
+            self._run_ruleset_validator(
                 key=current_key,
                 parent=key,
                 data=item,
@@ -313,12 +313,12 @@ class ListWrangler(Wrangler):
     def _is_list_rule(self, rtype: RuleType):
         return rtype.type == SchemaTypes.LIST
 
-    def _run_ruleset_wrangler(self, key: str, parent: str, data: Data, rtype: RuleType):
-        has_ruleset_wrangler = self.ruleset_wrangler is not None
+    def _run_ruleset_validator(self, key: str, parent: str, data: Data, rtype: RuleType):
+        has_ruleset_validator = self.ruleset_wrangler is not None
         is_ruleset_rule = rtype.type == SchemaTypes.RULESET
 
-        if has_ruleset_wrangler and is_ruleset_rule:
-            self.ruleset_wrangler.wrangle(
+        if has_ruleset_validator and is_ruleset_rule:
+            self.ruleset_wrangler.validate(
                 key=key,
                 parent=parent,
                 data=data,
@@ -329,7 +329,7 @@ class ListWrangler(Wrangler):
 _SchemaTypeDecoder = namedtuple("SchemaTypeDecoder", ["type", "friendly_name"])
 
 
-class BuildInTypeWrangler(Wrangler):
+class BuildInTypeValidator(Validator):
     """Wrangler to handle the build in types. e.g `int`, `list` & `str`"""
 
     def __init__(self, violations: deque) -> None:
@@ -341,8 +341,8 @@ class BuildInTypeWrangler(Wrangler):
             SchemaTypes.MAP: _SchemaTypeDecoder(dict, "map"),
         }
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False) -> None:
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False) -> None:
         """Wrangle the data to validate its data type. If the data matches
         the rule, then it is passed onto the next stage in the chain otherwise
         a `TypeViolation` is added to the violation manager.
@@ -356,7 +356,7 @@ class BuildInTypeWrangler(Wrangler):
         """
         buildin_type = self._built_in_lookups.get(rtype.type)
         if buildin_type is None:
-            super().wrangle(key, data, parent, rtype, is_required)
+            super().validate(key, data, parent, rtype, is_required)
             return
 
         if type(data) != buildin_type.type:
@@ -365,17 +365,17 @@ class BuildInTypeWrangler(Wrangler):
             self._violations.append(violation)
             return
 
-        super().wrangle(key, data, parent, rtype, is_required)
+        super().validate(key, data, parent, rtype, is_required)
 
     def _is_ruleset_type(self, rtype: RuleType) -> bool:
         return rtype.type == SchemaTypes.RULESET
 
 
-class MapWrangler(Wrangler):
+class MapValidator(Validator):
     """Wrangler to handle map types"""
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False) -> None:
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False) -> None:
         """Wrangle map data. If the rule type is not a map, then this is
         passed to the next item in the chain. If it is a map type, then each
         element is iterated over and the wrangler will call itself to iterate
@@ -390,11 +390,11 @@ class MapWrangler(Wrangler):
         """
 
         if not self._is_map_rule(rtype) or not self._is_map_type(data):
-            super().wrangle(key, data, parent, rtype, is_required)
+            super().validate(key, data, parent, rtype, is_required)
             return
 
         for child_key, value in data.items():
-            self.wrangle(
+            self.validate(
                 key=child_key,
                 data=value,
                 parent=key,
@@ -407,13 +407,13 @@ class MapWrangler(Wrangler):
         return type(data) == dict
 
 
-class AnyTypeWrangler(Wrangler):
+class AnyTypeValidator(Validator):
     """Wrangler to handle the `any` type, which ignores all type
     checks against the data
     """
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False) -> None:
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False) -> None:
         """Wrangle data when the rule marks the key as any type. This effectively
         ignores all type checks against the key. Any other rule that has a type
         besides `any` is passed onto the next wrangler in the chain.
@@ -429,13 +429,13 @@ class AnyTypeWrangler(Wrangler):
         if self._is_any_type(rtype):
             return
 
-        super().wrangle(key, data, parent, rtype, is_required)
+        super().validate(key, data, parent, rtype, is_required)
 
     def _is_any_type(self, rtype: RuleType):
         return rtype.type == SchemaTypes.ANY
 
 
-class EnumTypeWrangler(Wrangler):
+class EnumTypeValidator(Validator):
     """Wrangler to handle data that is contained in a enum as a constant"""
 
     def __init__(self, violations: deque, enums: dict):
@@ -451,8 +451,8 @@ class EnumTypeWrangler(Wrangler):
         super().__init__(violations)
         self.enums = enums
 
-    def wrangle(self, key: str, data: Data, parent: str, rtype: RuleType,
-                is_required: bool = False) -> None:
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False) -> None:
         """Wrangle enum data in the YAML and validate that
         there is a matching value in the rule. If a match is
         not found then a `TypeViolation` is added to the violation
@@ -467,7 +467,7 @@ class EnumTypeWrangler(Wrangler):
             is_required (bool):     Is the rule required
         """
         if not self._is_enum_rule(rtype):
-            super().wrangle(key, data, parent, rtype, is_required)
+            super().validate(key, data, parent, rtype, is_required)
             return
 
         if not self._is_enum_str_data(data):

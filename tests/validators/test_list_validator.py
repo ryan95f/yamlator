@@ -3,15 +3,15 @@ import unittest
 from .base import BaseWranglerTest
 from unittest.mock import MagicMock
 from parameterized import parameterized
-from yamler.wranglers import ListWrangler
+from yamler.validators import ListValidator
 from yamler.types import RuleType, SchemaTypes
 
 
 class TestListWrangler(BaseWranglerTest):
     def setUp(self):
         super().setUp()
-        self.mock_ruleset_wrangler = MagicMock()
-        self.mock_ruleset_wrangler.wrangle.return_value = None
+        self.mock_ruleset_validator = MagicMock()
+        self.mock_ruleset_validator.validate.return_value = None
 
     @parameterized.expand([
         ('with_non_list_type', RuleType(type=SchemaTypes.STR), 'hello', 0),
@@ -30,20 +30,20 @@ class TestListWrangler(BaseWranglerTest):
                 )
         ), [[0, 1, 2], [3, 4, 5]], 0)
     ])
-    def test_list_wrangler(self, name: str, rtype: RuleType, data: str,
-                           ruleset_wrangler_call_count: int):
-        wrangler = ListWrangler(self.violations)
-        wrangler.set_ruleset_wrangler(self.mock_ruleset_wrangler)
+    def test_list_validator(self, name: str, rtype: RuleType, data: str,
+                            ruleset_validate_call_count: int):
+        wrangler = ListValidator(self.violations)
+        wrangler.set_ruleset_validator(self.mock_ruleset_validator)
 
-        wrangler.wrangle(
+        wrangler.validate(
             key=self.key,
             data=data,
             parent=self.parent,
             rtype=rtype)
 
         self.assertEqual(
-            ruleset_wrangler_call_count,
-            self.mock_ruleset_wrangler.wrangle.call_count
+            ruleset_validate_call_count,
+            self.mock_ruleset_validator.validate.call_count
         )
 
 

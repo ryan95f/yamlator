@@ -2,7 +2,7 @@ import unittest
 
 from .base import BaseWranglerTest
 from parameterized import parameterized
-from yamler.wranglers import EnumTypeWrangler
+from yamler.validators import EnumTypeValidator
 from yamler.types import Data, EnumItem, RuleType, YamlerEnum, SchemaTypes
 
 
@@ -27,10 +27,10 @@ class TestEnumTypeWrangler(BaseWranglerTest):
         ('with_non_str_data_type', [0, 1, 2], RuleType(
             type=SchemaTypes.ENUM, lookup='message'), 1)
     ])
-    def test_enum_wrangler(self, name, data: Data, rtype: RuleType,
-                           expected_violation_count: int):
-        wrangler = EnumTypeWrangler(self.violations, self.enums)
-        wrangler.wrangle(
+    def test_enum_type_validator(self, name, data: Data, rtype: RuleType,
+                                 expected_violation_count: int):
+        wrangler = EnumTypeValidator(self.violations, self.enums)
+        wrangler.validate(
             key=self.key,
             data=data,
             parent=self.parent,
