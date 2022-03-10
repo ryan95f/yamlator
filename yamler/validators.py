@@ -40,7 +40,7 @@ def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
     violations = deque()
     entry_point: YamlerRuleSet = instructions.get('main', YamlerRuleSet('main', []))
 
-    validators = _create_wrangler_chain(
+    validators = _create_validators_chain(
         ruleset_lookups=instructions.get('rules', {}),
         enum_looksups=instructions.get('enums', {}),
         violations=violations
@@ -61,9 +61,9 @@ def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
     return violations
 
 
-def _create_wrangler_chain(ruleset_lookups: dict,
-                           enum_looksups: dict,
-                           violations: deque) -> Validator:
+def _create_validators_chain(ruleset_lookups: dict,
+                             enum_looksups: dict,
+                             violations: deque) -> Validator:
 
     root = OptionalValidator(violations)
     any_type_wrangler = AnyTypeValidator(violations)
@@ -93,7 +93,7 @@ class Validator(ABC):
     _next_validator = None
 
     def __init__(self, violations: deque) -> None:
-        """Wrangler constructor
+        """Validator base class
 
         Args:
             violations (deque): Contains violations that have been detected
@@ -136,13 +136,12 @@ class Validator(ABC):
 
 
 class OptionalValidator(Validator):
-    """Wrangler for handling optional rules"""
+    """Validator for handling optional rules"""
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
-        """Wrangle the data to find any optional rules. If an optional rule is
-        found and is None, then the next stage in the chain is not called otherwise
-        it will be called.
+        """Validate a key is an optional rules. If an optional rule is
+        found and is not `None`, then the next stage in the chain called.
 
         Args:
             key         (str):      The key that owns the data
@@ -160,11 +159,11 @@ class OptionalValidator(Validator):
 
 
 class RequiredValidator(Validator):
-    """Wrangler for handling data that is required"""
+    """Validator for handling data that is required"""
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
-        """Wrangle the data for required fields. If a required value
+        """Validate a key is a required rule. If a required value
         is None, then it is added to the violation manager.
 
         Args:
@@ -185,7 +184,7 @@ class RequiredValidator(Validator):
 
 
 class RuleSetValidator(Validator):
-    """Wrangler for handling rulesets"""
+    """Validator for handling rulesets"""
 
     _ruleset_validator: Validator = None
 
@@ -202,17 +201,17 @@ class RuleSetValidator(Validator):
         self.instructions = instructions
         super().__init__(violations)
 
-    def set_next_ruleset_validator(self, wrangler: Validator) -> None:
-        """Set the next wrangler for handling nested rulesets in the data
+    def set_next_ruleset_validator(self, validator: Validator) -> None:
+        """Set the next validator for handling nested rulesets in the data
 
         Args:
-            wrangler (Wrangler): The wrangler to add to the chain
+            validator (Validator): The validator to add to the chain
         """
-        self._ruleset_validator = wrangler
+        self._ruleset_validator = validator
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False):
-        """Wrangle the data rulesets and call the chain on the data itself to validate it.
+        """Validate ruleset data and call the chain on the data itself to validate it.
         If the current rule is not a ruleset then the next wrangler is called
         in the chain. If the data is not in a dict format then a type violation is added.
 
@@ -260,17 +259,17 @@ class RuleSetValidator(Validator):
 
 
 class ListValidator(Validator):
-    """Wrangler for handling list types"""
+    """Validtor for handling list types"""
 
-    ruleset_wrangler: Validator = None
+    ruleset_validator: Validator = None
 
-    def set_ruleset_validator(self, wrangler: Validator) -> None:
-        """Set a wrangler for when nested rulesets are within the list
+    def set_ruleset_validator(self, validator: Validator) -> None:
+        """Set a validator for when nested rulesets are within the list
 
         Args:
-            wrangler (Wrangler): The wrangler to handle rulesets
+            validator (Validator): The wrangler to handle rulesets
         """
-        self.ruleset_wrangler = wrangler
+        self.ruleset_validator = validator
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
@@ -314,11 +313,11 @@ class ListValidator(Validator):
         return rtype.type == SchemaTypes.LIST
 
     def _run_ruleset_validator(self, key: str, parent: str, data: Data, rtype: RuleType):
-        has_ruleset_validator = self.ruleset_wrangler is not None
+        has_ruleset_validator = self.ruleset_validator is not None
         is_ruleset_rule = rtype.type == SchemaTypes.RULESET
 
         if has_ruleset_validator and is_ruleset_rule:
-            self.ruleset_wrangler.validate(
+            self.ruleset_validator.validate(
                 key=key,
                 parent=parent,
                 data=data,
@@ -330,7 +329,7 @@ _SchemaTypeDecoder = namedtuple("SchemaTypeDecoder", ["type", "friendly_name"])
 
 
 class BuildInTypeValidator(Validator):
-    """Wrangler to handle the build in types. e.g `int`, `list` & `str`"""
+    """Validator to handle the build in types. e.g `int`, `list` & `str`"""
 
     def __init__(self, violations: deque) -> None:
         super().__init__(violations)
@@ -343,9 +342,9 @@ class BuildInTypeValidator(Validator):
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
-        """Wrangle the data to validate its data type. If the data matches
-        the rule, then it is passed onto the next stage in the chain otherwise
-        a `TypeViolation` is added to the violation manager.
+        """Validate data is either an `int`, `str`, `list` and `map` type.
+        If the data matches the rule, then it is passed onto the next stage
+        in the chain otherwise a `TypeViolation` is added to the violation manager.
 
         Args:
             key         (str):      The key that owns the data
@@ -372,11 +371,11 @@ class BuildInTypeValidator(Validator):
 
 
 class MapValidator(Validator):
-    """Wrangler to handle map types"""
+    """Validator to handle map types"""
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
-        """Wrangle map data. If the rule type is not a map, then this is
+        """Validate map data. If the rule type is not a map, then this is
         passed to the next item in the chain. If it is a map type, then each
         element is iterated over and the wrangler will call itself to iterate
         over any nested maps.
@@ -408,13 +407,13 @@ class MapValidator(Validator):
 
 
 class AnyTypeValidator(Validator):
-    """Wrangler to handle the `any` type, which ignores all type
+    """Validator to handle the `any` type, which ignores all type
     checks against the data
     """
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
-        """Wrangle data when the rule marks the key as any type. This effectively
+        """Validate data when the rule marks the key as any type. This effectively
         ignores all type checks against the key. Any other rule that has a type
         besides `any` is passed onto the next wrangler in the chain.
 
@@ -436,10 +435,10 @@ class AnyTypeValidator(Validator):
 
 
 class EnumTypeValidator(Validator):
-    """Wrangler to handle data that is contained in a enum as a constant"""
+    """Validator to handle data that is contained in a enum as a constant"""
 
     def __init__(self, violations: deque, enums: dict):
-        """EnumTypeWrangler constructor
+        """EnumTypeValidator constructor
 
         Args:
             violations (deque): Contains violations that have been detected
@@ -453,11 +452,11 @@ class EnumTypeValidator(Validator):
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
-        """Wrangle enum data in the YAML and validate that
+        """Validate enum data in the YAML and validate that
         there is a matching value in the rule. If a match is
         not found then a `TypeViolation` is added to the violation
         mamager. If the rule type is not a enum, then pass to the next
-        wrangler.
+        validator.
 
         Args:
             key         (str):      The key that owns the data
