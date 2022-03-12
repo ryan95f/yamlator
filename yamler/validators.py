@@ -1,5 +1,4 @@
 from __future__ import annotations
-from abc import ABC
 from typing import Iterable
 from collections import deque, namedtuple
 
@@ -10,7 +9,7 @@ from yamler.violations import TypeViolation
 from yamler.types import Data
 from yamler.types import Rule
 from yamler.types import RuleType
-from yamler.types import YamlerRuleSet
+from yamler.types import YamlerRuleset
 from yamler.types import SchemaTypes
 
 
@@ -38,7 +37,7 @@ def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
 
     entry_parent = '-'
     violations = deque()
-    entry_point: YamlerRuleSet = instructions.get('main', YamlerRuleSet('main', []))
+    entry_point: YamlerRuleset = instructions.get('main', YamlerRuleset('main', []))
 
     validators = _create_validators_chain(
         ruleset_lookups=instructions.get('rules', {}),
@@ -89,7 +88,7 @@ def _create_validators_chain(ruleset_lookups: dict,
     return root
 
 
-class Validator(ABC):
+class Validator:
     """Base class for validating a rule against the data"""
 
     _next_validator = None
@@ -247,7 +246,7 @@ class RulesetValidator(Validator):
                 )
 
     def _retrieve_next_ruleset(self, ruleset_name: str) -> Iterable[Rule]:
-        default_missing_ruleset = YamlerRuleSet(ruleset_name, [])
+        default_missing_ruleset = YamlerRuleset(ruleset_name, [])
         ruleset = self.instructions.get(ruleset_name, default_missing_ruleset)
         return ruleset.rules
 

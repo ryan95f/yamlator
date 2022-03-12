@@ -23,7 +23,7 @@ class SchemaTypes(Enum):
 
 class RuleType:
     def __init__(self, type: SchemaTypes, lookup: str = None, sub_type: RuleType = None):
-        """RuleType constructor
+        """RuleType init
 
         Args:
             type        (SchemaTypes): The expected type for a field
@@ -61,7 +61,7 @@ class YamlerType:
     """Base Class for custom types"""
 
     def __init__(self, name: str, type: ContainerTypes):
-        """YamlerType constructor
+        """YamlerType init
 
         Args:
             name            (str): The object name of the type
@@ -74,13 +74,13 @@ class YamlerType:
         return f"{self.type}({self.name})"
 
 
-class YamlerRuleSet(YamlerType):
+class YamlerRuleset(YamlerType):
     """Represent a Ruleset Type. A ruleset will contain a list of
     rules of `RuleType` which will validated against
     """
 
     def __init__(self, name: str, rules: list):
-        """YamlerRuleSet constructor
+        """YamlerRuleSet init
 
         Args:
             name     (str): The name of the ruleset
@@ -102,7 +102,7 @@ class YamlerEnum(YamlerType):
     """
 
     def __init__(self, name: str, items: dict):
-        """YamlerEnum constructor
+        """YamlerEnum init
 
         Args:
             name     (str): The name of the enum

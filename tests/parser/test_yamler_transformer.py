@@ -3,7 +3,7 @@ import unittest
 from collections import namedtuple
 from yamler.parser import YamlerTransformer
 from yamler.types import EnumItem, Rule, RuleType
-from yamler.types import YamlerEnum, YamlerRuleSet, SchemaTypes
+from yamler.types import YamlerEnum, YamlerRuleset, SchemaTypes
 
 
 Token = namedtuple('Token', ['value'])
@@ -62,7 +62,7 @@ class TestYamlerTransformer(unittest.TestCase):
                 'success': EnumItem('SUCCESS', 'success'),
                 'error': EnumItem('ERR', 'error')
             }),
-            YamlerRuleSet('main', [
+            YamlerRuleset('main', [
                 Rule('message', RuleType(type=SchemaTypes.STR), True)
             ])
         ]

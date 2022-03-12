@@ -3,7 +3,7 @@ import unittest
 from parameterized import parameterized
 from yamler.validators import validate_yaml
 from yamler.types import Data, EnumItem, Rule, RuleType
-from yamler.types import YamlerEnum, YamlerRuleSet, SchemaTypes
+from yamler.types import YamlerEnum, YamlerRuleset, SchemaTypes
 
 
 def create_flat_ruleset():
@@ -12,13 +12,13 @@ def create_flat_ruleset():
         Rule('number', RuleType(type=SchemaTypes.INT), False),
     ]
     return {
-        'main': YamlerRuleSet('main', rules),
+        'main': YamlerRuleset('main', rules),
         'rules': {}
     }
 
 
 def create_complex_ruleset():
-    person_ruleset = YamlerRuleSet('ruleset', [
+    person_ruleset = YamlerRuleset('ruleset', [
         Rule('name', RuleType(type=SchemaTypes.STR), True),
         Rule('age', RuleType(type=SchemaTypes.INT), False)
     ])
@@ -28,7 +28,7 @@ def create_complex_ruleset():
         'error':  EnumItem('ERR', 'error'),
     })
 
-    main_ruleset = YamlerRuleSet('main', [
+    main_ruleset = YamlerRuleset('main', [
         Rule('num_lists', RuleType(
             type=SchemaTypes.LIST,
             sub_type=RuleType(

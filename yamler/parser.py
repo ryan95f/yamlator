@@ -9,7 +9,7 @@ from lark.exceptions import UnexpectedEOF
 
 from yamler.types import Rule
 from yamler.types import ContainerTypes
-from yamler.types import YamlerRuleSet
+from yamler.types import YamlerRuleset
 from yamler.types import YamlerEnum
 from yamler.types import YamlerType
 from yamler.types import RuleType
@@ -62,11 +62,11 @@ class YamlerTransformer(Transformer):
     def ruleset(self, tokens):
         name = tokens[0].value
         rules = tokens[1:]
-        return YamlerRuleSet(name, rules)
+        return YamlerRuleset(name, rules)
 
     def main_ruleset(self, tokens):
         rules = tokens
-        return YamlerRuleSet('main', rules)
+        return YamlerRuleset('main', rules)
 
     def start(self, instructions: Iterator[YamlerType]):
         root = None
