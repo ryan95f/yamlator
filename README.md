@@ -1,6 +1,6 @@
 # Yamler
 
-[![validate](https://github.com/Ryan95Z/yamler/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/yamler/actions/workflows/test.yaml)
+[![Test](https://github.com/Ryan95Z/yamler/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/yamler/actions/workflows/test.yaml)
 
 A parser built using Lark to validate that a `.yaml` / `.yml` file contains a set of required fields.
 
