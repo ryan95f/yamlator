@@ -1,25 +1,26 @@
 import unittest
 
 from parameterized import parameterized
-from yamler.wranglers import wrangle_data
-from yamler.types import Data, EnumItem, Rule, RuleType, YamlerEnum, YamlerRuleSet
+from yamler.validators import validate_yaml
+from yamler.types import Data, EnumItem, Rule, RuleType
+from yamler.types import YamlerEnum, YamlerRuleset, SchemaTypes
 
 
 def create_flat_ruleset():
     rules = [
-        Rule('message', RuleType(type=str), True),
-        Rule('number', RuleType(type=int), False),
+        Rule('message', RuleType(type=SchemaTypes.STR), True),
+        Rule('number', RuleType(type=SchemaTypes.INT), False),
     ]
     return {
-        'main': YamlerRuleSet('main', rules),
+        'main': YamlerRuleset('main', rules),
         'rules': {}
     }
 
 
 def create_complex_ruleset():
-    person_ruleset = YamlerRuleSet('ruleset', [
-        Rule('name', RuleType(type=str), True),
-        Rule('age', RuleType(type=int), False)
+    person_ruleset = YamlerRuleset('ruleset', [
+        Rule('name', RuleType(type=SchemaTypes.STR), True),
+        Rule('age', RuleType(type=SchemaTypes.INT), False)
     ])
 
     status_enum = YamlerEnum('Status', {
@@ -27,13 +28,27 @@ def create_complex_ruleset():
         'error':  EnumItem('ERR', 'error'),
     })
 
-    main_ruleset = YamlerRuleSet('main', [
-        Rule('num_lists', RuleType(type=list, sub_type=RuleType(type=list, sub_type=RuleType(type=int))), False),  # nopep8
-        Rule('personList', RuleType(type=list, sub_type=RuleType(type='ruleset', lookup='person')), False),  # nopep8
-        Rule('person', RuleType(type='ruleset', lookup='person'), False),
-        Rule('my_map', RuleType(type=dict, sub_type=RuleType(type=str)), False),
-        Rule('my_any_list', RuleType(type=list, sub_type=RuleType(type='any')), False),
-        Rule('status', RuleType(type='enum', lookup='Status'), False),
+    main_ruleset = YamlerRuleset('main', [
+        Rule('num_lists', RuleType(
+            type=SchemaTypes.LIST,
+            sub_type=RuleType(
+                type=SchemaTypes.LIST,
+                sub_type=RuleType(type=SchemaTypes.INT))
+        ), False),
+        Rule('personList', RuleType(
+            type=SchemaTypes.LIST,
+            sub_type=RuleType(type=SchemaTypes.RULESET, lookup='person')
+        ), False),
+        Rule('person', RuleType(type=SchemaTypes.RULESET, lookup='person'), False),
+        Rule('my_map', RuleType(
+            type=SchemaTypes.MAP,
+            sub_type=RuleType(type=SchemaTypes.STR)
+        ), False),
+        Rule('my_any_list', RuleType(
+            type=SchemaTypes.LIST,
+            sub_type=RuleType(type=SchemaTypes.ANY)
+        ), False),
+        Rule('status', RuleType(type=SchemaTypes.ENUM, lookup='Status'), False),
     ])
 
     return {
@@ -54,9 +69,10 @@ class TestWrangleData(unittest.TestCase):
         ('none_instructions', {'message': 'hello'}, None),
         ('none_data_and_instructions', None, None),
     ])
-    def test_wrangler_invalid_parameters(self, name: str, data: Data, instructions: dict):
+    def test_validator_invalid_parameters(self, name: str, data: Data,
+                                          instructions: dict):
         with self.assertRaises(ValueError):
-            wrangle_data(data, instructions)
+            validate_yaml(data, instructions)
 
     @parameterized.expand([
         ('empty_data_and_rules', {}, {}, 0),
@@ -141,8 +157,8 @@ class TestWrangleData(unittest.TestCase):
             'status': [],
         }, 1),
     ])
-    def test_wrangler(self, name, ruleset, data, expected_violations_count):
-        violations = wrangle_data(data, ruleset)
+    def test_validator(self, name, ruleset, data, expected_violations_count):
+        violations = validate_yaml(data, ruleset)
         self.assertEqual(expected_violations_count, len(violations))
 
 

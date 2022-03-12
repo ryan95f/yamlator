@@ -7,47 +7,44 @@ from lark import Lark
 from lark import Transformer
 from lark.exceptions import UnexpectedEOF
 
-from .types import Rule
-from .types import ContainerTypes
-from .types import YamlerRuleSet
-from .types import YamlerEnum
-from .types import YamlerType
-from .types import RuleType
-from .types import EnumItem
+from yamler.types import Rule
+from yamler.types import ContainerTypes
+from yamler.types import YamlerRuleset
+from yamler.types import YamlerEnum
+from yamler.types import YamlerType
+from yamler.types import RuleType
+from yamler.types import EnumItem
+from yamler.types import SchemaTypes
 
 
 _package_dir = Path(__file__).parent.absolute()
 _GRAMMER_FILE = os.path.join(_package_dir, 'grammer/grammer.lark')
 
 
-class YamlerParser:
-    """Parsers a YAML file to generate the rules that will be
-    applied against a YAML file
+def parse_rulesets(ruleset_content: str) -> dict:
+    """Parses a ruleset into a set of instructions that can be
+    used to validate a YAML file.
+
+    Args:
+        ruleset_content (str): The string contnet of a ruleset schema
+
+    Returns:
+        A `dict` that contains the instructions to validate the YAML file
+
+    Raises:
+        ValueError: Raised when `ruleset_content` is `None`
     """
+    if ruleset_content is None:
+        raise ValueError("ruleset_content should not be None")
 
-    def __init__(self):
-        """YamlerParser Constructor"""
-        self._parser = Lark.open(_GRAMMER_FILE)
-        self._transfomer = YamlerTransformer()
+    lark_parser = Lark.open(_GRAMMER_FILE)
+    transformer = YamlerTransformer()
 
-    def parse(self, text: str) -> dict:
-        """Parses the yamler file contents to generate the rules
-
-        Args:
-            text (str): The content of the yamler file
-
-        Returns:
-            dict of the rules in a format that can be used
-            to validate a YAML file
-        """
-        if text is None:
-            raise ValueError("text cannot be None")
-
-        try:
-            tokens = self._parser.parse(text)
-            return self._transfomer.transform(tokens)
-        except UnexpectedEOF:
-            return {}
+    try:
+        tokens = lark_parser.parse(ruleset_content)
+        return transformer.transform(tokens)
+    except UnexpectedEOF:
+        return {}
 
 
 class YamlerTransformer(Transformer):
@@ -65,11 +62,11 @@ class YamlerTransformer(Transformer):
     def ruleset(self, tokens):
         name = tokens[0].value
         rules = tokens[1:]
-        return YamlerRuleSet(name, rules)
+        return YamlerRuleset(name, rules)
 
     def main_ruleset(self, tokens):
         rules = tokens
-        return YamlerRuleSet('main', rules)
+        return YamlerRuleset('main', rules)
 
     def start(self, instructions: Iterator[YamlerType]):
         root = None
@@ -93,27 +90,27 @@ class YamlerTransformer(Transformer):
         }
 
     def str_type(self, _):
-        return RuleType(type=str)
+        return RuleType(type=SchemaTypes.STR)
 
     def int_type(self, _):
-        return RuleType(type=int)
+        return RuleType(type=SchemaTypes.INT)
 
     def ruleset_type(self, tokens):
         (name, ) = tokens
-        return RuleType(type='ruleset', lookup=name.value)
+        return RuleType(type=SchemaTypes.RULESET, lookup=name.value)
 
     def list_type(self, tokens):
-        return RuleType(type=list, sub_type=tokens[0])
+        return RuleType(type=SchemaTypes.LIST, sub_type=tokens[0])
 
     def map_type(self, tokens):
-        return RuleType(type=dict, sub_type=tokens[0])
+        return RuleType(type=SchemaTypes.MAP, sub_type=tokens[0])
 
     def any_type(self, tokens):
-        return RuleType(type='any')
+        return RuleType(type=SchemaTypes.ANY)
 
     def enum_type(self, tokens):
         (name, ) = tokens
-        return RuleType(type='enum', lookup=name.value)
+        return RuleType(type=SchemaTypes.ENUM, lookup=name.value)
 
     def enum_item(self, tokens):
         name, value = tokens

@@ -1,14 +1,17 @@
 import argparse
 
 from abc import ABC
-from enum import Enum
 from typing import Iterator
 from yamler.exceptions import InvalidRulesetFilenameError
 from yamler.violations import ViolationType
 
-from .parser import YamlerParser
-from .wranglers import wrangle_data
-from .utils import load_yaml_file, load_yamler_ruleset
+from yamler.parser import parse_rulesets
+from yamler.validators import validate_yaml
+from yamler.utils import load_yaml_file
+from yamler.utils import load_yamler_ruleset
+
+SUCCESS = 0
+ERR = -1
 
 
 def main() -> int:
@@ -20,13 +23,13 @@ def main() -> int:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
     except FileNotFoundError as ex:
         print(ex)
-        return StatusCode.ERR.value
+        return ERR
     except InvalidRulesetFilenameError as ex:
         print(ex)
-        return StatusCode.ERR.value
+        return ERR
     except ValueError as ex:
         print(ex)
-        return StatusCode.ERR.value
+        return ERR
 
     return display_violations(violations)
 
@@ -62,22 +65,14 @@ def validate_yaml_data_from_file(yaml_filepath: str,
         that ends with the `.yamler` extension.
     """
     yaml_data = load_yaml_file(yaml_filepath)
-    ruleset = load_yamler_ruleset(ruleset_filepath)
+    ruleset_data = load_yamler_ruleset(ruleset_filepath)
 
-    parser = YamlerParser()
-    tokens = parser.parse(ruleset)
-
-    return wrangle_data(yaml_data, tokens)
+    instructions = parse_rulesets(ruleset_data)
+    return validate_yaml(yaml_data, instructions)
 
 
 def display_violations(violations: Iterator[ViolationType]) -> int:
     return ConsoleOutput.display(violations)
-
-
-class StatusCode(Enum):
-    """Status code for the output of running the validaton process"""
-    SUCCESS = 0
-    ERR = -1
 
 
 class ViolationOutput(ABC):
@@ -112,8 +107,9 @@ class ConsoleOutput(ViolationOutput):
         violation_count = len(violations)
         print("\n{:<4} violation(s) found".format(violation_count))
 
-        if violation_count == 0:
-            return StatusCode.SUCCESS.value
+        has_violations = violation_count != 0
+        if not has_violations:
+            return SUCCESS
 
         print('\n{:<30} {:<20} {:<15} {:20}'.format(
                 'Parent Key', 'Key', 'Violation', 'Message'))
@@ -125,4 +121,4 @@ class ConsoleOutput(ViolationOutput):
                 violation.violation_type,
                 violation.message))
         print('---------------------------------------------------------------------------')  # nopep8
-        return StatusCode.ERR.value
+        return ERR

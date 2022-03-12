@@ -24,8 +24,8 @@ class TestConsoleOutput(unittest.TestCase):
                                        violations: Iterator[ViolationType],
                                        expected_status_code: int):
 
-        # Supress the print statements
-        with patch('sys.stdout', new=io.StringIO()) as std_out:
+        # Suppress the print statements
+        with patch('sys.stdout', new=io.StringIO()):
             status_code = ConsoleOutput.display(violations)
             self.assertEqual(expected_status_code, status_code)
 

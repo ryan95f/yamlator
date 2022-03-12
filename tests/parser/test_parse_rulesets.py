@@ -1,28 +1,27 @@
 import unittest
 
-from yamler.parser import YamlerParser
+from yamler.parser import parse_rulesets
 from yamler.utils import load_yamler_ruleset
 from yamler.utils import load_yaml_file
 from lark.exceptions import UnexpectedCharacters
 
 
-class TestYamlerParser(unittest.TestCase):
+class TestParseRulesets(unittest.TestCase):
     def setUp(self):
         self.valid_yamler_file = './tests/files/hello.yamler'
         self.invalid_yamler_file = './tests/files/hello.yaml'
-        self.parser = YamlerParser()
 
     def test_parse_with_none_text(self):
         with self.assertRaises(ValueError):
-            self.parser.parse(None)
+            parse_rulesets(None)
 
     def test_parse_with_empty_text(self):
-        instructions = self.parser.parse('')
+        instructions = parse_rulesets('')
         self.assertIsNotNone(instructions)
 
     def test_parse_with_valid_content(self):
         yamler_content = load_yamler_ruleset(self.valid_yamler_file)
-        instructions = self.parser.parse(yamler_content)
+        instructions = parse_rulesets(yamler_content)
         main = instructions.get('main')
 
         self.assertIsNotNone(instructions)
@@ -32,7 +31,7 @@ class TestYamlerParser(unittest.TestCase):
     def test_parse_with_invalid_content(self):
         yaml_content = load_yaml_file(self.invalid_yamler_file)
         with self.assertRaises(UnexpectedCharacters):
-            self.parser.parse(str(yaml_content))
+            parse_rulesets(str(yaml_content))
 
 
 if __name__ == '__main__':

@@ -1,24 +1,5 @@
 from __future__ import annotations
 from enum import Enum
-from collections import deque
-
-
-class ViolationManager:
-    """Manages the total violations that are found during the wrangling process"""
-
-    def __init__(self):
-        """ViolationManager constructor"""
-        self._violations = deque()
-
-    @property
-    def violations(self):
-        return self._violations.copy()
-
-    def add_violation(self, violation: Violation):
-        self._violations.append(violation)
-
-    def clear(self):
-        self._violations.clear()
 
 
 class ViolationType(Enum):

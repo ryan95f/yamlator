@@ -1,7 +1,7 @@
 import yaml
 import re
 
-from .exceptions import InvalidRulesetFilenameError
+from yamler.exceptions import InvalidRulesetFilenameError
 
 _YAMLER_SCHEMA_REGEX = re.compile(r'^[.\/]?[a-zA-Z0-9_\-\/]+.yamler')
 

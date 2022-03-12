@@ -1,13 +1,12 @@
 import unittest
 from yamler.types import Data
-
-from yamler.wranglers import RequiredWrangler
-
-from .base import BaseWranglerTest
+from yamler.validators import RequiredValidator
 from parameterized import parameterized
 
+from .base import BaseValidatorTest
 
-class TestRequiredWrangler(BaseWranglerTest):
+
+class TestRequiredValidator(BaseValidatorTest):
 
     @parameterized.expand([
         ('required_data', 'hello world', True, False),
@@ -15,18 +14,17 @@ class TestRequiredWrangler(BaseWranglerTest):
         ('optional_data', 'hello world', False, False),
         ('optional_none_data', None, False, False)
     ])
-    def test_required_wrangler(self, name: str, data: Data, is_required: bool,
-                               expect_violation: bool):
-        wrangler = RequiredWrangler(self.violation_manager)
-        wrangler.wrangle(
+    def test_required_validator(self, name: str, data: Data, is_required: bool,
+                                expect_violation: bool):
+        validator = RequiredValidator(self.violations)
+        validator.validate(
             key=self.key,
             data=data,
             parent=self.parent,
             rtype=self.rtype,
             is_required=is_required)
 
-        violations = self.violation_manager.violations
-        has_violations = len(violations) == 1
+        has_violations = len(self.violations) == 1
         self.assertEqual(expect_violation, has_violations)
 
 
