@@ -1,12 +1,12 @@
 import unittest
 
-from .base import BaseWranglerTest
+from .base import BaseValidatorTest
 from parameterized import parameterized
 from yamler.validators import RulesetValidator
 from yamler.types import Data, Rule, RuleType, YamlerRuleset, SchemaTypes
 
 
-class TestRuleSetWrangler(BaseWranglerTest):
+class TestRuleSetValidator(BaseValidatorTest):
     def setUp(self):
         super().setUp()
         self.instructions = self._create_flat_ruleset()
@@ -36,8 +36,8 @@ class TestRuleSetWrangler(BaseWranglerTest):
     ])
     def test_ruleset_validator(self, name: str, rtype: RuleType, data: Data,
                                expect_violations: bool):
-        wrangler = RulesetValidator(self.violations, self.instructions)
-        wrangler.validate(
+        validator = RulesetValidator(self.violations, self.instructions)
+        validator.validate(
             key=self.key,
             data=data,
             parent=self.parent,

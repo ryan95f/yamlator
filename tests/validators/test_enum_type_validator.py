@@ -1,12 +1,12 @@
 import unittest
 
-from .base import BaseWranglerTest
+from .base import BaseValidatorTest
 from parameterized import parameterized
 from yamler.validators import EnumTypeValidator
 from yamler.types import Data, EnumItem, RuleType, YamlerEnum, SchemaTypes
 
 
-class TestEnumTypeWrangler(BaseWranglerTest):
+class TestEnumTypeValidator(BaseValidatorTest):
     def setUp(self):
         super().setUp()
         self.enums = {
@@ -29,8 +29,8 @@ class TestEnumTypeWrangler(BaseWranglerTest):
     ])
     def test_enum_type_validator(self, name, data: Data, rtype: RuleType,
                                  expected_violation_count: int):
-        wrangler = EnumTypeValidator(self.violations, self.enums)
-        wrangler.validate(
+        validator = EnumTypeValidator(self.violations, self.enums)
+        validator.validate(
             key=self.key,
             data=data,
             parent=self.parent,

@@ -1,13 +1,13 @@
 import unittest
 
-from .base import BaseWranglerTest
+from .base import BaseValidatorTest
 from unittest.mock import MagicMock
 from parameterized import parameterized
 from yamler.validators import ListValidator
 from yamler.types import RuleType, SchemaTypes
 
 
-class TestListWrangler(BaseWranglerTest):
+class TestListValidator(BaseValidatorTest):
     def setUp(self):
         super().setUp()
         self.mock_ruleset_validator = MagicMock()
@@ -32,10 +32,10 @@ class TestListWrangler(BaseWranglerTest):
     ])
     def test_list_validator(self, name: str, rtype: RuleType, data: str,
                             ruleset_validate_call_count: int):
-        wrangler = ListValidator(self.violations)
-        wrangler.set_ruleset_validator(self.mock_ruleset_validator)
+        validator = ListValidator(self.violations)
+        validator.set_ruleset_validator(self.mock_ruleset_validator)
 
-        wrangler.validate(
+        validator.validate(
             key=self.key,
             data=data,
             parent=self.parent,

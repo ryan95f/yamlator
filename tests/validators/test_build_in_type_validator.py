@@ -1,12 +1,12 @@
 import unittest
 
-from .base import BaseWranglerTest
+from .base import BaseValidatorTest
 from parameterized import parameterized
 from yamler.validators import BuildInTypeValidator
 from yamler.types import Data, RuleType, SchemaTypes
 
 
-class TestBuildInTypeWrangler(BaseWranglerTest):
+class TestBuildInTypeValidator(BaseValidatorTest):
 
     @parameterized.expand([
         ('int_type_match', RuleType(type=SchemaTypes.INT), 1, False),
@@ -21,8 +21,8 @@ class TestBuildInTypeWrangler(BaseWranglerTest):
     ])
     def test_build_in_type_validator(self, name: str, rtype: RuleType, data: Data,
                                      expect_violations: bool):
-        wrangler = BuildInTypeValidator(self.violations)
-        wrangler.validate(
+        validator = BuildInTypeValidator(self.violations)
+        validator.validate(
             key=self.key,
             data=data,
             parent=self.parent,

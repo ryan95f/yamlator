@@ -1,14 +1,13 @@
 import unittest
 
-
-from .base import BaseWranglerTest
+from .base import BaseValidatorTest
 from parameterized import parameterized
 from unittest.mock import patch, Mock
 from yamler.types import Data, RuleType, SchemaTypes
 from yamler.validators import AnyTypeValidator
 
 
-class TestAnyTypeWrangler(BaseWranglerTest):
+class TestAnyTypeValidator(BaseValidatorTest):
 
     @parameterized.expand([
         ('is_any_type', {'message': 'test'}, RuleType(type=SchemaTypes.ANY), 0),
@@ -17,18 +16,18 @@ class TestAnyTypeWrangler(BaseWranglerTest):
     ])
     @patch('yamler.validators.Validator.validate')
     def test_any_type_validator(self, name: str, data: Data, rtype: RuleType,
-                                expected_wrangler_call_count: int,
-                                mock_parent_wrangler: Mock):
-        wrangler = AnyTypeValidator(self.violations)
-        wrangler.validate(
+                                expected_validator_call_count: int,
+                                mock_parent_validator: Mock):
+        validator = AnyTypeValidator(self.violations)
+        validator.validate(
             key=self.key,
             parent=self.parent,
             data=data,
             rtype=rtype
         )
         self.assertEqual(
-            expected_wrangler_call_count,
-            mock_parent_wrangler.call_count
+            expected_validator_call_count,
+            mock_parent_validator.call_count
         )
 
 

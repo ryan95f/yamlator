@@ -69,7 +69,7 @@ class TestWrangleData(unittest.TestCase):
         ('none_instructions', {'message': 'hello'}, None),
         ('none_data_and_instructions', None, None),
     ])
-    def test_wrangler_invalid_parameters(self, name: str, data: Data, instructions: dict):
+    def test_validator_invalid_parameters(self, name: str, data: Data, instructions: dict):
         with self.assertRaises(ValueError):
             validate_yaml(data, instructions)
 
@@ -156,7 +156,7 @@ class TestWrangleData(unittest.TestCase):
             'status': [],
         }, 1),
     ])
-    def test_wrangler(self, name, ruleset, data, expected_violations_count):
+    def test_validator(self, name, ruleset, data, expected_violations_count):
         violations = validate_yaml(data, ruleset)
         self.assertEqual(expected_violations_count, len(violations))
 

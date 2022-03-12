@@ -5,11 +5,11 @@ from unittest.mock import patch, Mock
 from parameterized import parameterized
 from yamler.types import Data, RuleType, SchemaTypes
 
-from .base import BaseWranglerTest
+from .base import BaseValidatorTest
 from yamler.validators import MapValidator
 
 
-class TestMapWrangler(BaseWranglerTest):
+class TestMapValidator(BaseValidatorTest):
     @parameterized.expand([
         ('with_str_rule_type', 'hello', RuleType(type=SchemaTypes.STR), 1),
         ('with_ruleset_rule_type', {'message': 'hello'}, RuleType(
@@ -28,15 +28,15 @@ class TestMapWrangler(BaseWranglerTest):
     ])
     @patch('yamler.validators.Validator.validate')
     def test_map_validator(self, name: str, data: Data, rtype: RuleType,
-                           expected_parent_call_count: int, mock_parent_wrangler: Mock):
-        wrangler = MapValidator(self.violations)
-        wrangler.validate(
+                           expected_parent_call_count: int, mock_parent_validator: Mock):
+        validator = MapValidator(self.violations)
+        validator.validate(
             key=self.key,
             data=data,
             parent=self.parent,
             rtype=rtype
         )
-        self.assertEqual(expected_parent_call_count, mock_parent_wrangler.call_count)
+        self.assertEqual(expected_parent_call_count, mock_parent_validator.call_count)
 
 
 if __name__ == '__main__':

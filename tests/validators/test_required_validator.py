@@ -3,10 +3,10 @@ from yamler.types import Data
 from yamler.validators import RequiredValidator
 from parameterized import parameterized
 
-from .base import BaseWranglerTest
+from .base import BaseValidatorTest
 
 
-class TestRequiredWrangler(BaseWranglerTest):
+class TestRequiredValidator(BaseValidatorTest):
 
     @parameterized.expand([
         ('required_data', 'hello world', True, False),
@@ -16,8 +16,8 @@ class TestRequiredWrangler(BaseWranglerTest):
     ])
     def test_required_validator(self, name: str, data: Data, is_required: bool,
                                 expect_violation: bool):
-        wrangler = RequiredValidator(self.violations)
-        wrangler.validate(
+        validator = RequiredValidator(self.violations)
+        validator.validate(
             key=self.key,
             data=data,
             parent=self.parent,
