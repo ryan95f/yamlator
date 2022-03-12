@@ -1,11 +1,12 @@
 import unittest
+from parameterized import parameterized
+
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
-from parameterized import parameterized
+from yamler.exceptions import InvalidRulesetFilenameError
 
 
 class TestLoadYamlFile(unittest.TestCase):
-
     @parameterized.expand([
         ('with_empty_str', ''),
         ('with_none', None)
@@ -27,6 +28,14 @@ class TestLoadYamlerRuleset(unittest.TestCase):
     ])
     def test_load_yamler_ruleset_invalid_filename(self, name, filename):
         with self.assertRaises(ValueError):
+            load_yamler_ruleset(filename)
+
+    @parameterized.expand([
+        ('with_yaml_extension', 'test.yaml'),
+        ('with_txt_extension', 'test/test.txt')
+    ])
+    def test_load_yamler_ruleset_malfromed_filename(self, name, filename):
+        with self.assertRaises(InvalidRulesetFilenameError):
             load_yamler_ruleset(filename)
 
     def test_successfully_load_yamler_file(self):

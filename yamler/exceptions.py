@@ -1,8 +1,8 @@
 class InvalidRulesetFilenameError(RuntimeError):
-    """Exception for when the schema filename does not match the expected pattern"""
+    """When the schema filename does not match the expected pattern"""
 
     def __init__(self, filename: str) -> None:
-        """Represents an error in the filename that does not match the expected pattern
+        """InvalidRulesetFilenameError init
 
         Args:
             filename (str): The filename that was invalid
