@@ -4,8 +4,8 @@ import unittest
 from typing import Iterator
 from unittest.mock import patch
 from parameterized import parameterized
-from yamler.cmd import ERR, SUCCESS, JSONOutput
 
+from yamler.cmd import ERR, SUCCESS, JSONOutput
 from yamler.violations import RequiredViolation, TypeViolation, Violation
 
 

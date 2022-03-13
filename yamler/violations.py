@@ -12,30 +12,25 @@ class ViolationType(Enum):
 
 
 class ViolationJSONEncoder(json.JSONEncoder):
-    def default(self, o: Any) -> str:
+    """Custom JSON encoder to handle the Violation classes"""
+
+    def default(self, o: Any) -> Any:
         if isinstance(o, deque):
             return list(o)
 
-        if isinstance(o, RequiredViolation):
+        if issubclass(type(o), Violation):
             return {
                 'key': o.key,
                 'parent': o.parent,
                 'message': o.message,
-                'violation_type': 'Required'
-            }
-        if isinstance(o, TypeViolation):
-            return {
-                'key': o.key,
-                'parent': o.parent,
-                'message': o.message,
-                'violation_type': 'Type'
+                'violation_type': o.violation_type
             }
         return super().default(o)
 
 
 class Violation:
     def __init__(self, key: str, parent: str, message: str, v_type: ViolationType):
-        """Violation constructor
+        """Violation init
 
         Args:
             key     (str):              The key name in the YAML file
