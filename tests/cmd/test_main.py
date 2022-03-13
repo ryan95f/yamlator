@@ -19,37 +19,37 @@ class TestMain(unittest.TestCase):
         ('with_yaml_matching_ruleset', ValidateArgs(
             HELLO_YAML_FILE_PATH,
             HELLO_RULESET_FILE_PATH,
-            DisplayMethod.TABLE
+            DisplayMethod.TABLE.value
         ), SUCCESS),
         ('with_yaml_containing_ruleset_violations', ValidateArgs(
             INVALID_HELLO_YAML_FILE_PATH,
             HELLO_RULESET_FILE_PATH,
-            DisplayMethod.TABLE
+            DisplayMethod.TABLE.value
         ), ERR),
         ('with_ruleset_file_not_found', ValidateArgs(
             HELLO_YAML_FILE_PATH,
             '/test/files/not_found.yamler',
-            DisplayMethod.TABLE
+            DisplayMethod.TABLE.value
         ), ERR),
         ('with_yaml_data_not_found', ValidateArgs(
             './tests/files/not_found.yaml',
             HELLO_RULESET_FILE_PATH,
-            DisplayMethod.TABLE
+            DisplayMethod.TABLE.value
         ), ERR),
         ('with_empty_yaml_file_path', ValidateArgs(
             '',
             HELLO_RULESET_FILE_PATH,
-            DisplayMethod.TABLE
+            DisplayMethod.TABLE.value
         ), ERR),
         ('with_empty_ruleset_path', ValidateArgs(
             HELLO_YAML_FILE_PATH,
             '',
-            DisplayMethod.TABLE
+            DisplayMethod.TABLE.value
         ), ERR),
         ('with_invalid_ruleset_extension', ValidateArgs(
             HELLO_YAML_FILE_PATH,
             './test/files/hello.ruleset',
-            DisplayMethod.TABLE
+            DisplayMethod.TABLE.value
         ), ERR)
     ])
     @patch('argparse.ArgumentParser')
