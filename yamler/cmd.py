@@ -3,6 +3,7 @@ import json
 
 from abc import ABC
 from typing import Iterator
+from enum import Enum
 
 from yamler.parser import parse_rulesets
 from yamler.validators import validate_yaml
@@ -33,7 +34,8 @@ def main() -> int:
         print(ex)
         return ERR
 
-    return display_violations(violations, args.output)
+    display_method = DisplayMethod[args.output.upper()]
+    return display_violations(violations, display_method)
 
 
 def _create_args_parser():
@@ -77,20 +79,36 @@ def validate_yaml_data_from_file(yaml_filepath: str,
     return validate_yaml(yaml_data, instructions)
 
 
-def display_violations(violations: Iterator[ViolationType], method: str = 'table') -> int:
+class DisplayMethod(Enum):
+    """Represents the supported violation display methods"""
+    TABLE = "table"
+    JSON = "json"
+
+
+def display_violations(violations: Iterator[ViolationType],
+                       method: DisplayMethod = DisplayMethod.TABLE) -> int:
     """Displays the violations to standard output
 
     Args:
         violations (Iterator[ViolationType]): A collection of violations
-        method                         (str): Defines how the violations will be
-        displayed. Supported options are 'table' or 'json'. By default table will be
-        used unless method = 'json' is specified.
+
+        method               (DisplayMethod): Defines how the violations will be
+        displayed. By default table will be used specified
 
     Returns:
         The status code if violations were found. 0 = no violations were found
         and -1 = violations were found
+
+    Raises:
+        ValueError: If `violations` or `method` is None
     """
-    if method.lower() == 'json':
+    if violations is None:
+        raise ValueError("violations should not be None")
+
+    if method is None:
+        raise ValueError("method should not be None")
+
+    if method == DisplayMethod.JSON:
         return JSONOutput.display(violations)
     return TableOutput.display(violations)
 
