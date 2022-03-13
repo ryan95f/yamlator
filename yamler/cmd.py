@@ -1,9 +1,11 @@
 import argparse
+from email.policy import default
+import json
 
 from abc import ABC
 from typing import Iterator
 from yamler.exceptions import InvalidRulesetFilenameError
-from yamler.violations import ViolationType
+from yamler.violations import ViolationJSONEncoder, ViolationType
 
 from yamler.parser import parse_rulesets
 from yamler.validators import validate_yaml
@@ -31,7 +33,7 @@ def main() -> int:
         print(ex)
         return ERR
 
-    return display_violations(violations)
+    return display_violations(violations, args.output)
 
 
 def _create_args_parser():
@@ -43,6 +45,8 @@ def _create_args_parser():
 
     parser.add_argument('-schema', type=str, required=True, dest='ruleset_schema',
                         help='The schama that will be used to validate the file')
+
+    parser.add_argument('-output', type=str, required=False, default='table')
     return parser
 
 
@@ -71,8 +75,10 @@ def validate_yaml_data_from_file(yaml_filepath: str,
     return validate_yaml(yaml_data, instructions)
 
 
-def display_violations(violations: Iterator[ViolationType]) -> int:
-    return ConsoleOutput.display(violations)
+def display_violations(violations: Iterator[ViolationType], method: str = 'table') -> int:
+    if method.lower() == 'table':
+        return ConsoleOutput.display(violations)
+    return JSONOutput.display(violations)
 
 
 class ViolationOutput(ABC):
@@ -122,3 +128,11 @@ class ConsoleOutput(ViolationOutput):
                 violation.message))
         print('---------------------------------------------------------------------------')  # nopep8
         return ERR
+
+
+class JSONOutput(ViolationOutput):
+    def display(violations: Iterator[ViolationType]) -> int:
+        data = {'violatons': violations}
+        json_data = json.dumps(data, cls=ViolationJSONEncoder, indent=4)
+        print(json_data)
+        return 0

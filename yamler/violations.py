@@ -1,10 +1,35 @@
 from __future__ import annotations
+from collections import deque
+import json
 from enum import Enum
+from typing import Any
 
 
 class ViolationType(Enum):
     REQUIRED = 'required'
     TYPE = 'type'
+
+
+class ViolationJSONEncoder(json.JSONEncoder):
+    def default(self, o: Any) -> str:
+        if isinstance(o, deque):
+            return list(o)
+
+        if isinstance(o, RequiredViolation):
+            return {
+                'key': o.key,
+                'parent': o.parent,
+                'message': o.message,
+                'violation_type': 'Required'
+            }
+        if isinstance(o, TypeViolation):
+            return {
+                'key': o.key,
+                'parent': o.parent,
+                'message': o.message,
+                'violation_type': 'Type'
+            }
+        return super().default(o)
 
 
 class Violation:

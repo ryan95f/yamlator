@@ -10,7 +10,9 @@ HELLO_YAML_FILE_PATH = './tests/files/hello.yaml'
 HELLO_RULESET_FILE_PATH = './tests/files/hello.yamler'
 INVALID_HELLO_YAML_FILE_PATH = './test/files/invalid_hello.yaml'
 
-ValidateArgs = namedtuple('ValidateArgs', ['file', 'ruleset_schema'])
+TABLE_OUTPUT = 'table'
+
+ValidateArgs = namedtuple('ValidateArgs', ['file', 'ruleset_schema', 'output'])
 
 
 class TestMain(unittest.TestCase):
@@ -18,31 +20,38 @@ class TestMain(unittest.TestCase):
     @parameterized.expand([
         ('with_yaml_matching_ruleset', ValidateArgs(
             HELLO_YAML_FILE_PATH,
-            HELLO_RULESET_FILE_PATH
+            HELLO_RULESET_FILE_PATH,
+            TABLE_OUTPUT
         ), SUCCESS),
         ('with_yaml_containing_ruleset_violations', ValidateArgs(
             INVALID_HELLO_YAML_FILE_PATH,
-            HELLO_RULESET_FILE_PATH
+            HELLO_RULESET_FILE_PATH,
+            TABLE_OUTPUT
         ), ERR),
         ('with_ruleset_file_not_found', ValidateArgs(
             HELLO_YAML_FILE_PATH,
-            '/test/files/not_found.yamler'
+            '/test/files/not_found.yamler',
+            TABLE_OUTPUT
         ), ERR),
         ('with_yaml_data_not_found', ValidateArgs(
             './tests/files/not_found.yaml',
-            HELLO_RULESET_FILE_PATH
+            HELLO_RULESET_FILE_PATH,
+            TABLE_OUTPUT
         ), ERR),
         ('with_empty_yaml_file_path', ValidateArgs(
             '',
-            HELLO_RULESET_FILE_PATH
+            HELLO_RULESET_FILE_PATH,
+            TABLE_OUTPUT
         ), ERR),
         ('with_empty_ruleset_path', ValidateArgs(
             HELLO_YAML_FILE_PATH,
-            ''
+            '',
+            TABLE_OUTPUT
         ), ERR),
         ('with_invalid_ruleset_extension', ValidateArgs(
             HELLO_YAML_FILE_PATH,
-            './test/files/hello.ruleset'
+            './test/files/hello.ruleset',
+            TABLE_OUTPUT
         ), ERR)
     ])
     @patch('argparse.ArgumentParser')
