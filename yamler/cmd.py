@@ -176,9 +176,9 @@ class JSONOutput(ViolationOutput):
             and -1 = violations were found
         """
         violation_count = len(violations)
-        data = {'violatons': violations, 'violation_count': violation_count}
+        pre_json_data = {'violatons': violations, 'violation_count': violation_count}
 
-        json_data = json.dumps(data, cls=ViolationJSONEncoder, indent=4)
+        json_data = json.dumps(pre_json_data, cls=ViolationJSONEncoder, indent=4)
         print(json_data)
 
         return SUCCESS if violation_count == 0 else ERR
