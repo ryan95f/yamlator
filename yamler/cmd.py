@@ -1,16 +1,16 @@
 import argparse
-from email.policy import default
 import json
 
 from abc import ABC
 from typing import Iterator
-from yamler.exceptions import InvalidRulesetFilenameError
-from yamler.violations import ViolationJSONEncoder, ViolationType
 
 from yamler.parser import parse_rulesets
 from yamler.validators import validate_yaml
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
+from yamler.exceptions import InvalidRulesetFilenameError
+from yamler.violations import ViolationJSONEncoder, ViolationType
+
 
 SUCCESS = 0
 ERR = -1
@@ -41,12 +41,14 @@ def _create_args_parser():
 
     parser = argparse.ArgumentParser(prog="yamler", description=description)
     parser.add_argument('file', type=str,
-                        help='The file to be validated')
+                        help='The YAML file to be validated')
 
-    parser.add_argument('-schema', type=str, required=True, dest='ruleset_schema',
-                        help='The schama that will be used to validate the file')
+    parser.add_argument('-s', '--schema', type=str, required=True, dest='ruleset_schema',
+                        help='The schama that will be used to validate the YAML file')
 
-    parser.add_argument('-output', type=str, required=False, default='table')
+    parser.add_argument('-o', '--output', type=str, required=False, default='table',
+                        choices=['table', 'json'],
+                        help='Defines the format that will be displayed for the violations')  # nopep8
     return parser
 
 
@@ -76,9 +78,21 @@ def validate_yaml_data_from_file(yaml_filepath: str,
 
 
 def display_violations(violations: Iterator[ViolationType], method: str = 'table') -> int:
-    if method.lower() == 'table':
-        return ConsoleOutput.display(violations)
-    return JSONOutput.display(violations)
+    """Displays the violations to standard output
+
+    Args:
+        violations (Iterator[ViolationType]): A collection of violations
+        method                         (str): Defines how the violations will be
+        displayed. Supported options are 'table' or 'json'. By default table will be
+        used unless method = 'json' is specified.
+
+    Returns:
+        The status code if violations were found. 0 = no violations were found
+        and -1 = violations were found
+    """
+    if method.lower() == 'json':
+        return JSONOutput.display(violations)
+    return TableOutput.display(violations)
 
 
 class ViolationOutput(ABC):
@@ -88,7 +102,7 @@ class ViolationOutput(ABC):
         """Display the violations to the user
 
         Args:
-            violations Iterator[ViolationType]: A collection of violations
+            violations (Iterator[ViolationType]): A collection of violations
 
         Returns:
             The status code if violations were found. 0 = no violations were found
@@ -97,14 +111,14 @@ class ViolationOutput(ABC):
         pass
 
 
-class ConsoleOutput(ViolationOutput):
+class TableOutput(ViolationOutput):
     """Displays violations as a table"""
 
     def display(violations: Iterator[ViolationType]) -> int:
         """Display the violations to the user as a table
 
         Args:
-            violations Iterator[ViolationType]: A collection of violations
+            violations (Iterator[ViolationType]): A collection of violations
 
         Returns:
             The status code if violations were found. 0 = no violations were found
@@ -131,8 +145,22 @@ class ConsoleOutput(ViolationOutput):
 
 
 class JSONOutput(ViolationOutput):
+    """Displays violations as JSON"""
+
     def display(violations: Iterator[ViolationType]) -> int:
-        data = {'violatons': violations}
+        """Display the violations to the user as JSON
+
+        Args:
+            violations (Iterator[ViolationType]): A collection of violations
+
+        Returns:
+            The status code if violations were found. 0 = no violations were found
+            and -1 = violations were found
+        """
+        violation_count = len(violations)
+        data = {'violatons': violations, 'violation_count': violation_count}
+
         json_data = json.dumps(data, cls=ViolationJSONEncoder, indent=4)
         print(json_data)
-        return 0
+
+        return SUCCESS if violation_count == 0 else ERR
