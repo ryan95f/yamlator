@@ -1,6 +1,6 @@
-from collections import deque
 import unittest
 
+from collections import deque
 from typing import Any
 from parameterized import parameterized
 
