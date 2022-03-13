@@ -5,28 +5,24 @@ from typing import Iterator
 from unittest.mock import patch
 from parameterized import parameterized
 
-from yamler.cmd import ConsoleOutput
-from yamler.violations import RequiredViolation
-from yamler.violations import TypeViolation
-from yamler.violations import ViolationType
+from yamler.cmd import ERR, SUCCESS, JSONOutput
+from yamler.violations import RequiredViolation, TypeViolation, Violation
 
 
-class TestConsoleOutput(unittest.TestCase):
-
+class TestJSONOutput(unittest.TestCase):
     @parameterized.expand([
-        ('with_no_violations', [], 0),
+        ('with_no_violations', [], SUCCESS),
         ('with_violations', [
             RequiredViolation(key='message', parent='-'),
             TypeViolation(key='number', parent='-', message='Invalid number')
-        ], -1)
+        ], ERR)
     ])
-    def test_displayed_violation_outut(self, name: str,
-                                       violations: Iterator[ViolationType],
-                                       expected_status_code: int):
-
+    def test_json_output(self, name: str,
+                         violations: Iterator[Violation],
+                         expected_status_code: str):
         # Suppress the print statements
         with patch('sys.stdout', new=io.StringIO()):
-            status_code = ConsoleOutput.display(violations)
+            status_code = JSONOutput.display(violations)
             self.assertEqual(expected_status_code, status_code)
 
 

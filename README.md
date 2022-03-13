@@ -77,5 +77,5 @@ pycodestyle .
 To run the example:
 
 ```bash
-python -m yamler example/hello.yaml -schema example/hello.yamler
+python -m yamler example/hello.yaml -s example/hello.yamler
 ```

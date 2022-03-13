@@ -1,14 +1,17 @@
 import argparse
+import json
 
 from abc import ABC
 from typing import Iterator
-from yamler.exceptions import InvalidRulesetFilenameError
-from yamler.violations import ViolationType
+from enum import Enum
 
 from yamler.parser import parse_rulesets
 from yamler.validators import validate_yaml
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
+from yamler.exceptions import InvalidRulesetFilenameError
+from yamler.violations import ViolationJSONEncoder, ViolationType
+
 
 SUCCESS = 0
 ERR = -1
@@ -31,7 +34,8 @@ def main() -> int:
         print(ex)
         return ERR
 
-    return display_violations(violations)
+    display_method = DisplayMethod[args.output.upper()]
+    return display_violations(violations, display_method)
 
 
 def _create_args_parser():
@@ -39,10 +43,14 @@ def _create_args_parser():
 
     parser = argparse.ArgumentParser(prog="yamler", description=description)
     parser.add_argument('file', type=str,
-                        help='The file to be validated')
+                        help='The YAML file to be validated')
 
-    parser.add_argument('-schema', type=str, required=True, dest='ruleset_schema',
-                        help='The schama that will be used to validate the file')
+    parser.add_argument('-s', '--schema', type=str, required=True, dest='ruleset_schema',
+                        help='The schama that will be used to validate the YAML file')
+
+    parser.add_argument('-o', '--output', type=str, required=False, default='table',
+                        choices=['table', 'json'],
+                        help='Defines the format that will be displayed for the violations')  # nopep8
     return parser
 
 
@@ -71,8 +79,38 @@ def validate_yaml_data_from_file(yaml_filepath: str,
     return validate_yaml(yaml_data, instructions)
 
 
-def display_violations(violations: Iterator[ViolationType]) -> int:
-    return ConsoleOutput.display(violations)
+class DisplayMethod(Enum):
+    """Represents the supported violation display methods"""
+    TABLE = "table"
+    JSON = "json"
+
+
+def display_violations(violations: Iterator[ViolationType],
+                       method: DisplayMethod = DisplayMethod.TABLE) -> int:
+    """Displays the violations to standard output
+
+    Args:
+        violations (Iterator[ViolationType]): A collection of violations
+
+        method               (DisplayMethod): Defines how the violations will be
+        displayed. By default table will be used specified
+
+    Returns:
+        The status code if violations were found. 0 = no violations were found
+        and -1 = violations were found
+
+    Raises:
+        ValueError: If `violations` or `method` is None
+    """
+    if violations is None:
+        raise ValueError("violations should not be None")
+
+    if method is None:
+        raise ValueError("method should not be None")
+
+    if method == DisplayMethod.JSON:
+        return JSONOutput.display(violations)
+    return TableOutput.display(violations)
 
 
 class ViolationOutput(ABC):
@@ -82,7 +120,7 @@ class ViolationOutput(ABC):
         """Display the violations to the user
 
         Args:
-            violations Iterator[ViolationType]: A collection of violations
+            violations (Iterator[ViolationType]): A collection of violations
 
         Returns:
             The status code if violations were found. 0 = no violations were found
@@ -91,14 +129,14 @@ class ViolationOutput(ABC):
         pass
 
 
-class ConsoleOutput(ViolationOutput):
+class TableOutput(ViolationOutput):
     """Displays violations as a table"""
 
     def display(violations: Iterator[ViolationType]) -> int:
         """Display the violations to the user as a table
 
         Args:
-            violations Iterator[ViolationType]: A collection of violations
+            violations (Iterator[ViolationType]): A collection of violations
 
         Returns:
             The status code if violations were found. 0 = no violations were found
@@ -122,3 +160,25 @@ class ConsoleOutput(ViolationOutput):
                 violation.message))
         print('---------------------------------------------------------------------------')  # nopep8
         return ERR
+
+
+class JSONOutput(ViolationOutput):
+    """Displays violations as JSON"""
+
+    def display(violations: Iterator[ViolationType]) -> int:
+        """Display the violations to the user as JSON
+
+        Args:
+            violations (Iterator[ViolationType]): A collection of violations
+
+        Returns:
+            The status code if violations were found. 0 = no violations were found
+            and -1 = violations were found
+        """
+        violation_count = len(violations)
+        pre_json_data = {'violatons': violations, 'violation_count': violation_count}
+
+        json_data = json.dumps(pre_json_data, cls=ViolationJSONEncoder, indent=4)
+        print(json_data)
+
+        return SUCCESS if violation_count == 0 else ERR

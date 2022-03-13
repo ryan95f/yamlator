@@ -1,5 +1,9 @@
 from __future__ import annotations
+import json
+
+from collections import deque
 from enum import Enum
+from typing import Any
 
 
 class ViolationType(Enum):
@@ -7,9 +11,26 @@ class ViolationType(Enum):
     TYPE = 'type'
 
 
+class ViolationJSONEncoder(json.JSONEncoder):
+    """Custom JSON encoder to handle the Violation classes"""
+
+    def default(self, o: Any) -> Any:
+        if isinstance(o, deque):
+            return list(o)
+
+        if issubclass(type(o), Violation):
+            return {
+                'key': o.key,
+                'parent': o.parent,
+                'message': o.message,
+                'violation_type': o.violation_type
+            }
+        return super().default(o)
+
+
 class Violation:
     def __init__(self, key: str, parent: str, message: str, v_type: ViolationType):
-        """Violation constructor
+        """Violation init
 
         Args:
             key     (str):              The key name in the YAML file
