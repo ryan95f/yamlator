@@ -14,6 +14,55 @@ pip install yamler
 
 ## Creating a basic schema
 
+Schemas in Yamler are comprised of a set of rulesets and enums. As a minimum, a ruleset named `main` must be provided. For example:
+
+```text
+ruleset main {
+    name str
+    age int
+}
+```
+
+The ruleset must be saved as a `.yamler` file, which can be used to validate the following YAML file:
+
+```yaml
+name: Name
+age: 100
+```
+
+With Yamler, more complex structures can be defined to validate nested structures. For example:
+
+```text
+ruleset employee {
+    firstName str
+    lastName str
+    roles list(str) optional
+}
+
+ruleset main {
+    employees list((employee))
+}
+```
+
+This can then be used to validate the following YAML data:
+
+```yaml
+employees:
+    - firstName: employee
+      lastName: one
+      departments:
+        - manager
+    - firstName: employee
+      lastName: two
+      departments:
+        - engineer
+        - manager
+    - firstName: employee
+      lastName: three
+```
+
+More information regarding the types can be found in the [supported types documentation](./docs/schema_types.md).
+
 ## How to run the CLI
 
 Assuming you have a YAML file and a ruleset file, the CLI can be executed with:
