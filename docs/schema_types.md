@@ -1,4 +1,6 @@
-# Rulesets
+# Schema Types
+
+## Rulesets
 
 In Yamler, a ruleset defines the basic validation block that is compared against a YAML file. A ruleset is made up or 1 or more rules.
 
@@ -6,36 +8,37 @@ Below is the basic definition of a user defined ruleset:
 
 ```text
 ruleset <name> {
-    ...
-}
-```
-
-In order for a ruleset to be executed by Yamler, it needs to be attached to the *main ruleset*. This acts as an entry point for Yamler to start the validation process. The definition of a main ruleset:
-
-```text
-ruleset main {
-    ...
+    <list of rules>
 }
 ```
 
 ## Rules
 
-Each roleset has one or more rules. These define the checks that will compared against the Yaml. A rule can be defined as either **optional** or **required**. Each rule starts with the name of the key to look for in the Yaml file, followed by a type and if required / not.
+A rule define the checks that will compared against the Yaml. The name of the rule should match the expect key in the YAML file. For example, if we had the following data:
 
-To define a key with a required string:
-
-```text
-hello str required
+```yaml
+message: hello world
 ```
 
-Other rulesets can be linked up to a ruleset. A special syntax `(<ruleset_name>)` around the type to indicates it is a ruleset. For example:
+The corresponding ruleset and rule would be:
 
 ```text
-ruleset person {
-    name str required
-}
-
-ruleset details {
-    person (person) required
+ruleset <ruleset-name> {
+    message str
 }
 ```
+
+A ruleset can either be marked as *optional* or *required*. All rules are implicity required if the option is not specified in the schema file. Below are the different ways a rule can be defined as required or optinal:
+
+```text
+ruleset <ruleset-name> {
+    message str                     # Is a required rule
+    requiredMessage str required    # Is a required rule
+    optionalMessage str optional    # Is an optional rule
+}
+```
+
+Required rules validate that the key is present in the YAML data. If the required data is missing then a required violation is raised. If the rule is optional, then a violation is not raised when it is missing from the YAML data.
+
+### Basic Types
+
