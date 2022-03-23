@@ -32,13 +32,38 @@ A ruleset can either be marked as *optional* or *required*. All rules are implic
 
 ```text
 ruleset <ruleset-name> {
-    message str                     # Is a required rule
-    requiredMessage str required    # Is a required rule
-    optionalMessage str optional    # Is an optional rule
+    message <type>                     # Is a required rule
+    requiredMessage <type> required    # Is a required rule
+    optionalMessage <type> optional    # Is an optional rule
 }
 ```
 
 Required rules validate that the key is present in the YAML data. If the required data is missing then a required violation is raised. If the rule is optional, then a violation is not raised when it is missing from the YAML data.
 
+## Rule Types
+
 ### Basic Types
 
+For each rule, the following basic types are supported:
+
+* `int` - Integer type
+* `str` - String type
+* `list(<type>)` - List type
+* `map(<type>)` - Map Type
+
+### Any Type
+
+The `any` type allows for a key to be defined that does not require a type check. When the `any` type key is used in a rule all type checks are ignored and any data type may be used. Only the required and optional checks are applied.
+
+An example of it in a ruleset:
+
+```text
+ruleset <ruleset-name> {
+    message any
+    type any optional
+}
+```
+
+### Ruleset Type
+
+### Enum Type
