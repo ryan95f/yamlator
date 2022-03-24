@@ -28,7 +28,7 @@ ruleset <ruleset-name> {
 }
 ```
 
-A ruleset can either be marked as *optional* or *required*. All rules are implicity required if the option is not specified in the schema file. Below are the different ways a rule can be defined as required or optinal:
+A ruleset can either be marked as *optional* or *required*. All rules are implicitly required if the option is not specified in the schema file. Below are the different ways a rule can be defined as required or optional:
 
 ```text
 ruleset <ruleset-name> {
