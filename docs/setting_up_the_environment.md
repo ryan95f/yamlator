@@ -52,7 +52,7 @@ coverage report -m
 
 ## Coding Standards
 
-This project adopts the [PEP 8](https://www.python.org/dev/peps/pep-0008/) coding standard. To validate the code, run the `pycodestyle` linter with:
+This project adopts the [PEP 8](https://www.python.org/dev/peps/pep-0008/) coding standard. To lint the code, run the `pycodestyle` linter with:
 
 ```bash
 pycodestyle .

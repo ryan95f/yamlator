@@ -2,7 +2,7 @@
 
 [![Test](https://github.com/Ryan95Z/yamler/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/yamler/actions/workflows/test.yaml)
 
-Yamler is a cli tool that allows for a schema to be defined as a collection rulesets. When the tool is executed, a YAML file will be compared against the rulesets where a collection of violations will be returned.
+Yamler is a CLI tool that allows a YAML file to be validated against a schema. When executed, the YAML data structure is compared against the rules to validate that the required keys are present and the data type is correct. Once the YAML file has been validated, a list of violations will be returned that can be used to amend the file.
 
 ## Installing the package
 
@@ -61,7 +61,7 @@ employees:
       lastName: three
 ```
 
-More information regarding the types can be found in the [supported types documentation](./docs/schema_types.md).
+More information on the different components that make up a schema, read the [schema components document](./docs/schema_components.md).
 
 ## How to run the CLI
 
@@ -73,7 +73,7 @@ yamler <path-to-yaml-file> -s <path-to-schema>
 
 Where `<path-to-yaml-file>` is replaced with the path to your YAML file and `<path-to-schema>` is the path to the schema.
 
-The first argument for the CLI is always the path to the YAML file followed by the followed arguments:
+The first argument for the CLI is always the path to the YAML file then the following arguments:
 
 | Flag | Alias | Description | Is Required |
 |:-----|:------|:------------|:------------|
@@ -81,10 +81,6 @@ The first argument for the CLI is always the path to the YAML file followed by t
 | `--output` | `-o` | Defines the format that will be displayed for the violations. Support values are `table` or `json` | False |
 
 To see the help options for the CLI, run `yamler -h` or `yamler --help`
-
-## Schema Components
-
-For more information on the different components that make up a schema, read the [schema components document](./docs/schema_components.md).
 
 ## Setting up the development environment
 
