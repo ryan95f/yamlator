@@ -82,6 +82,10 @@ The first argument for the CLI is always the path to the YAML file followed by t
 
 To see the help options for the CLI, run `yamler -h` or `yamler --help`
 
+## Schema Components
+
+For more information on the different components that make up a schema, read the [schema components document](./docs/schema_components.md).
+
 ## Setting up the development environment
 
 For instructions on how to set up the development environment, read the [setting up the environment document](./docs/setting_up_the_environment.md).
