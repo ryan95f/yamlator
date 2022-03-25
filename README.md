@@ -2,80 +2,86 @@
 
 [![Test](https://github.com/Ryan95Z/yamler/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/yamler/actions/workflows/test.yaml)
 
-A parser built using Lark to validate that a `.yaml` / `.yml` file contains a set of required fields.
+Yamler is a CLI tool that allows a YAML file to be validated against a schema. When executed, the YAML data structure is compared against the rules to validate that the required keys are present and the data type is correct. Once the YAML file has been validated, a list of violations will be returned that can be used to amend the file.
 
-## Requirements
+## Installing the package
 
-The project requires the following:
-
-* Python 3.7 or above
-
-## Setting up the environment
-
-To set up the environment, ensure the virtualenv package has been installed. This can be added to your Python instance with:
+The Yamler package can be installed by PyPi with:
 
 ```bash
-pip install virtualenv
+pip install yamler
 ```
 
-Once `virtualenv` has been installed. A new virtual environment can be created with:
+## Creating a basic schema
+
+Schemas in Yamler are comprised of a set of rulesets and enums. As a minimum, a ruleset named `main` must be provided. For example:
+
+```text
+ruleset main {
+    name str
+    age int
+}
+```
+
+The ruleset must be saved as a `.yamler` file, which can be used to validate the following YAML file:
+
+```yaml
+name: Name
+age: 100
+```
+
+With Yamler, more complex structures can be defined to validate nested structures. For example:
+
+```text
+ruleset employee {
+    firstName str
+    lastName str
+    roles list(str) optional
+}
+
+ruleset main {
+    employees list((employee))
+}
+```
+
+This can then be used to validate the following YAML data:
+
+```yaml
+employees:
+    - firstName: employee
+      lastName: one
+      departments:
+        - manager
+    - firstName: employee
+      lastName: two
+      departments:
+        - engineer
+        - manager
+    - firstName: employee
+      lastName: three
+```
+
+More information on the different components that make up a schema, read the [schema components document](./docs/schema_components.md).
+
+## How to run the CLI
+
+Assuming you have a YAML file and a ruleset file, the CLI can be executed with:
 
 ```bash
-python -m venv env
+yamler <path-to-yaml-file> -s <path-to-schema>
 ```
 
-Then activate the virtual environment witb:
+Where `<path-to-yaml-file>` is replaced with the path to your YAML file and `<path-to-schema>` is the path to the schema.
 
-```bash
-# For Windows
-./env/Scripts/activate
+The first argument for the CLI is always the path to the YAML file.
 
-# For Linux / MacOS
-source env/bin/activate
-```
+| Flag | Alias | Description | Is Required |
+|:-----|:------|:------------|:------------|
+| `--schema` | `-s` | The schema that will be used to validate the YAML file | True |
+| `--output` | `-o` | Defines the format that will be displayed for the violations. Support values are `table` or `json`. Defaults to `table` if not specified. | False |
 
-Install the development dependencies:
+To see the help options for the CLI, run `yamler -h` or `yamler --help`
 
-```bash
-pip install -r requirements-dev.txt
-```
+## Setting up the development environment
 
-## Running Yamler
-
-To run the yamler demo:
-
-```bash
-python main.py
-```
-
-## Running the Tests
-
-This project uses `unittest` and `coverage`. The tests must be executed first before the coverage report can be shown.
-
-To run the tests:
-
-```bash
-coverage run -m unittest
-```
-
-The coverage report can then be shown with:
-
-```bash
-coverage report -m
-```
-
-## Coding Standards
-
-This project follows the [PEP 8](https://www.python.org/dev/peps/pep-0008/) coding standard. To validate the code run with `pycodestyle` linter with:
-
-```bash
-pycodestyle .
-```
-
-## Running the example
-
-To run the example:
-
-```bash
-python -m yamler example/hello.yaml -s example/hello.yamler
-```
+For instructions on how to set up the development environment, read the [setting up the environment document](./docs/setting_up_the_environment.md).
