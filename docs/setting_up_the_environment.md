@@ -20,7 +20,7 @@ Once `virtualenv` has been installed. A new virtual environment can be created w
 python -m venv env
 ```
 
-Then activate the virtual environment witb:
+Then activate the virtual environment with:
 
 ```bash
 # For Windows
@@ -38,7 +38,7 @@ pip install -r requirements-dev.txt
 
 ## Unit Tests
 
-This project uses `unittest` and `coverage`. To run the tests with coverage:
+This project uses `unittest` and `coverage`. To run the tests with coverage, use:
 
 ```bash
 coverage run -m unittest
@@ -52,7 +52,7 @@ coverage report -m
 
 ## Coding Standards
 
-This project adopts the [PEP 8](https://www.python.org/dev/peps/pep-0008/) coding standard. To lint the code, run the `pycodestyle` linter with:
+This project adopts the [PEP 8](https://www.python.org/dev/peps/pep-0008/) coding standard. To run the `pycodestyle` linter, use:
 
 ```bash
 pycodestyle .

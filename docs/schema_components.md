@@ -82,7 +82,7 @@ ruleset <ruleset-name> {
 
 ### Ruleset Type
 
-Rulesets can be referenced as a type for a rule to validate complicated YAML structures. For example, the following YAML data existed:
+Rulesets can be referenced as a type for a rule to validate complicated YAML structures. For example, if the following YAML data existed:
 
 ```yaml
 project:
@@ -98,7 +98,7 @@ project:
         label2: value2
 ```
 
-Then the ruleset to represent the `project` key data:
+Then the ruleset to represent the `project` key data would be:
 
 ```text
 ruleset project {
@@ -110,7 +110,7 @@ ruleset project {
 }
 ```
 
-Once the `project` ruleset has been defined, it can be used within a another ruleset with:
+Once the `project` ruleset has been defined, it can be used within another ruleset with:
 
 **Note**: In the ruleset, to reference another ruleset as a type it must be enclosed in brackets.
 
@@ -122,7 +122,7 @@ ruleset <name> {
 
 ### Enum Type
 
-Enums can be used to define string contants in a schema. This can be used to enforce specific string values in the YAML data. An enum must start with a captial level. A enum can be defined with:
+Enums can be used to define string constant in a schema. This can be used to enforce specific string values in the YAML data. An enum must start with a capital letter. A enum can be defined with:
 
 ```text
 enum <enum-name> {
@@ -140,7 +140,7 @@ enum LogLevel {
 }
 ```
 
-Like a ruleset, enums can be referanced as a type within a rule. For example:
+Like a ruleset, enums can be referenced as a type within a rule. For example:
 
 ```text
 ruleset <ruleset-name> {

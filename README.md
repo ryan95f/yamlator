@@ -73,11 +73,11 @@ yamler <path-to-yaml-file> -s <path-to-schema>
 
 Where `<path-to-yaml-file>` is replaced with the path to your YAML file and `<path-to-schema>` is the path to the schema.
 
-The first argument for the CLI is always the path to the YAML file then the following arguments:
+The first argument for the CLI is always the path to the YAML file.
 
 | Flag | Alias | Description | Is Required |
 |:-----|:------|:------------|:------------|
-| `--schema` | `-s` | The schama that will be used to validate the YAML file | True |
+| `--schema` | `-s` | The schema that will be used to validate the YAML file | True |
 | `--output` | `-o` | Defines the format that will be displayed for the violations. Support values are `table` or `json`. Defaults to `table` if not specified. | False |
 
 To see the help options for the CLI, run `yamler -h` or `yamler --help`
