@@ -333,6 +333,7 @@ class BuildInTypeValidator(Validator):
         self._built_in_lookups = {
             SchemaTypes.INT: _SchemaTypeDecoder(int, "int"),
             SchemaTypes.STR: _SchemaTypeDecoder(str, "str"),
+            SchemaTypes.FLOAT: _SchemaTypeDecoder(float, "float"),
             SchemaTypes.LIST: _SchemaTypeDecoder(list, "list"),
             SchemaTypes.MAP: _SchemaTypeDecoder(dict, "map"),
         }

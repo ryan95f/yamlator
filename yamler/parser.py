@@ -95,6 +95,9 @@ class YamlerTransformer(Transformer):
     def int_type(self, _):
         return RuleType(type=SchemaTypes.INT)
 
+    def float_type(self, _):
+        return RuleType(type=SchemaTypes.FLOAT)
+
     def ruleset_type(self, tokens):
         (name, ) = tokens
         return RuleType(type=SchemaTypes.RULESET, lookup=name.value)

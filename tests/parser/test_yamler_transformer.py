@@ -83,6 +83,10 @@ class TestYamlerTransformer(unittest.TestCase):
         int_rule_type = self.transformer.int_type(())
         self.assertEqual(SchemaTypes.INT, int_rule_type.type)
 
+    def test_float_type(self):
+        float_rule_type = self.transformer.float_type(())
+        self.assertEqual(SchemaTypes.FLOAT, float_rule_type.type)
+
     def test_ruleset_type(self):
         ruleset_type = self.transformer.ruleset_type((self.name_token, ))
 

@@ -14,6 +14,7 @@ class SchemaTypes(Enum):
     """Represents the support types that can be defined in a ruleset"""
     STR = auto()
     INT = auto()
+    FLOAT = auto()
     MAP = auto()
     LIST = auto()
     ENUM = auto()
