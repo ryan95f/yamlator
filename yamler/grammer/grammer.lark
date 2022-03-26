@@ -1,8 +1,9 @@
-start: instructions+
+start: instructions*
 
 ?instructions: enum
             | main_ruleset
             | ruleset
+            | schema_entry ~ 1
 
 type: int_type
      | float_type
@@ -28,13 +29,14 @@ primitives: ESCAPED_STRING
 ?rule: required_rule
      | optional_rule
 
+schema_entry: "schema" "{" rule+ "}"
+
 required_rule: /[a-zA-Z0-9_]+/ type "required"
              | /[a-zA-Z0-9_]+/ type
 optional_rule: /[a-zA-Z0-9_]+/ type "optional"
 
 main_ruleset: "ruleset" "main" "{" rule+ "}"
 ruleset: "ruleset" /[a-z]+/ "{" rule+ "}"
-
 
 enum: "enum" /[A-Z]{1}[a-z0-9_]+/ "{" enum_item+ "}"
 enum_item: /[A-Z0-9_]+/ "=" /[A-Za-z0-9_]+/

@@ -20,6 +20,6 @@ ruleset project {
     project_details (details)
 }
 
-ruleset main {
+schema {
     project (project)
 }

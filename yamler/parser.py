@@ -1,4 +1,5 @@
 from __future__ import annotations
+from distutils.log import debug
 
 import os
 from pathlib import Path
@@ -132,6 +133,9 @@ class YamlerTransformer(Transformer):
     def type(self, tokens):
         (t, ) = tokens
         return t
+
+    def schema_entry(self, tokens):
+        return YamlerRuleset('main', tokens)
 
 
 class _InstructionHandler:
