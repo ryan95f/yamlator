@@ -1,10 +1,25 @@
+// Entry point
 start: instructions*
 
+// Collection data structure Definitions
 ?instructions: enum
-            | main_ruleset
             | ruleset
-            | schema_entry ~ 1
+            | schema_entry
 
+schema_entry: "schema" "{" rule+ "}"
+ruleset: "ruleset" /[a-z]+/ "{" rule+ "}"
+enum: "enum" /[A-Z]{1}[a-z0-9_]+/ "{" enum_item+ "}"
+enum_item: /[A-Z0-9_]+/ "=" /[A-Za-z0-9_]+/
+
+// Rule Definitions
+?rule: required_rule
+     | optional_rule
+
+required_rule: /[a-zA-Z0-9_]+/ type "required"
+             | /[a-zA-Z0-9_]+/ type
+optional_rule: /[a-zA-Z0-9_]+/ type "optional"
+
+// Data types for rules
 type: int_type
      | float_type
      | str_type
@@ -22,24 +37,6 @@ list_type: "list""(" type ")"
 map_type: "map""(" type ")"
 ruleset_type: "("/[a-zA-Z0-9]+/")"
 enum_type: /[A-Z]{1}[a-z0-9_]+/
-
-primitives: ESCAPED_STRING
-          | INT -> number
-
-?rule: required_rule
-     | optional_rule
-
-schema_entry: "schema" "{" rule+ "}"
-
-required_rule: /[a-zA-Z0-9_]+/ type "required"
-             | /[a-zA-Z0-9_]+/ type
-optional_rule: /[a-zA-Z0-9_]+/ type "optional"
-
-main_ruleset: "ruleset" "main" "{" rule+ "}"
-ruleset: "ruleset" /[a-z]+/ "{" rule+ "}"
-
-enum: "enum" /[A-Z]{1}[a-z0-9_]+/ "{" enum_item+ "}"
-enum_item: /[A-Z0-9_]+/ "=" /[A-Za-z0-9_]+/
 
 NEW_LINES: "\n"+
 

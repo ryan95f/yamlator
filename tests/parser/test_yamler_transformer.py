@@ -43,14 +43,6 @@ class TestYamlerTransformer(unittest.TestCase):
         self.assertEqual(name.value, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
 
-    def test_main_ruleset(self):
-        expected_ruleset_name = 'main'
-        tokens = (*self.ruleset_rules, )
-        ruleset = self.transformer.main_ruleset(tokens)
-
-        self.assertEqual(expected_ruleset_name, ruleset.name)
-        self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
-
     def test_start(self):
         # This will be zero since main is removed from the dict
         # when processed by the start transformer
