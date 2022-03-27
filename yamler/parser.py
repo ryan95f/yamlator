@@ -15,6 +15,7 @@ from yamler.types import YamlerType
 from yamler.types import RuleType
 from yamler.types import EnumItem
 from yamler.types import SchemaTypes
+from yamler.exceptions import ConstructNotFoundError
 
 
 _package_dir = Path(__file__).parent.absolute()
@@ -37,7 +38,7 @@ def parse_rulesets(ruleset_content: str) -> dict:
     if ruleset_content is None:
         raise ValueError("ruleset_content should not be None")
 
-    lark_parser = Lark.open(_GRAMMER_FILE)
+    lark_parser = Lark.open(_GRAMMER_FILE, debug=True)
     transformer = YamlerTransformer()
 
     try:
@@ -48,8 +49,11 @@ def parse_rulesets(ruleset_content: str) -> dict:
 
 
 class YamlerTransformer(Transformer):
+    seen_constructs = {}
+
     def __init__(self, visit_tokens: bool = True) -> None:
         super().__init__(visit_tokens)
+        self.seen_constructs = {}
 
     def required_rule(self, tokens):
         (name, rtype) = tokens
@@ -62,11 +66,8 @@ class YamlerTransformer(Transformer):
     def ruleset(self, tokens):
         name = tokens[0].value
         rules = tokens[1:]
+        self.seen_constructs[name] = SchemaTypes.RULESET
         return YamlerRuleset(name, rules)
-
-    def main_ruleset(self, tokens):
-        rules = tokens
-        return YamlerRuleset('main', rules)
 
     def start(self, instructions: Iterator[YamlerType]):
         root = None
@@ -95,9 +96,8 @@ class YamlerTransformer(Transformer):
     def int_type(self, _):
         return RuleType(type=SchemaTypes.INT)
 
-    def ruleset_type(self, tokens):
-        (name, ) = tokens
-        return RuleType(type=SchemaTypes.RULESET, lookup=name.value)
+    def float_type(self, _):
+        return RuleType(type=SchemaTypes.FLOAT)
 
     def list_type(self, tokens):
         return RuleType(type=SchemaTypes.LIST, sub_type=tokens[0])
@@ -107,10 +107,6 @@ class YamlerTransformer(Transformer):
 
     def any_type(self, tokens):
         return RuleType(type=SchemaTypes.ANY)
-
-    def enum_type(self, tokens):
-        (name, ) = tokens
-        return RuleType(type=SchemaTypes.ENUM, lookup=name.value)
 
     def enum_item(self, tokens):
         name, value = tokens
@@ -124,11 +120,22 @@ class YamlerTransformer(Transformer):
 
         for item in items:
             enums[item.value] = item
+        self.seen_constructs[name] = SchemaTypes.ENUM
         return YamlerEnum(name.value, enums)
+
+    def container_type(self, token):
+        name = token[0]
+        schema_type = self.seen_constructs.get(name)
+        if schema_type is None:
+            raise ConstructNotFoundError(name)
+        return RuleType(type=schema_type, lookup=name)
 
     def type(self, tokens):
         (t, ) = tokens
         return t
+
+    def schema_entry(self, tokens):
+        return YamlerRuleset('main', tokens)
 
 
 class _InstructionHandler:

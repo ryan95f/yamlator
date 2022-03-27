@@ -1,4 +1,4 @@
-ruleset main {
+schema {
     message str
     number int
 }
