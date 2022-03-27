@@ -3,23 +3,23 @@ enum Status {
     ERROR = failure
 }
 
-ruleset address {
+ruleset Address {
     road str required
 }
 
-ruleset person {
+ruleset Person {
     hello str
     name str
     surname str
     age int
-    address (address)
+    address Address
 }
 
 schema {
     number int
-    root (person) required
-    person (person) optional
+    root Person required
+    person Person optional
     my_map map(int) required
-    numbers list((address))
+    numbers list(Address)
     enum1 Status required
 }

@@ -5,6 +5,8 @@ from abc import ABC
 from typing import Iterator
 from enum import Enum
 
+import lark
+
 from yamler.parser import parse_rulesets
 from yamler.validators import validate_yaml
 from yamler.utils import load_yaml_file
@@ -24,6 +26,9 @@ def main() -> int:
 
     try:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
+    except lark.exceptions.VisitError as ex:
+        print(f"Failed to parse schema: {ex.__context__}")
+        return ERR
     except FileNotFoundError as ex:
         print(ex)
         return ERR

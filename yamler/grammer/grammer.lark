@@ -7,7 +7,7 @@ start: instructions*
             | schema_entry
 
 schema_entry: "schema" "{" rule+ "}"
-ruleset: "ruleset" /[a-z]+/ "{" rule+ "}"
+ruleset: "ruleset" /[A-Z]{1}[a-z0-9_]+/ "{" rule+ "}"
 enum: "enum" /[A-Z]{1}[a-z0-9_]+/ "{" enum_item+ "}"
 enum_item: /[A-Z0-9_]+/ "=" /[A-Za-z0-9_]+/
 
@@ -26,8 +26,9 @@ type: int_type
      | list_type
      | map_type
      | any_type
-     | enum_type
-     | ruleset_type
+     | container_type
+     // | enum_type
+     // | ruleset_type
 
 str_type: "str"
 int_type: "int"
@@ -35,8 +36,10 @@ any_type: "any"
 float_type: "float"
 list_type: "list""(" type ")"
 map_type: "map""(" type ")"
-ruleset_type: "("/[a-zA-Z0-9]+/")"
-enum_type: /[A-Z]{1}[a-z0-9_]+/
+container_type: /[A-Z]{1}[a-z0-9_]+/
+
+// ruleset_type: "("/[a-zA-Z0-9]+/")"
+// enum_type: /[A-Z]{1}[a-z0-9_]+/
 
 NEW_LINES: "\n"+
 

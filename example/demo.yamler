@@ -4,22 +4,22 @@ enum Status {
     DELETED = deleted
 }
 
-ruleset details {
+ruleset Details {
     owner str
     team str
     labels map(str)
 }
 
-ruleset project {
+ruleset Project {
     version str
     projectId str
     displayName str
     iam_permission list(str)
     labels map(str)
     status Status
-    project_details (details)
+    project_details Details
 }
 
 schema {
-    project (project)
+    project Project
 }
