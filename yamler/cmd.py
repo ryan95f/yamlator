@@ -7,7 +7,7 @@ from enum import Enum
 
 import lark
 
-from yamler.parser import parse_rulesets
+from yamler.parser import YamlerSyntaxError, parse_rulesets
 from yamler.validators import validate_yaml
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
@@ -28,6 +28,10 @@ def main() -> int:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
     except lark.exceptions.VisitError as ex:
         print(f"Failed to parse schema: {ex.__context__}")
+        return ERR
+    except YamlerSyntaxError as se:
+        print(f"Error parsing {args.ruleset_schema}")
+        print(se)
         return ERR
     except FileNotFoundError as ex:
         print(ex)

@@ -1,9 +1,10 @@
 from __future__ import annotations
+from cProfile import label
 
 import os
 from pathlib import Path
 from typing import Iterator
-from lark import Lark
+from lark import Lark, UnexpectedCharacters, UnexpectedInput
 from lark import Transformer
 from lark.exceptions import UnexpectedEOF
 
@@ -46,6 +47,8 @@ def parse_rulesets(ruleset_content: str) -> dict:
         return transformer.transform(tokens)
     except UnexpectedEOF:
         return {}
+    except UnexpectedInput as u:
+        _handle_syntax_errors(u, lark_parser, ruleset_content)
 
 
 class YamlerTransformer(Transformer):
@@ -174,3 +177,52 @@ class _RulesetInstructionHandler(_InstructionHandler):
             return
 
         self._rulesets[instruction.name] = instruction
+
+
+class YamlerSyntaxError(SyntaxError):
+    def __str__(self):
+        context, line, column = self.args
+        return '%s at line %s, column %s.\n\n%s' % (self.label, line, column, context)
+
+
+class YamlerMalformedRulesetName(YamlerSyntaxError):
+    label = 'Invalid Ruleset Name'
+
+
+class YamlerMalformedEnumName(YamlerSyntaxError):
+    label = 'Invalid Enum Name'
+
+
+class YamlerInvalidType(YamlerSyntaxError):
+    label = 'Invalid Type'
+
+
+class YamlerMissingRules(YamlerSyntaxError):
+    label = 'Missing rules'
+
+
+def _handle_syntax_errors(u: UnexpectedInput, parser: Lark, content: str):
+    exc_class = u.match_examples(parser.parse, {
+        YamlerMalformedRulesetName: [
+            'ruleset foo',
+            'ruleset 1234Foo',
+            'ruleset FOO',
+        ],
+        YamlerMalformedEnumName: [
+            'enum foo',
+            'enum 1234Foo',
+            'enum FOO',
+        ],
+        YamlerMissingRules: [
+            'ruleset Foo {}',
+            'schema {}'
+        ],
+        YamlerInvalidType: [
+            'foo foo',
+            'foo foo optional',
+            'foo 1234'
+        ]
+    }, use_accepts=True)
+    if not exc_class:
+        raise
+    raise exc_class(u.get_context(content), u.line, u.column)
