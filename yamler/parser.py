@@ -4,9 +4,9 @@ from cProfile import label
 import os
 from pathlib import Path
 from typing import Iterator
-from lark import Lark, UnexpectedCharacters, UnexpectedInput
+from lark import Lark, UnexpectedInput
 from lark import Transformer
-from lark.exceptions import UnexpectedEOF
+from lark.exceptions import VisitError
 
 from yamler.types import Rule
 from yamler.types import ContainerTypes
@@ -17,6 +17,7 @@ from yamler.types import RuleType
 from yamler.types import EnumItem
 from yamler.types import SchemaTypes
 from yamler.exceptions import ConstructNotFoundError
+from yamler.exceptions import YamlerParseError
 
 
 _package_dir = Path(__file__).parent.absolute()
@@ -35,18 +36,20 @@ def parse_rulesets(ruleset_content: str) -> dict:
 
     Raises:
         ValueError: Raised when `ruleset_content` is `None`
+        YamlerParseError: Raised when the parsing process is interrupted
+        YamlerSyntaxError: Raised when a syntax error is detected in the schema
     """
     if ruleset_content is None:
         raise ValueError("ruleset_content should not be None")
 
-    lark_parser = Lark.open(_GRAMMER_FILE, debug=True)
+    lark_parser = Lark.open(_GRAMMER_FILE)
     transformer = YamlerTransformer()
 
     try:
         tokens = lark_parser.parse(ruleset_content)
         return transformer.transform(tokens)
-    except UnexpectedEOF:
-        return {}
+    except VisitError as ve:
+        raise YamlerParseError(ve.__context__)
     except UnexpectedInput as u:
         _handle_syntax_errors(u, lark_parser, ruleset_content)
 
@@ -180,21 +183,23 @@ class _RulesetInstructionHandler(_InstructionHandler):
 
 
 class YamlerSyntaxError(SyntaxError):
-    def __str__(self):
+    """A generic syntax error in the Yamler content"""
+
+    label = None
+
+    def __str__(self) -> str:
         context, line, column = self.args
-        return '%s at line %s, column %s.\n\n%s' % (self.label, line, column, context)
+        if self.label is None:
+            return f'Error on line {line}, column {column}.\n\n{context}'
+        return f'{self.label} at line {line}, column {column}.\n\n{context}'
 
 
 class YamlerMalformedRulesetName(YamlerSyntaxError):
-    label = 'Invalid Ruleset Name'
+    label = 'Invalid ruleset name'
 
 
 class YamlerMalformedEnumName(YamlerSyntaxError):
-    label = 'Invalid Enum Name'
-
-
-class YamlerInvalidType(YamlerSyntaxError):
-    label = 'Invalid Type'
+    label = 'Invalid enum name'
 
 
 class YamlerMissingRules(YamlerSyntaxError):
@@ -216,13 +221,8 @@ def _handle_syntax_errors(u: UnexpectedInput, parser: Lark, content: str):
         YamlerMissingRules: [
             'ruleset Foo {}',
             'schema {}'
-        ],
-        YamlerInvalidType: [
-            'foo foo',
-            'foo foo optional',
-            'foo 1234'
         ]
     }, use_accepts=True)
     if not exc_class:
-        raise
+        raise YamlerSyntaxError(u.get_context(content), u.line, u.column)
     raise exc_class(u.get_context(content), u.line, u.column)

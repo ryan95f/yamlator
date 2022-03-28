@@ -5,13 +5,11 @@ from abc import ABC
 from typing import Iterator
 from enum import Enum
 
-import lark
-
 from yamler.parser import YamlerSyntaxError, parse_rulesets
 from yamler.validators import validate_yaml
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
-from yamler.exceptions import InvalidRulesetFilenameError
+from yamler.exceptions import InvalidRulesetFilenameError, YamlerParseError
 from yamler.violations import ViolationJSONEncoder, ViolationType
 
 
@@ -26,11 +24,10 @@ def main() -> int:
 
     try:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
-    except lark.exceptions.VisitError as ex:
-        print(f"Failed to parse schema: {ex.__context__}")
+    except YamlerParseError as pe:
+        print(pe)
         return ERR
     except YamlerSyntaxError as se:
-        print(f"Error parsing {args.ruleset_schema}")
         print(se)
         return ERR
     except FileNotFoundError as ex:
