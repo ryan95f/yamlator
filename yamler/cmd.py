@@ -29,11 +29,11 @@ def main() -> int:
 
     try:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
-    except YamlerParseError as pe:
-        print(pe)
+    except YamlerParseError as ex:
+        print(ex)
         return ERR
-    except YamlerSyntaxError as se:
-        print(se)
+    except YamlerSyntaxError as ex:
+        print(ex)
         return ERR
     except FileNotFoundError as ex:
         print(ex)
