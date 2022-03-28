@@ -18,6 +18,11 @@ ERR = -1
 
 
 def main() -> int:
+    """Entry point into the Yamler CLI
+
+    Returns:
+        A status code where 0 = success and -1 = error
+    """
     parser = _create_args_parser()
     args = parser.parse_args()
     violations = []

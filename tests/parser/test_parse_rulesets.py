@@ -1,9 +1,9 @@
 import unittest
 
+from yamler.parser import YamlerSyntaxError
 from yamler.parser import parse_rulesets
 from yamler.utils import load_yamler_ruleset
 from yamler.utils import load_yaml_file
-from lark.exceptions import UnexpectedCharacters
 
 
 class TestParseRulesets(unittest.TestCase):
@@ -30,7 +30,7 @@ class TestParseRulesets(unittest.TestCase):
 
     def test_parse_with_invalid_content(self):
         yaml_content = load_yaml_file(self.invalid_yamler_file)
-        with self.assertRaises(UnexpectedCharacters):
+        with self.assertRaises(YamlerSyntaxError):
             parse_rulesets(str(yaml_content))
 
 
