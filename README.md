@@ -2,11 +2,11 @@
 
 [![Test](https://github.com/Ryan95Z/yamler/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/yamler/actions/workflows/test.yaml)
 
-Yamler is a CLI tool that allows a YAML file to be validated against a schema. When executed, the YAML data structure is compared against the rules to validate that the required keys are present and the data type is correct. Once the YAML file has been validated, a list of violations will be returned that can be used to amend the file.
+Yamler is a CLI tool that allows a YAML file to be validated against a schema. When executed, the YAML data structure is compared against the rules to validate that the required keys are present and the data types are correct. Once the YAML file has been validated, a list of violations will be returned that can be used to amend the file.
 
 ## Installing the package
 
-The Yamler package can be installed by PyPi with:
+The Yamler package can be installed from PyPi with:
 
 ```bash
 pip install yamler
@@ -14,16 +14,16 @@ pip install yamler
 
 ## Creating a basic schema
 
-Schemas in Yamler are comprised of a set of rulesets and enums. As a minimum, a ruleset named `main` must be provided. For example:
+Schemas in Yamler are comprised of rules, rulesets and enums. As a minimum, a `.yamler` file needs to be created with a schema block. For example:
 
 ```text
-ruleset main {
+schema {
     name str
     age int
 }
 ```
 
-The ruleset must be saved as a `.yamler` file, which can be used to validate the following YAML file:
+Once a `.yamler` file has been defined, it can be used to validate the following YAML file:
 
 ```yaml
 name: Name
@@ -33,14 +33,14 @@ age: 100
 With Yamler, more complex structures can be defined to validate nested structures. For example:
 
 ```text
-ruleset employee {
+ruleset Employee {
     firstName str
     lastName str
     roles list(str) optional
 }
 
-ruleset main {
-    employees list((employee))
+schema {
+    employees list(Employee)
 }
 ```
 
@@ -61,17 +61,17 @@ employees:
       lastName: three
 ```
 
-More information on the different components that make up a schema, read the [schema components document](./docs/schema_components.md).
+More information on the different components that make up a schema can be found in the [schema components document](./docs/schema_components.md).
 
 ## How to run the CLI
 
-Assuming you have a YAML file and a ruleset file, the CLI can be executed with:
+Assuming you have a YAML and yamler files, the CLI can be executed with:
 
 ```bash
-yamler <path-to-yaml-file> -s <path-to-schema>
+yamler <path-to-yaml-file> -s <path-to-yamler-schema>
 ```
 
-Where `<path-to-yaml-file>` is replaced with the path to your YAML file and `<path-to-schema>` is the path to the schema.
+Where `<path-to-yaml-file>` is replaced with the path to your YAML file and `<path-to-yamler-schema>` is the path to the schema.
 
 The first argument for the CLI is always the path to the YAML file.
 
