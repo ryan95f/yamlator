@@ -3,8 +3,9 @@ from __future__ import annotations
 import os
 from pathlib import Path
 from typing import Iterator
-from lark import Lark, UnexpectedInput
+from lark import Lark
 from lark import Transformer
+from lark import UnexpectedInput
 from lark.exceptions import VisitError
 from typing import Any
 
@@ -71,23 +72,34 @@ class YamlerTransformer(Transformer):
     seen_constructs = {}
 
     def __init__(self, visit_tokens: bool = True) -> None:
+        """YamlerTransformer init
+
+        Args:
+            visit_tokens (bool): Should the transformer visit tokens in addition
+            to rules. Setting this to False is slightly faster. Defaults to True
+        """
         super().__init__(visit_tokens)
 
     def required_rule(self, tokens: Any) -> Rule:
+        """Transforms the required rule tokens in a Rule object"""
         (name, rtype) = tokens
         return Rule(name.value, rtype, True)
 
     def optional_rule(self, tokens: Any) -> Rule:
+        """Transforms the optional rule tokens in a Rule object"""
         (name, rtype) = tokens
         return Rule(name.value, rtype, False)
 
     def ruleset(self, tokens: Any) -> YamlerRuleset:
+        """Transforms the ruleset tokens into a YamlerRuleset object"""
         name = tokens[0].value
         rules = tokens[1:]
         self.seen_constructs[name] = SchemaTypes.RULESET
         return YamlerRuleset(name, rules)
 
     def start(self, instructions: Iterator[YamlerType]) -> dict:
+        """Transforms the instructions into a dict that sorts the rulesets,
+        enums and entry point to validate YAML data"""
         root = None
         rules = {}
         enums = {}
@@ -109,28 +121,36 @@ class YamlerTransformer(Transformer):
         }
 
     def str_type(self, _: Any) -> RuleType:
+        """Transforms a string type token into a RuleType object"""
         return RuleType(type=SchemaTypes.STR)
 
     def int_type(self, _: Any) -> RuleType:
+        """Transforms a int type token into a RuleType object"""
         return RuleType(type=SchemaTypes.INT)
 
     def float_type(self, _: Any) -> RuleType:
+        """Transforms a float type token into a RuleType object"""
         return RuleType(type=SchemaTypes.FLOAT)
 
     def list_type(self, tokens: Any) -> RuleType:
+        """Transforms a list type token into a RuleType object"""
         return RuleType(type=SchemaTypes.LIST, sub_type=tokens[0])
 
     def map_type(self, tokens: Any) -> RuleType:
+        """Transforms a map type token into a RuleType object"""
         return RuleType(type=SchemaTypes.MAP, sub_type=tokens[0])
 
     def any_type(self, _: Any) -> RuleType:
+        """Transforms a any type token into a RuleType object"""
         return RuleType(type=SchemaTypes.ANY)
 
     def enum_item(self, tokens: Any) -> EnumItem:
+        """Transforms a enum item token into a EnumItem object"""
         name, value = tokens
         return EnumItem(name=name.value, value=value.value)
 
     def enum(self, tokens: Any) -> YamlerEnum:
+        """Transforms a enum token into a YamlerEnum object"""
         enums = {}
 
         name = tokens[0]
@@ -142,6 +162,11 @@ class YamlerTransformer(Transformer):
         return YamlerEnum(name.value, enums)
 
     def container_type(self, token: Any) -> RuleType:
+        """Transforms a container type token into a RuleType object
+
+        Raises:
+            ConstructNotFoundError: Raised if the enum or ruleset cannot be found
+        """
         name = token[0]
         schema_type = self.seen_constructs.get(name)
         if schema_type is None:
@@ -149,10 +174,16 @@ class YamlerTransformer(Transformer):
         return RuleType(type=schema_type, lookup=name)
 
     def type(self, tokens: Any) -> Any:
+        """Extracts the type tokens and passes them through onto
+        the next stage in the transformer
+        """
         (t, ) = tokens
         return t
 
     def schema_entry(self, rules: list) -> YamlerRuleset:
+        """Transforms the schema entry point token into a YamlerRuleset called
+        main that will act as the entry point for validaiting the YAML data
+        """
         return YamlerRuleset('main', rules)
 
 
