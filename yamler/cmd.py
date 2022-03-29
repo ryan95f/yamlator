@@ -9,7 +9,7 @@ from yamler.parser import YamlerSyntaxError, parse_rulesets
 from yamler.validators import validate_yaml
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
-from yamler.exceptions import InvalidRulesetFilenameError, YamlerParseError
+from yamler.exceptions import InvalidYamlerFilenameError, YamlerParseError
 from yamler.violations import ViolationJSONEncoder, ViolationType
 
 
@@ -38,7 +38,7 @@ def main() -> int:
     except FileNotFoundError as ex:
         print(ex)
         return ERR
-    except InvalidRulesetFilenameError as ex:
+    except InvalidYamlerFilenameError as ex:
         print(ex)
         return ERR
     except ValueError as ex:
@@ -50,7 +50,7 @@ def main() -> int:
 
 
 def _create_args_parser():
-    description = 'A YAML validation tool that determines if a YAML file matches a given ruleset schema'  # nopep8
+    description = 'A YAML validation tool that determines if a YAML file matches a given schema'  # nopep8
 
     parser = argparse.ArgumentParser(prog="yamler", description=description)
     parser.add_argument('file', type=str,
@@ -66,12 +66,12 @@ def _create_args_parser():
 
 
 def validate_yaml_data_from_file(yaml_filepath: str,
-                                 ruleset_filepath: str) -> Iterator[ViolationType]:
-    """Validate a YAML file with a ruleset
+                                 yamler_filepath: str) -> Iterator[ViolationType]:
+    """Validate a YAML file with a yamler schema file
 
     Args:
-        yaml_filepath    (str): The path to the YAML data file
-        ruleset_filepath (str): The path to the ruleset file
+        yaml_filepath   (str): The path to the YAML data file
+        yamler_filepath (str): The path to the yamler file
 
     Returns:
         A Iterator collection of ViolationType objects that contains
@@ -80,11 +80,11 @@ def validate_yaml_data_from_file(yaml_filepath: str,
     Raises:
         ValueError: If either argument is `None` or an empty string
         FileNotFoundError: If either argument cannot be found on the file system
-        InvalidRulesetFilenameError: If `ruleset_filepath` does not have a valid filename
+        InvalidYamlerFilenameError: If `yamler_filepath` does not have a valid filename
         that ends with the `.yamler` extension.
     """
     yaml_data = load_yaml_file(yaml_filepath)
-    ruleset_data = load_yamler_ruleset(ruleset_filepath)
+    ruleset_data = load_yamler_ruleset(yamler_filepath)
 
     instructions = parse_rulesets(ruleset_data)
     return validate_yaml(yaml_data, instructions)

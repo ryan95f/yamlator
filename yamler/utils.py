@@ -1,7 +1,7 @@
 import yaml
 import re
 
-from yamler.exceptions import InvalidRulesetFilenameError
+from yamler.exceptions import InvalidYamlerFilenameError
 
 _YAMLER_SCHEMA_REGEX = re.compile(r'^[.\/]?[a-zA-Z0-9_\-\/]+.yamler')
 
@@ -41,7 +41,7 @@ def load_yamler_ruleset(filename: str) -> str:
 
     Raises:
         ValueError: If `filename` is None or an empty string
-        InvalidRulesetFilenameError: If the filename does not match
+        InvalidYamlerFilenameError: If the filename does not match
         a file with a `.yamler` extention
     """
     if filename is None:
@@ -51,7 +51,7 @@ def load_yamler_ruleset(filename: str) -> str:
         raise ValueError('filename cannot be an empty string')
 
     if not _YAMLER_SCHEMA_REGEX.match(filename):
-        raise InvalidRulesetFilenameError(filename)
+        raise InvalidYamlerFilenameError(filename)
 
     with open(filename) as f:
         return f.read()

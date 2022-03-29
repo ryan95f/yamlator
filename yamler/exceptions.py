@@ -1,8 +1,8 @@
-class InvalidRulesetFilenameError(RuntimeError):
+class InvalidYamlerFilenameError(RuntimeError):
     """When the schema filename does not match the expected pattern"""
 
     def __init__(self, filename: str) -> None:
-        """InvalidRulesetFilenameError init
+        """InvalidYamlerFilenameError init
 
         Args:
             filename (str): The filename that was invalid
