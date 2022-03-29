@@ -2,15 +2,45 @@
 
 Below are the various components that can be used to construct a schema in Yamler that can be used to validate a YAML file.
 
+## Schema
+
+A schema block defines the entry point for the validation schema. Within the block a list of rules can be defined to indicate the root keys of a YAML file. For example, given the following YAML data:
+
+```yaml
+message: Hello World
+number: 42
+```
+
+The following schema block can be defined:
+
+```text
+schema {
+    message str
+    number int optional
+}
+```
+
 ## Rulesets
 
-In Yamler, a ruleset defines the basic validation block that is compared against a YAML file. A ruleset is made up or 1 or more rules.
+A ruleset allows for complex YAML structures to be defined. A ruleset is made up or 1 or more rules and the name of the ruleset must begin with a capital letter.
 
 Below is the basic definition of a user defined ruleset:
 
 ```text
 ruleset <name> {
     <list of rules>
+}
+```
+
+An example of a ruleset:
+
+```text
+ruleset Project {
+    version str
+    id int
+    name str
+    users list(str) optional
+    labels map(str) optional
 }
 ```
 
@@ -49,6 +79,7 @@ Required rules validate that the key is present in the YAML data. If the require
 For each rule, the following basic types are supported:
 
 * `int` - Integer type
+* `float` - Float type
 * `str` - String type
 * `list(<type>)` - List type where `<type>` defines the expected type of each item in the list.
 * `map(<type>)` - Map Type where `<type>` defines the expected type of the value.
@@ -64,7 +95,7 @@ matrix list(list(int))
 A map of rulesets can be defined as:
 
 ```text
-employees map((employee))
+employees map(Employee)
 ```
 
 ### Any Type
@@ -101,7 +132,7 @@ project:
 Then the ruleset to represent the `project` key data would be:
 
 ```text
-ruleset project {
+ruleset Project {
     version str
     id int
     name str
@@ -110,13 +141,11 @@ ruleset project {
 }
 ```
 
-Once the `project` ruleset has been defined, it can be used within another ruleset with:
-
-**Note**: In the ruleset, to reference another ruleset as a type it must be enclosed in brackets.
+Once the `Project` ruleset has been defined, it can be used within another ruleset with:
 
 ```text
 ruleset <name> {
-    project (project)
+    project Project
 }
 ```
 
