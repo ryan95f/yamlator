@@ -8,7 +8,7 @@ from yamler.cmd import main, SUCCESS, ERR, DisplayMethod
 
 HELLO_YAML_FILE_PATH = './tests/files/hello.yaml'
 HELLO_RULESET_FILE_PATH = './tests/files/hello.yamler'
-INVALID_HELLO_YAML_FILE_PATH = './test/files/invalid_hello.yaml'
+INVALID_HELLO_YAML_FILE_PATH = './tests/files/invalid_hello.yaml'
 
 ValidateArgs = namedtuple('ValidateArgs', ['file', 'ruleset_schema', 'output'])
 
@@ -48,7 +48,17 @@ class TestMain(unittest.TestCase):
         ), ERR),
         ('with_invalid_ruleset_extension', ValidateArgs(
             HELLO_YAML_FILE_PATH,
-            './test/files/hello.ruleset',
+            './tests/files/hello.ruleset',
+            DisplayMethod.TABLE.value
+        ), ERR),
+        ('with_syntax_errors', ValidateArgs(
+            HELLO_YAML_FILE_PATH,
+            './tests/files/invalid_files/invalid_enum_name.yamler',
+            DisplayMethod.TABLE.value
+        ), ERR),
+        ('with_ruleset_not_defined', ValidateArgs(
+            HELLO_YAML_FILE_PATH,
+            './tests/files/invalid_files/missing_defined_ruleset.yamler',
             DisplayMethod.TABLE.value
         ), ERR)
     ])
