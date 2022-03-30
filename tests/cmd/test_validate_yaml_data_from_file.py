@@ -3,7 +3,7 @@ import unittest
 from parameterized import parameterized
 from collections import namedtuple
 from yamler.cmd import validate_yaml_data_from_file
-from yamler.exceptions import InvalidRulesetFilenameError
+from yamler.exceptions import InvalidYamlerFilenameError
 
 VALID_YAML_DATA_FILE_PATH = './tests/files/hello.yaml'
 VALID_RULESET_FILE_PATH = './tests/files/hello.yamler'
@@ -26,7 +26,7 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
         ('ruleset_invalid_file_extension', ValidateArgs(
             VALID_YAML_DATA_FILE_PATH,
             './tests/files/hello.ruleset'
-        ), InvalidRulesetFilenameError)
+        ), InvalidYamlerFilenameError)
     ])
     def test_validate_yaml_data_from_file_with_invalid_args(self, name: str,
                                                             args: ValidateArgs,
@@ -37,7 +37,7 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
     def test_validate_yaml_data_from_file_with_valid_data(self):
         violations = validate_yaml_data_from_file(
             yaml_filepath=VALID_YAML_DATA_FILE_PATH,
-            ruleset_filepath=VALID_RULESET_FILE_PATH
+            yamler_filepath=VALID_RULESET_FILE_PATH
         )
         self.assertIsNotNone(violations)
 

@@ -1,0 +1,4 @@
+schema {
+    message str optional
+    details Details
+}

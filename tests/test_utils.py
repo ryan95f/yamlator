@@ -3,7 +3,7 @@ from parameterized import parameterized
 
 from yamler.utils import load_yaml_file
 from yamler.utils import load_yamler_ruleset
-from yamler.exceptions import InvalidRulesetFilenameError
+from yamler.exceptions import InvalidYamlerFilenameError
 
 
 class TestLoadYamlFile(unittest.TestCase):
@@ -32,15 +32,18 @@ class TestLoadYamlerRuleset(unittest.TestCase):
 
     @parameterized.expand([
         ('with_yaml_extension', 'test.yaml'),
-        ('with_txt_extension', 'test/test.txt')
+        ('with_txt_extension', 'test/test.txt'),
     ])
     def test_load_yamler_ruleset_malfromed_filename(self, name, filename):
-        with self.assertRaises(InvalidRulesetFilenameError):
+        with self.assertRaises(InvalidYamlerFilenameError):
             load_yamler_ruleset(filename)
 
-    def test_successfully_load_yamler_file(self):
-        yamler_file_path = 'tests/files/hello.yamler'
-        results = load_yamler_ruleset(yamler_file_path)
+    @parameterized.expand([
+        ('with_unix_style_path', 'tests/files/hello.yamler'),
+        ('with_windows_style_path', 'tests\\files\\hello.yamler')
+    ])
+    def test_successfully_load_yamler_file(self, name, filename):
+        results = load_yamler_ruleset(filename)
         self.assertIsNotNone(results)
 
 

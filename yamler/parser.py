@@ -5,7 +5,9 @@ from pathlib import Path
 from typing import Iterator
 from lark import Lark
 from lark import Transformer
-from lark.exceptions import UnexpectedEOF
+from lark import UnexpectedInput
+from lark.exceptions import VisitError
+from typing import Any
 
 from yamler.types import Rule
 from yamler.types import ContainerTypes
@@ -16,6 +18,7 @@ from yamler.types import RuleType
 from yamler.types import EnumItem
 from yamler.types import SchemaTypes
 from yamler.exceptions import ConstructNotFoundError
+from yamler.exceptions import YamlerParseError
 
 
 _package_dir = Path(__file__).parent.absolute()
@@ -34,42 +37,69 @@ def parse_rulesets(ruleset_content: str) -> dict:
 
     Raises:
         ValueError: Raised when `ruleset_content` is `None`
+        YamlerParseError: Raised when the parsing process is interrupted
+        YamlerSyntaxError: Raised when a syntax error is detected in the schema
     """
     if ruleset_content is None:
         raise ValueError("ruleset_content should not be None")
 
-    lark_parser = Lark.open(_GRAMMER_FILE, debug=True)
+    lark_parser = Lark.open(_GRAMMER_FILE)
     transformer = YamlerTransformer()
 
     try:
         tokens = lark_parser.parse(ruleset_content)
         return transformer.transform(tokens)
-    except UnexpectedEOF:
-        return {}
+    except VisitError as ve:
+        raise YamlerParseError(ve.__context__)
+    except UnexpectedInput as u:
+        _handle_syntax_errors(u, lark_parser, ruleset_content)
 
 
 class YamlerTransformer(Transformer):
+    """Transforms the Yamler schema contents into a set of objects that
+    can be used to validate a YAML file. This class will be used by Lark
+    during the parsing process.
+
+    Each method matches to a terminal or rule in the grammer (.lark) file. E.g the
+    method `required_rule` corresponds to the following rule in the grammer:
+
+    required_rule: /[a-zA-Z0-9_]+/ type "required"
+                 | /[a-zA-Z0-9_]+/ type
+    """
+
+    # Used to track previously seen enums or rulesets to dynamically
+    # determine the type of the rule if a enum or ruleset is used
     seen_constructs = {}
 
     def __init__(self, visit_tokens: bool = True) -> None:
-        super().__init__(visit_tokens)
-        self.seen_constructs = {}
+        """YamlerTransformer init
 
-    def required_rule(self, tokens):
+        Args:
+            visit_tokens (bool): Should the transformer visit tokens in addition
+            to rules. Setting this to False is slightly faster. Defaults to True
+        """
+        super().__init__(visit_tokens)
+
+    def required_rule(self, tokens: Any) -> Rule:
+        """Transforms the required rule tokens in a Rule object"""
         (name, rtype) = tokens
         return Rule(name.value, rtype, True)
 
-    def optional_rule(self, tokens):
+    def optional_rule(self, tokens: Any) -> Rule:
+        """Transforms the optional rule tokens in a Rule object"""
         (name, rtype) = tokens
         return Rule(name.value, rtype, False)
 
-    def ruleset(self, tokens):
+    def ruleset(self, tokens: Any) -> YamlerRuleset:
+        """Transforms the ruleset tokens into a YamlerRuleset object"""
         name = tokens[0].value
         rules = tokens[1:]
         self.seen_constructs[name] = SchemaTypes.RULESET
         return YamlerRuleset(name, rules)
 
-    def start(self, instructions: Iterator[YamlerType]):
+    def start(self, instructions: Iterator[YamlerType]) -> dict:
+        """Transforms the instructions into a dict that sorts the rulesets,
+        enums and entry point to validate YAML data"""
         root = None
         rules = {}
         enums = {}
@@ -90,29 +120,37 @@ class YamlerTransformer(Transformer):
             'enums': enums
         }
 
-    def str_type(self, _):
+    def str_type(self, _: Any) -> RuleType:
+        """Transforms a string type token into a RuleType object"""
         return RuleType(type=SchemaTypes.STR)
 
-    def int_type(self, _):
+    def int_type(self, _: Any) -> RuleType:
+        """Transforms a int type token into a RuleType object"""
         return RuleType(type=SchemaTypes.INT)
 
-    def float_type(self, _):
+    def float_type(self, _: Any) -> RuleType:
+        """Transforms a float type token into a RuleType object"""
         return RuleType(type=SchemaTypes.FLOAT)
 
-    def list_type(self, tokens):
+    def list_type(self, tokens: Any) -> RuleType:
+        """Transforms a list type token into a RuleType object"""
         return RuleType(type=SchemaTypes.LIST, sub_type=tokens[0])
 
-    def map_type(self, tokens):
+    def map_type(self, tokens: Any) -> RuleType:
+        """Transforms a map type token into a RuleType object"""
         return RuleType(type=SchemaTypes.MAP, sub_type=tokens[0])
 
-    def any_type(self, tokens):
+    def any_type(self, _: Any) -> RuleType:
+        """Transforms a any type token into a RuleType object"""
         return RuleType(type=SchemaTypes.ANY)
 
-    def enum_item(self, tokens):
+    def enum_item(self, tokens: Any) -> EnumItem:
+        """Transforms a enum item token into a EnumItem object"""
         name, value = tokens
         return EnumItem(name=name.value, value=value.value)
 
-    def enum(self, tokens):
+    def enum(self, tokens: Any) -> YamlerEnum:
+        """Transforms a enum token into a YamlerEnum object"""
         enums = {}
 
         name = tokens[0]
@@ -123,19 +161,30 @@ class YamlerTransformer(Transformer):
         self.seen_constructs[name] = SchemaTypes.ENUM
         return YamlerEnum(name.value, enums)
 
-    def container_type(self, token):
+    def container_type(self, token: Any) -> RuleType:
+        """Transforms a container type token into a RuleType object
+
+        Raises:
+            ConstructNotFoundError: Raised if the enum or ruleset cannot be found
+        """
         name = token[0]
         schema_type = self.seen_constructs.get(name)
         if schema_type is None:
             raise ConstructNotFoundError(name)
         return RuleType(type=schema_type, lookup=name)
 
-    def type(self, tokens):
+    def type(self, tokens: Any) -> Any:
+        """Extracts the type tokens and passes them through onto
+        the next stage in the transformer
+        """
         (t, ) = tokens
         return t
 
-    def schema_entry(self, tokens):
-        return YamlerRuleset('main', tokens)
+    def schema_entry(self, rules: list) -> YamlerRuleset:
+        """Transforms the schema entry point token into a YamlerRuleset called
+        main that will act as the entry point for validaiting the YAML data
+        """
+        return YamlerRuleset('main', rules)
 
 
 class _InstructionHandler:
@@ -174,3 +223,52 @@ class _RulesetInstructionHandler(_InstructionHandler):
             return
 
         self._rulesets[instruction.name] = instruction
+
+
+class YamlerSyntaxError(SyntaxError):
+    """A generic syntax error in the Yamler content"""
+
+    label = None
+
+    def __str__(self) -> str:
+        context, line, column = self.args
+        if self.label is None:
+            return f'Error on line {line}, column {column}.\n\n{context}'
+        return f'{self.label} at line {line}, column {column}.\n\n{context}'
+
+
+class YamlerMalformedRulesetNameError(YamlerSyntaxError):
+    """Indicates an error in the ruleset name"""
+    label = 'Invalid ruleset name'
+
+
+class YamlerMalformedEnumNameError(YamlerSyntaxError):
+    """Indicates an error in the enum name"""
+    label = 'Invalid enum name'
+
+
+class YamlerMissingRulesError(YamlerSyntaxError):
+    """Indicates that a ruleset or schema block is missing rules"""
+    label = 'Missing rules'
+
+
+def _handle_syntax_errors(u: UnexpectedInput, parser: Lark, content: str) -> None:
+    exc_class = u.match_examples(parser.parse, {
+        YamlerMalformedRulesetNameError: [
+            'ruleset foo',
+            'ruleset 1234Foo',
+            'ruleset FOO',
+        ],
+        YamlerMalformedEnumNameError: [
+            'enum foo',
+            'enum 1234Foo',
+            'enum FOO',
+        ],
+        YamlerMissingRulesError: [
+            'ruleset Foo {}',
+            'schema {}'
+        ]
+    }, use_accepts=True)
+    if not exc_class:
+        raise YamlerSyntaxError(u.get_context(content), u.line, u.column)
+    raise exc_class(u.get_context(content), u.line, u.column)

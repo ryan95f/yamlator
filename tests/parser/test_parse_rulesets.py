@@ -1,9 +1,15 @@
 import unittest
 
-from yamler.parser import parse_rulesets
+from parameterized import parameterized
+
 from yamler.utils import load_yamler_ruleset
+from yamler.parser import parse_rulesets
 from yamler.utils import load_yaml_file
-from lark.exceptions import UnexpectedCharacters
+from yamler.exceptions import YamlerParseError
+from yamler.parser import YamlerMalformedEnumNameError
+from yamler.parser import YamlerMalformedRulesetNameError
+from yamler.parser import YamlerMissingRulesError
+from yamler.parser import YamlerSyntaxError
 
 
 class TestParseRulesets(unittest.TestCase):
@@ -30,7 +36,39 @@ class TestParseRulesets(unittest.TestCase):
 
     def test_parse_with_invalid_content(self):
         yaml_content = load_yaml_file(self.invalid_yamler_file)
-        with self.assertRaises(UnexpectedCharacters):
+        with self.assertRaises(YamlerSyntaxError):
+            parse_rulesets(str(yaml_content))
+
+    @parameterized.expand([
+        (
+            'with_schema_missing_rules',
+            './tests/files/invalid_files/schema_missing_rules.yamler',
+            YamlerMissingRulesError
+        ),
+        (
+            'with_ruleset_missing_rules',
+            './tests/files/invalid_files/schema_missing_rules.yamler',
+            YamlerMissingRulesError
+        ),
+        (
+            'with_invalid_enum_name',
+            './tests/files/invalid_files/invalid_enum_name.yamler',
+            YamlerMalformedEnumNameError
+        ),
+        (
+            'with_invalid_ruleset_name',
+            './tests/files/invalid_files/invalid_ruleset_name.yamler',
+            YamlerMalformedRulesetNameError
+        ),
+        (
+            'with_ruleset_not_defined',
+            './tests/files/invalid_files/missing_defined_ruleset.yamler',
+            YamlerParseError
+        )
+    ])
+    def test_parse_syntax_errors(self, name: str, yamler_file_path: str, exception_type):
+        yaml_content = load_yaml_file(yamler_file_path)
+        with self.assertRaises(exception_type):
             parse_rulesets(str(yaml_content))
 
 
