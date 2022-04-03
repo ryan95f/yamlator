@@ -5,7 +5,7 @@ import setuptools
 with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
-VERSION = '0.0.2'
+VERSION = '0.0.1'
 PACKAGE_NAME = 'yamler'
 DESCRIPTION = 'Yamler is a CLI tool that allows a YAML file to be validated against a schema'  # nopep8
 
