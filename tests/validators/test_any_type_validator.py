@@ -14,7 +14,7 @@ class TestAnyTypeValidator(BaseValidatorTest):
         ('is_list_type', [0, 1, 2, 3, 4], RuleType(
             type=list, sub_type=RuleType(type=SchemaTypes.INT)), 1),
     ])
-    @patch('yamler.validators.Validator.validate')
+    @patch('src.validators.Validator.validate')
     def test_any_type_validator(self, name: str, data: Data, rtype: RuleType,
                                 expected_validator_call_count: int,
                                 mock_parent_validator: Mock):

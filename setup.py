@@ -17,7 +17,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/Ryan95Z/yamler',
     author='Ryan Flynn',
-    packages=setuptools.find_packages(include=['yamler']),
+    packages=setuptools.find_packages(include=['src']),
     install_requires=[
         'lark==1.0.0',
         'PyYAML==6.0'
