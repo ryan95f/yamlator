@@ -21,7 +21,7 @@ class TestLoadYamlFile(unittest.TestCase):
         self.assertIsNotNone(results)
 
 
-class TestLoadYamlerRuleset(unittest.TestCase):
+class TestLoadSchema(unittest.TestCase):
     @parameterized.expand([
         ('with_empty_str', ''),
         ('with_none', None)

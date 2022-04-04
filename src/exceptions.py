@@ -12,10 +12,20 @@ class InvalidSchemaFilenameError(RuntimeError):
 
 
 class ConstructNotFoundError(RuntimeError):
+    """Represents a enum or rule not being found during
+    the transformation process
+    """
+
     def __init__(self, construct_name: str) -> None:
+        """ConstructNotFoundError init
+
+        Args:
+            construct_name (str): The name of the Enum or Ruleset construct
+        """
         message = f"Type {construct_name} was not found in the schema definition"
         super().__init__(message)
 
 
 class SchemaParseError(RuntimeError):
+    """Represents a parse error when reading the schema"""
     pass

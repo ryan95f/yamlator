@@ -67,11 +67,11 @@ def _create_args_parser():
 
 def validate_yaml_data_from_file(yaml_filepath: str,
                                  schema_filepath: str) -> Iterator[ViolationType]:
-    """Validate a YAML file with a yamler schema file
+    """Validate a YAML file with a schema file
 
     Args:
         yaml_filepath   (str): The path to the YAML data file
-        schema_filepath (str): The path to the yamler file
+        schema_filepath (str): The path to the schema file
 
     Returns:
         A Iterator collection of ViolationType objects that contains
@@ -187,7 +187,10 @@ class JSONOutput(ViolationOutput):
             and -1 = violations were found
         """
         violation_count = len(violations)
-        pre_json_data = {'violatons': violations, 'violation_count': violation_count}
+        pre_json_data = {
+            'violatons': violations,
+            'violation_count': violation_count
+        }
 
         json_data = json.dumps(pre_json_data, cls=ViolationJSONEncoder, indent=4)
         print(json_data)
