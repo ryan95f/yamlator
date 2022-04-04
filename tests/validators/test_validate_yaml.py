@@ -6,7 +6,7 @@ from src.types import Data, EnumItem, Rule, RuleType
 from src.types import YamlatorEnum, YamlatorRuleset, SchemaTypes
 
 
-def create_flat_ruleset():
+def create_flat_schema():
     rules = [
         Rule('message', RuleType(type=SchemaTypes.STR), True),
         Rule('number', RuleType(type=SchemaTypes.INT), False),
@@ -17,7 +17,7 @@ def create_flat_ruleset():
     }
 
 
-def create_complex_ruleset():
+def create_complex_schema():
     person_ruleset = YamlatorRuleset('ruleset', [
         Rule('name', RuleType(type=SchemaTypes.STR), True),
         Rule('age', RuleType(type=SchemaTypes.INT), False)
@@ -58,8 +58,8 @@ def create_complex_ruleset():
     }
 
 
-FLAT_RULESET = create_flat_ruleset()
-COMPLEX_RULESET = create_complex_ruleset()
+FLAT_RULESET = create_flat_schema()
+COMPLEX_RULESET = create_complex_schema()
 
 
 class TestWrangleData(unittest.TestCase):
@@ -75,9 +75,9 @@ class TestWrangleData(unittest.TestCase):
             validate_yaml(data, instructions)
 
     @parameterized.expand([
-        ('empty_data_and_rules', {}, {}, 0),
-        ('empty_rules', {}, {'message': 'hello'}, 0),
-        ('primitive_data_rules', FLAT_RULESET, {
+        ('empty_data_and_schema', {}, {}, 0),
+        ('empty_schema', {}, {'message': 'hello'}, 0),
+        ('primitive_data_schema', FLAT_RULESET, {
             'message': 'hello', 'number': 1
         }, 0),
         ('primitive_data_invalid_data', FLAT_RULESET, {

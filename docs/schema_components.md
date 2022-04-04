@@ -1,6 +1,6 @@
 # Schema components
 
-Below are the various components that can be used to construct a schema in Yamler that can be used to validate a YAML file.
+Below are the various components that can be used to construct a schema with Yamlator that can be used to validate a YAML file.
 
 ## Schema
 

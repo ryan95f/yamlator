@@ -62,7 +62,7 @@ class YamlatorType:
     """Base Class for custom types"""
 
     def __init__(self, name: str, type: ContainerTypes):
-        """YamlerType init
+        """YamlatorType init
 
         Args:
             name            (str): The object name of the type
