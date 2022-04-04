@@ -5,7 +5,7 @@ from abc import ABC
 from typing import Iterator
 from enum import Enum
 
-from src.parser import SchemaSyntaxError, parse_rulesets
+from src.parser import SchemaSyntaxError, parse_schema
 from src.validators import validate_yaml
 from src.utils import load_yaml_file
 from src.utils import load_schema
@@ -86,7 +86,7 @@ def validate_yaml_data_from_file(yaml_filepath: str,
     yaml_data = load_yaml_file(yaml_filepath)
     ruleset_data = load_schema(yamler_filepath)
 
-    instructions = parse_rulesets(ruleset_data)
+    instructions = parse_schema(ruleset_data)
     return validate_yaml(yaml_data, instructions)
 
 

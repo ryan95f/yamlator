@@ -3,7 +3,7 @@ import unittest
 from parameterized import parameterized
 
 from src.utils import load_schema
-from src.parser import parse_rulesets
+from src.parser import parse_schema
 from src.utils import load_yaml_file
 from src.exceptions import SchemaParseError
 from src.parser import MalformedEnumNameError
@@ -19,15 +19,15 @@ class TestParseRulesets(unittest.TestCase):
 
     def test_parse_with_none_text(self):
         with self.assertRaises(ValueError):
-            parse_rulesets(None)
+            parse_schema(None)
 
     def test_parse_with_empty_text(self):
-        instructions = parse_rulesets('')
+        instructions = parse_schema('')
         self.assertIsNotNone(instructions)
 
     def test_parse_with_valid_content(self):
         schema_content = load_schema(self.valid_schema_file)
-        instructions = parse_rulesets(schema_content)
+        instructions = parse_schema(schema_content)
         main = instructions.get('main')
 
         self.assertIsNotNone(instructions)
@@ -37,7 +37,7 @@ class TestParseRulesets(unittest.TestCase):
     def test_parse_with_invalid_content(self):
         yaml_content = load_yaml_file(self.invalid_schema_file)
         with self.assertRaises(SchemaSyntaxError):
-            parse_rulesets(str(yaml_content))
+            parse_schema(str(yaml_content))
 
     @parameterized.expand([
         (
@@ -69,7 +69,7 @@ class TestParseRulesets(unittest.TestCase):
     def test_parse_syntax_errors(self, name: str, schema_file_path: str, exception_type):
         schema_content = load_yaml_file(schema_file_path)
         with self.assertRaises(exception_type):
-            parse_rulesets(str(schema_content))
+            parse_schema(str(schema_content))
 
 
 if __name__ == '__main__':

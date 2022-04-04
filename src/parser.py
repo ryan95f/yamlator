@@ -25,34 +25,34 @@ _package_dir = Path(__file__).parent.absolute()
 _GRAMMER_FILE = os.path.join(_package_dir, 'grammer/grammer.lark')
 
 
-def parse_rulesets(ruleset_content: str) -> dict:
-    """Parses a ruleset into a set of instructions that can be
+def parse_schema(schema_content: str) -> dict:
+    """Parses a schema into a set of instructions that can be
     used to validate a YAML file.
 
     Args:
-        ruleset_content (str): The string contnet of a ruleset schema
+        schema_content (str): The content of a schema
 
     Returns:
         A `dict` that contains the instructions to validate the YAML file
 
     Raises:
-        ValueError: Raised when `ruleset_content` is `None`
-        YamlerParseError: Raised when the parsing process is interrupted
-        YamlerSyntaxError: Raised when a syntax error is detected in the schema
+        ValueError: Raised when `schema_content` is `None`
+        SchemaParseError: Raised when the parsing process is interrupted
+        SchemaSyntaxError: Raised when a syntax error is detected in the schema
     """
-    if ruleset_content is None:
-        raise ValueError("ruleset_content should not be None")
+    if schema_content is None:
+        raise ValueError("schema_content should not be None")
 
     lark_parser = Lark.open(_GRAMMER_FILE)
     transformer = SchemaTransformer()
 
     try:
-        tokens = lark_parser.parse(ruleset_content)
+        tokens = lark_parser.parse(schema_content)
         return transformer.transform(tokens)
     except VisitError as ve:
         raise SchemaParseError(ve.__context__)
     except UnexpectedInput as u:
-        _handle_syntax_errors(u, lark_parser, ruleset_content)
+        _handle_syntax_errors(u, lark_parser, schema_content)
 
 
 class SchemaTransformer(Transformer):
