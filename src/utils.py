@@ -1,7 +1,7 @@
 import yaml
 import re
 
-from src.exceptions import InvalidYamlerFilenameError
+from src.exceptions import InvalidSchemaFilenameError
 
 _YAMLER_SCHEMA_REGEX = re.compile(r'^[.\/\\]?[a-zA-Z0-9_\-\/\\]+.yamler')
 _BACKSLASH_REGEX = re.compile(r'[\\]{1,2}')
@@ -52,7 +52,7 @@ def load_yamler_ruleset(filename: str) -> str:
         raise ValueError('filename cannot be an empty string')
 
     if not _YAMLER_SCHEMA_REGEX.match(filename):
-        raise InvalidYamlerFilenameError(filename)
+        raise InvalidSchemaFilenameError(filename)
 
     filename = _BACKSLASH_REGEX.sub('/', filename)
 

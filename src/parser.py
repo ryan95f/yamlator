@@ -18,7 +18,7 @@ from src.types import RuleType
 from src.types import EnumItem
 from src.types import SchemaTypes
 from src.exceptions import ConstructNotFoundError
-from src.exceptions import YamlerParseError
+from src.exceptions import SchemaParseError
 
 
 _package_dir = Path(__file__).parent.absolute()
@@ -50,7 +50,7 @@ def parse_rulesets(ruleset_content: str) -> dict:
         tokens = lark_parser.parse(ruleset_content)
         return transformer.transform(tokens)
     except VisitError as ve:
-        raise YamlerParseError(ve.__context__)
+        raise SchemaParseError(ve.__context__)
     except UnexpectedInput as u:
         _handle_syntax_errors(u, lark_parser, ruleset_content)
 
@@ -225,7 +225,7 @@ class _RulesetInstructionHandler(_InstructionHandler):
         self._rulesets[instruction.name] = instruction
 
 
-class YamlerSyntaxError(SyntaxError):
+class SchemaSyntaxError(SyntaxError):
     """A generic syntax error in the Yamler content"""
 
     label = None
@@ -237,38 +237,38 @@ class YamlerSyntaxError(SyntaxError):
         return f'{self.label} at line {line}, column {column}.\n\n{context}'
 
 
-class YamlerMalformedRulesetNameError(YamlerSyntaxError):
+class MalformedRulesetNameError(SchemaSyntaxError):
     """Indicates an error in the ruleset name"""
     label = 'Invalid ruleset name'
 
 
-class YamlerMalformedEnumNameError(YamlerSyntaxError):
+class MalformedEnumNameError(SchemaSyntaxError):
     """Indicates an error in the enum name"""
     label = 'Invalid enum name'
 
 
-class YamlerMissingRulesError(YamlerSyntaxError):
+class MissingRulesError(SchemaSyntaxError):
     """Indicates that a ruleset or schema block is missing rules"""
     label = 'Missing rules'
 
 
 def _handle_syntax_errors(u: UnexpectedInput, parser: Lark, content: str) -> None:
     exc_class = u.match_examples(parser.parse, {
-        YamlerMalformedRulesetNameError: [
+        MalformedRulesetNameError: [
             'ruleset foo',
             'ruleset 1234Foo',
             'ruleset FOO',
         ],
-        YamlerMalformedEnumNameError: [
+        MalformedEnumNameError: [
             'enum foo',
             'enum 1234Foo',
             'enum FOO',
         ],
-        YamlerMissingRulesError: [
+        MissingRulesError: [
             'ruleset Foo {}',
             'schema {}'
         ]
     }, use_accepts=True)
     if not exc_class:
-        raise YamlerSyntaxError(u.get_context(content), u.line, u.column)
+        raise SchemaSyntaxError(u.get_context(content), u.line, u.column)
     raise exc_class(u.get_context(content), u.line, u.column)

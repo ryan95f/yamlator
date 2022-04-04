@@ -5,11 +5,11 @@ from abc import ABC
 from typing import Iterator
 from enum import Enum
 
-from src.parser import YamlerSyntaxError, parse_rulesets
+from src.parser import SchemaSyntaxError, parse_rulesets
 from src.validators import validate_yaml
 from src.utils import load_yaml_file
 from src.utils import load_yamler_ruleset
-from src.exceptions import InvalidYamlerFilenameError, YamlerParseError
+from src.exceptions import InvalidSchemaFilenameError, SchemaParseError
 from src.violations import ViolationJSONEncoder, ViolationType
 
 
@@ -29,16 +29,16 @@ def main() -> int:
 
     try:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
-    except YamlerParseError as ex:
+    except SchemaParseError as ex:
         print(ex)
         return ERR
-    except YamlerSyntaxError as ex:
+    except SchemaSyntaxError as ex:
         print(ex)
         return ERR
     except FileNotFoundError as ex:
         print(ex)
         return ERR
-    except InvalidYamlerFilenameError as ex:
+    except InvalidSchemaFilenameError as ex:
         print(ex)
         return ERR
     except ValueError as ex:

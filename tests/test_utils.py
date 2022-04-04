@@ -3,7 +3,7 @@ from parameterized import parameterized
 
 from src.utils import load_yaml_file
 from src.utils import load_yamler_ruleset
-from src.exceptions import InvalidYamlerFilenameError
+from src.exceptions import InvalidSchemaFilenameError
 
 
 class TestLoadYamlFile(unittest.TestCase):
@@ -35,7 +35,7 @@ class TestLoadYamlerRuleset(unittest.TestCase):
         ('with_txt_extension', 'test/test.txt'),
     ])
     def test_load_yamler_ruleset_malfromed_filename(self, name, filename):
-        with self.assertRaises(InvalidYamlerFilenameError):
+        with self.assertRaises(InvalidSchemaFilenameError):
             load_yamler_ruleset(filename)
 
     @parameterized.expand([

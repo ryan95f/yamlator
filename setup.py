@@ -7,7 +7,7 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 VERSION = '0.0.1'
 PACKAGE_NAME = 'yamlator'
-DESCRIPTION = 'yamlator is a CLI tool that allows a YAML file to be validated against a schema'  # nopep8
+DESCRIPTION = 'yamlator is a CLI tool that allows a YAML file to be validated using a lightweight schema language'  # nopep8
 
 setuptools.setup(
     name=PACKAGE_NAME,
@@ -34,7 +34,7 @@ setuptools.setup(
         'Operating System :: OS Independent'
     ],
     entry_points={
-        'console_scripts': ['yn=src.cmd:main']
+        'console_scripts': ['yamlator=src.cmd:main']
     },
     package_data={'src': ['grammer/grammer.lark']}
 )

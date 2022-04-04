@@ -1,8 +1,8 @@
-class InvalidYamlerFilenameError(RuntimeError):
+class InvalidSchemaFilenameError(RuntimeError):
     """When the schema filename does not match the expected pattern"""
 
     def __init__(self, filename: str) -> None:
-        """InvalidYamlerFilenameError init
+        """InvalidSchemaFilenameError init
 
         Args:
             filename (str): The filename that was invalid
@@ -17,5 +17,5 @@ class ConstructNotFoundError(RuntimeError):
         super().__init__(message)
 
 
-class YamlerParseError(RuntimeError):
+class SchemaParseError(RuntimeError):
     pass

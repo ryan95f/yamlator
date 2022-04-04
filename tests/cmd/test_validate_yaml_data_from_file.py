@@ -3,7 +3,7 @@ import unittest
 from parameterized import parameterized
 from collections import namedtuple
 from src.cmd import validate_yaml_data_from_file
-from src.exceptions import InvalidYamlerFilenameError
+from src.exceptions import InvalidSchemaFilenameError
 
 VALID_YAML_DATA_FILE_PATH = './tests/files/hello.yaml'
 VALID_RULESET_FILE_PATH = './tests/files/hello.yamler'
@@ -26,7 +26,7 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
         ('ruleset_invalid_file_extension', ValidateArgs(
             VALID_YAML_DATA_FILE_PATH,
             './tests/files/hello.ruleset'
-        ), InvalidYamlerFilenameError)
+        ), InvalidSchemaFilenameError)
     ])
     def test_validate_yaml_data_from_file_with_invalid_args(self, name: str,
                                                             args: ValidateArgs,
