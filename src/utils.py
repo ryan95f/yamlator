@@ -3,7 +3,7 @@ import re
 
 from src.exceptions import InvalidSchemaFilenameError
 
-_YAMLER_SCHEMA_REGEX = re.compile(r'^[.\/\\]?[a-zA-Z0-9_\-\/\\]+.yamler')
+_YAMLER_SCHEMA_REGEX = re.compile(r'.ys$')
 _BACKSLASH_REGEX = re.compile(r'[\\]{1,2}')
 
 
@@ -31,7 +31,7 @@ def load_yaml_file(filename: str) -> dict:
         return yaml.load(f, Loader=yaml.Loader)
 
 
-def load_yamler_ruleset(filename: str) -> str:
+def load_schema(filename: str) -> str:
     """Load the contents of a Yamler file as a string
 
     Args:
@@ -51,7 +51,7 @@ def load_yamler_ruleset(filename: str) -> str:
     if len(filename) == 0:
         raise ValueError('filename cannot be an empty string')
 
-    if not _YAMLER_SCHEMA_REGEX.match(filename):
+    if not _YAMLER_SCHEMA_REGEX.search(filename):
         raise InvalidSchemaFilenameError(filename)
 
     filename = _BACKSLASH_REGEX.sub('/', filename)

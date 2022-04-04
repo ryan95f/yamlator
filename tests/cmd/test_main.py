@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, Mock, patch
 from src.cmd import main, SUCCESS, ERR, DisplayMethod
 
 HELLO_YAML_FILE_PATH = './tests/files/hello.yaml'
-HELLO_RULESET_FILE_PATH = './tests/files/hello.yamler'
+HELLO_RULESET_FILE_PATH = './tests/files/hello.ys'
 INVALID_HELLO_YAML_FILE_PATH = './tests/files/invalid_hello.yaml'
 
 ValidateArgs = namedtuple('ValidateArgs', ['file', 'ruleset_schema', 'output'])
@@ -28,7 +28,7 @@ class TestMain(unittest.TestCase):
         ), ERR),
         ('with_ruleset_file_not_found', ValidateArgs(
             HELLO_YAML_FILE_PATH,
-            '/test/files/not_found.yamler',
+            '/test/files/not_found.ys',
             DisplayMethod.TABLE.value
         ), ERR),
         ('with_yaml_data_not_found', ValidateArgs(
@@ -53,12 +53,12 @@ class TestMain(unittest.TestCase):
         ), ERR),
         ('with_syntax_errors', ValidateArgs(
             HELLO_YAML_FILE_PATH,
-            './tests/files/invalid_files/invalid_enum_name.yamler',
+            './tests/files/invalid_files/invalid_enum_name.ys',
             DisplayMethod.TABLE.value
         ), ERR),
         ('with_ruleset_not_defined', ValidateArgs(
             HELLO_YAML_FILE_PATH,
-            './tests/files/invalid_files/missing_defined_ruleset.yamler',
+            './tests/files/invalid_files/missing_defined_ruleset.ys',
             DisplayMethod.TABLE.value
         ), ERR)
     ])

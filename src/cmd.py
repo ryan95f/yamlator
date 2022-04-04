@@ -8,7 +8,7 @@ from enum import Enum
 from src.parser import SchemaSyntaxError, parse_rulesets
 from src.validators import validate_yaml
 from src.utils import load_yaml_file
-from src.utils import load_yamler_ruleset
+from src.utils import load_schema
 from src.exceptions import InvalidSchemaFilenameError, SchemaParseError
 from src.violations import ViolationJSONEncoder, ViolationType
 
@@ -84,7 +84,7 @@ def validate_yaml_data_from_file(yaml_filepath: str,
         that ends with the `.yamler` extension.
     """
     yaml_data = load_yaml_file(yaml_filepath)
-    ruleset_data = load_yamler_ruleset(yamler_filepath)
+    ruleset_data = load_schema(yamler_filepath)
 
     instructions = parse_rulesets(ruleset_data)
     return validate_yaml(yaml_data, instructions)
