@@ -32,18 +32,18 @@ def load_yaml_file(filename: str) -> dict:
 
 
 def load_schema(filename: str) -> str:
-    """Load the contents of a Yamler file as a string
+    """Load the contents of a schema file
 
     Args:
-        filename (str): The path to the Yamler file
+        filename (str): The path to the schema file
 
     Returns:
         The content of the file as a string
 
     Raises:
         ValueError: If `filename` is None or an empty string
-        InvalidYamlerFilenameError: If the filename does not match
-        a file with a `.yamler` extention
+        InvalidSchemaFilenameError: If the filename does not match
+        a file with a `.ys` extention
     """
     if filename is None:
         raise ValueError('filename cannot be None')

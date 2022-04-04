@@ -11,7 +11,7 @@ Data = Union[dict, list, int, float, str]
 
 
 class SchemaTypes(Enum):
-    """Represents the support types that can be defined in a ruleset"""
+    """Represents the support types that can be defined in a schema"""
     STR = auto()
     INT = auto()
     FLOAT = auto()
@@ -81,7 +81,7 @@ class YamlatorRuleset(YamlatorType):
     """
 
     def __init__(self, name: str, rules: list):
-        """YamlerRuleSet init
+        """YamlatorRuleset init
 
         Args:
             name     (str): The name of the ruleset

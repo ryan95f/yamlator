@@ -37,7 +37,7 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
     def test_validate_yaml_data_from_file_with_valid_data(self):
         violations = validate_yaml_data_from_file(
             yaml_filepath=VALID_YAML_DATA_FILE_PATH,
-            yamler_filepath=VALID_SCHEMA_FILE_PATH
+            schema_filepath=VALID_SCHEMA_FILE_PATH
         )
         self.assertIsNotNone(violations)
 

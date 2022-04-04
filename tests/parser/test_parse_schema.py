@@ -12,7 +12,7 @@ from src.parser import MissingRulesError
 from src.parser import SchemaSyntaxError
 
 
-class TestParseRulesets(unittest.TestCase):
+class TestParseSchema(unittest.TestCase):
     def setUp(self):
         self.valid_schema_file = './tests/files/hello.ys'
         self.invalid_schema_file = './tests/files/hello.yaml'

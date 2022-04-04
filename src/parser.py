@@ -91,7 +91,7 @@ class SchemaTransformer(Transformer):
         return Rule(name.value, rtype, False)
 
     def ruleset(self, tokens: Any) -> YamlatorRuleset:
-        """Transforms the ruleset tokens into a YamlerRuleset object"""
+        """Transforms the ruleset tokens into a YamlatorRuleset object"""
         name = tokens[0].value
         rules = tokens[1:]
         self.seen_constructs[name] = SchemaTypes.RULESET
@@ -150,7 +150,7 @@ class SchemaTransformer(Transformer):
         return EnumItem(name=name.value, value=value.value)
 
     def enum(self, tokens: Any) -> YamlatorEnum:
-        """Transforms a enum token into a YamlerEnum object"""
+        """Transforms a enum token into a YamlatorEnum object"""
         enums = {}
 
         name = tokens[0]
@@ -181,7 +181,7 @@ class SchemaTransformer(Transformer):
         return t
 
     def schema_entry(self, rules: list) -> YamlatorRuleset:
-        """Transforms the schema entry point token into a YamlerRuleset called
+        """Transforms the schema entry point token into a YamlatorRuleset called
         main that will act as the entry point for validaiting the YAML data
         """
         return YamlatorRuleset('main', rules)
@@ -226,7 +226,7 @@ class _RulesetInstructionHandler(_InstructionHandler):
 
 
 class SchemaSyntaxError(SyntaxError):
-    """A generic syntax error in the Yamler content"""
+    """A generic syntax error in the schema content"""
 
     label = None
 

@@ -52,7 +52,7 @@ def main() -> int:
 def _create_args_parser():
     description = 'A YAML validation tool that determines if a YAML file matches a given schema'  # nopep8
 
-    parser = argparse.ArgumentParser(prog="yamler", description=description)
+    parser = argparse.ArgumentParser(prog='yamlator', description=description)
     parser.add_argument('file', type=str,
                         help='The YAML file to be validated')
 
@@ -66,12 +66,12 @@ def _create_args_parser():
 
 
 def validate_yaml_data_from_file(yaml_filepath: str,
-                                 yamler_filepath: str) -> Iterator[ViolationType]:
+                                 schema_filepath: str) -> Iterator[ViolationType]:
     """Validate a YAML file with a yamler schema file
 
     Args:
         yaml_filepath   (str): The path to the YAML data file
-        yamler_filepath (str): The path to the yamler file
+        schema_filepath (str): The path to the yamler file
 
     Returns:
         A Iterator collection of ViolationType objects that contains
@@ -80,11 +80,11 @@ def validate_yaml_data_from_file(yaml_filepath: str,
     Raises:
         ValueError: If either argument is `None` or an empty string
         FileNotFoundError: If either argument cannot be found on the file system
-        InvalidYamlerFilenameError: If `yamler_filepath` does not have a valid filename
-        that ends with the `.yamler` extension.
+        InvalidSchemaFilenameError: If `schema_filepath` does not have a valid filename
+        that ends with the `.ys` extension.
     """
     yaml_data = load_yaml_file(yaml_filepath)
-    ruleset_data = load_schema(yamler_filepath)
+    ruleset_data = load_schema(schema_filepath)
 
     instructions = parse_schema(ruleset_data)
     return validate_yaml(yaml_data, instructions)
