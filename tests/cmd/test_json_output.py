@@ -5,8 +5,8 @@ from typing import Iterator
 from unittest.mock import patch
 from parameterized import parameterized
 
-from yamler.cmd import ERR, SUCCESS, JSONOutput
-from yamler.violations import RequiredViolation, TypeViolation, Violation
+from src.cmd import ERR, SUCCESS, JSONOutput
+from src.violations import RequiredViolation, TypeViolation, Violation
 
 
 class TestJSONOutput(unittest.TestCase):

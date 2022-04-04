@@ -3,10 +3,10 @@ import unittest
 
 from unittest.mock import patch, Mock
 from parameterized import parameterized
-from yamler.types import Data, RuleType, SchemaTypes
+from src.types import Data, RuleType, SchemaTypes
 
 from .base import BaseValidatorTest
-from yamler.validators import MapValidator
+from src.validators import MapValidator
 
 
 class TestMapValidator(BaseValidatorTest):

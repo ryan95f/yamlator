@@ -4,11 +4,11 @@ from collections import deque
 from typing import Any
 from parameterized import parameterized
 
-from yamler.violations import BuiltInTypeViolation
-from yamler.violations import RequiredViolation
-from yamler.violations import RulesetTypeViolation
-from yamler.violations import TypeViolation
-from yamler.violations import ViolationJSONEncoder
+from src.violations import BuiltInTypeViolation
+from src.violations import RequiredViolation
+from src.violations import RulesetTypeViolation
+from src.violations import TypeViolation
+from src.violations import ViolationJSONEncoder
 
 
 class TestViolationJSONEncoder(unittest.TestCase):

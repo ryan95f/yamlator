@@ -4,7 +4,7 @@ import unittest
 from collections import namedtuple
 from parameterized import parameterized
 from unittest.mock import MagicMock, Mock, patch
-from yamler.cmd import main, SUCCESS, ERR, DisplayMethod
+from src.cmd import main, SUCCESS, ERR, DisplayMethod
 
 HELLO_YAML_FILE_PATH = './tests/files/hello.yaml'
 HELLO_RULESET_FILE_PATH = './tests/files/hello.yamler'

@@ -1,6 +1,6 @@
 import unittest
-from yamler.types import Data
-from yamler.validators import RequiredValidator
+from src.types import Data
+from src.validators import RequiredValidator
 from parameterized import parameterized
 
 from .base import BaseValidatorTest

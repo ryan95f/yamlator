@@ -2,15 +2,15 @@ from __future__ import annotations
 from typing import Iterable
 from collections import deque, namedtuple
 
-from yamler.violations import RequiredViolation
-from yamler.violations import RulesetTypeViolation
-from yamler.violations import TypeViolation
+from src.violations import RequiredViolation
+from src.violations import RulesetTypeViolation
+from src.violations import TypeViolation
 
-from yamler.types import Data
-from yamler.types import Rule
-from yamler.types import RuleType
-from yamler.types import YamlerRuleset
-from yamler.types import SchemaTypes
+from src.types import Data
+from src.types import Rule
+from src.types import RuleType
+from src.types import YamlerRuleset
+from src.types import SchemaTypes
 
 
 def validate_yaml(yaml_data: Data, instructions: dict) -> deque:

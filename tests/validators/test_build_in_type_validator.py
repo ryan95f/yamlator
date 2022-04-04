@@ -2,8 +2,8 @@ import unittest
 
 from .base import BaseValidatorTest
 from parameterized import parameterized
-from yamler.validators import BuildInTypeValidator
-from yamler.types import Data, RuleType, SchemaTypes
+from src.validators import BuildInTypeValidator
+from src.types import Data, RuleType, SchemaTypes
 
 
 class TestBuildInTypeValidator(BaseValidatorTest):

@@ -2,14 +2,14 @@ import unittest
 
 from parameterized import parameterized
 
-from yamler.utils import load_yamler_ruleset
-from yamler.parser import parse_rulesets
-from yamler.utils import load_yaml_file
-from yamler.exceptions import YamlerParseError
-from yamler.parser import YamlerMalformedEnumNameError
-from yamler.parser import YamlerMalformedRulesetNameError
-from yamler.parser import YamlerMissingRulesError
-from yamler.parser import YamlerSyntaxError
+from src.utils import load_yamler_ruleset
+from src.parser import parse_rulesets
+from src.utils import load_yaml_file
+from src.exceptions import YamlerParseError
+from src.parser import YamlerMalformedEnumNameError
+from src.parser import YamlerMalformedRulesetNameError
+from src.parser import YamlerMissingRulesError
+from src.parser import YamlerSyntaxError
 
 
 class TestParseRulesets(unittest.TestCase):

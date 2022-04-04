@@ -3,8 +3,8 @@ import unittest
 from .base import BaseValidatorTest
 from unittest.mock import MagicMock
 from parameterized import parameterized
-from yamler.validators import ListValidator
-from yamler.types import RuleType, SchemaTypes
+from src.validators import ListValidator
+from src.types import RuleType, SchemaTypes
 
 
 class TestListValidator(BaseValidatorTest):

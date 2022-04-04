@@ -2,8 +2,8 @@ import unittest
 
 from .base import BaseValidatorTest
 from parameterized import parameterized
-from yamler.validators import EnumTypeValidator
-from yamler.types import Data, EnumItem, RuleType, YamlerEnum, SchemaTypes
+from src.validators import EnumTypeValidator
+from src.types import Data, EnumItem, RuleType, YamlerEnum, SchemaTypes
 
 
 class TestEnumTypeValidator(BaseValidatorTest):

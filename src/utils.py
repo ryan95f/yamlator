@@ -1,7 +1,7 @@
 import yaml
 import re
 
-from yamler.exceptions import InvalidYamlerFilenameError
+from src.exceptions import InvalidYamlerFilenameError
 
 _YAMLER_SCHEMA_REGEX = re.compile(r'^[.\/\\]?[a-zA-Z0-9_\-\/\\]+.yamler')
 _BACKSLASH_REGEX = re.compile(r'[\\]{1,2}')

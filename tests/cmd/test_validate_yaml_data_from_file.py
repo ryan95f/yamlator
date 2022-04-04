@@ -2,8 +2,8 @@ import unittest
 
 from parameterized import parameterized
 from collections import namedtuple
-from yamler.cmd import validate_yaml_data_from_file
-from yamler.exceptions import InvalidYamlerFilenameError
+from src.cmd import validate_yaml_data_from_file
+from src.exceptions import InvalidYamlerFilenameError
 
 VALID_YAML_DATA_FILE_PATH = './tests/files/hello.yaml'
 VALID_RULESET_FILE_PATH = './tests/files/hello.yamler'

@@ -1,9 +1,9 @@
 import unittest
 from parameterized import parameterized
 
-from yamler.utils import load_yaml_file
-from yamler.utils import load_yamler_ruleset
-from yamler.exceptions import InvalidYamlerFilenameError
+from src.utils import load_yaml_file
+from src.utils import load_yamler_ruleset
+from src.exceptions import InvalidYamlerFilenameError
 
 
 class TestLoadYamlFile(unittest.TestCase):

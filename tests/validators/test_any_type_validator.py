@@ -3,8 +3,8 @@ import unittest
 from .base import BaseValidatorTest
 from parameterized import parameterized
 from unittest.mock import patch, Mock
-from yamler.types import Data, RuleType, SchemaTypes
-from yamler.validators import AnyTypeValidator
+from src.types import Data, RuleType, SchemaTypes
+from src.validators import AnyTypeValidator
 
 
 class TestAnyTypeValidator(BaseValidatorTest):

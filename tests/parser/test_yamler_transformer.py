@@ -2,11 +2,11 @@ import unittest
 
 from collections import namedtuple
 from parameterized import parameterized
-from yamler.exceptions import ConstructNotFoundError
+from src.exceptions import ConstructNotFoundError
 
-from yamler.parser import YamlerTransformer
-from yamler.types import EnumItem, Rule, RuleType
-from yamler.types import YamlerEnum, YamlerRuleset, SchemaTypes
+from src.parser import YamlerTransformer
+from src.types import EnumItem, Rule, RuleType
+from src.types import YamlerEnum, YamlerRuleset, SchemaTypes
 
 
 Token = namedtuple('Token', ['value'])

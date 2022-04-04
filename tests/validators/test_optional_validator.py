@@ -4,8 +4,8 @@ from .base import BaseValidatorTest
 
 from unittest.mock import Mock, patch
 from parameterized import parameterized
-from yamler.types import Data
-from yamler.validators import OptionalValidator
+from src.types import Data
+from src.validators import OptionalValidator
 
 
 class TestOptionalValidator(BaseValidatorTest):

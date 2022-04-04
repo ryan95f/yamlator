@@ -1,9 +1,9 @@
 import unittest
 
 from parameterized import parameterized
-from yamler.validators import validate_yaml
-from yamler.types import Data, EnumItem, Rule, RuleType
-from yamler.types import YamlerEnum, YamlerRuleset, SchemaTypes
+from src.validators import validate_yaml
+from src.types import Data, EnumItem, Rule, RuleType
+from src.types import YamlerEnum, YamlerRuleset, SchemaTypes
 
 
 def create_flat_ruleset():
