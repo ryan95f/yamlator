@@ -58,7 +58,7 @@ class ContainerTypes(Enum):
     ENUM = 1
 
 
-class YamlerType:
+class YamlatorType:
     """Base Class for custom types"""
 
     def __init__(self, name: str, type: ContainerTypes):
@@ -75,7 +75,7 @@ class YamlerType:
         return f"{self.type}({self.name})"
 
 
-class YamlerRuleset(YamlerType):
+class YamlatorRuleset(YamlatorType):
     """Represent a Ruleset Type. A ruleset will contain a list of
     rules of `RuleType` which will validated against
     """
@@ -91,7 +91,7 @@ class YamlerRuleset(YamlerType):
         self.rules = rules
 
 
-class YamlerEnum(YamlerType):
+class YamlatorEnum(YamlatorType):
     """Represents a Enum Type that will contain a dict of valid
     values. The dict of items will be in the format: {<value>: EnumItem(<name>, <value>)}
 
@@ -103,7 +103,7 @@ class YamlerEnum(YamlerType):
     """
 
     def __init__(self, name: str, items: dict):
-        """YamlerEnum init
+        """YamlatorEnum init
 
         Args:
             name     (str): The name of the enum

@@ -3,7 +3,7 @@ import unittest
 from .base import BaseValidatorTest
 from parameterized import parameterized
 from src.validators import RulesetValidator
-from src.types import Data, Rule, RuleType, YamlerRuleset, SchemaTypes
+from src.types import Data, Rule, RuleType, YamlatorRuleset, SchemaTypes
 
 
 class TestRuleSetValidator(BaseValidatorTest):
@@ -12,7 +12,7 @@ class TestRuleSetValidator(BaseValidatorTest):
         self.instructions = self._create_flat_ruleset()
 
     def _create_flat_ruleset(self):
-        message_ruleset = YamlerRuleset('message', [
+        message_ruleset = YamlatorRuleset('message', [
             Rule('message', RuleType(type=SchemaTypes.STR), True),
             Rule('number', RuleType(type=SchemaTypes.INT), False)
         ])

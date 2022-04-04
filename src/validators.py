@@ -9,7 +9,7 @@ from src.violations import TypeViolation
 from src.types import Data
 from src.types import Rule
 from src.types import RuleType
-from src.types import YamlerRuleset
+from src.types import YamlatorRuleset
 from src.types import SchemaTypes
 
 
@@ -37,7 +37,7 @@ def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
 
     entry_parent = '-'
     violations = deque()
-    entry_point: YamlerRuleset = instructions.get('main', YamlerRuleset('main', []))
+    entry_point: YamlatorRuleset = instructions.get('main', YamlatorRuleset('main', []))
 
     validators = _create_validators_chain(
         ruleset_lookups=instructions.get('rules', {}),
@@ -246,7 +246,7 @@ class RulesetValidator(Validator):
                 )
 
     def _retrieve_next_ruleset(self, ruleset_name: str) -> Iterable[Rule]:
-        default_missing_ruleset = YamlerRuleset(ruleset_name, [])
+        default_missing_ruleset = YamlatorRuleset(ruleset_name, [])
         ruleset = self.instructions.get(ruleset_name, default_missing_ruleset)
         return ruleset.rules
 

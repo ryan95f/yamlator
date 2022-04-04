@@ -4,17 +4,17 @@ from collections import namedtuple
 from parameterized import parameterized
 from src.exceptions import ConstructNotFoundError
 
-from src.parser import YamlerTransformer
+from src.parser import SchemaTransformer
 from src.types import EnumItem, Rule, RuleType
-from src.types import YamlerEnum, YamlerRuleset, SchemaTypes
+from src.types import YamlatorEnum, YamlatorRuleset, SchemaTypes
 
 
 Token = namedtuple('Token', ['value'])
 
 
-class TestYamlerTransformer(unittest.TestCase):
+class TestSchemaTransformer(unittest.TestCase):
     def setUp(self):
-        self.transformer = YamlerTransformer()
+        self.transformer = SchemaTransformer()
         self.name_token = Token('message')
         self.status_code_token = Token('StatusCode')
 
@@ -53,11 +53,11 @@ class TestYamlerTransformer(unittest.TestCase):
         expected_enum_count = 1
 
         instructions = [
-            YamlerEnum('StatusCode', {
+            YamlatorEnum('StatusCode', {
                 'success': EnumItem('SUCCESS', 'success'),
                 'error': EnumItem('ERR', 'error')
             }),
-            YamlerRuleset('main', [
+            YamlatorRuleset('main', [
                 Rule('message', RuleType(type=SchemaTypes.STR), True)
             ])
         ]

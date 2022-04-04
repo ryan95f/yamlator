@@ -11,9 +11,9 @@ from typing import Any
 
 from src.types import Rule
 from src.types import ContainerTypes
-from src.types import YamlerRuleset
-from src.types import YamlerEnum
-from src.types import YamlerType
+from src.types import YamlatorRuleset
+from src.types import YamlatorEnum
+from src.types import YamlatorType
 from src.types import RuleType
 from src.types import EnumItem
 from src.types import SchemaTypes
@@ -44,7 +44,7 @@ def parse_rulesets(ruleset_content: str) -> dict:
         raise ValueError("ruleset_content should not be None")
 
     lark_parser = Lark.open(_GRAMMER_FILE)
-    transformer = YamlerTransformer()
+    transformer = SchemaTransformer()
 
     try:
         tokens = lark_parser.parse(ruleset_content)
@@ -55,8 +55,8 @@ def parse_rulesets(ruleset_content: str) -> dict:
         _handle_syntax_errors(u, lark_parser, ruleset_content)
 
 
-class YamlerTransformer(Transformer):
-    """Transforms the Yamler schema contents into a set of objects that
+class SchemaTransformer(Transformer):
+    """Transforms the schema contents into a set of objects that
     can be used to validate a YAML file. This class will be used by Lark
     during the parsing process.
 
@@ -72,7 +72,7 @@ class YamlerTransformer(Transformer):
     seen_constructs = {}
 
     def __init__(self, visit_tokens: bool = True) -> None:
-        """YamlerTransformer init
+        """SchemaTransformer init
 
         Args:
             visit_tokens (bool): Should the transformer visit tokens in addition
@@ -90,14 +90,14 @@ class YamlerTransformer(Transformer):
         (name, rtype) = tokens
         return Rule(name.value, rtype, False)
 
-    def ruleset(self, tokens: Any) -> YamlerRuleset:
+    def ruleset(self, tokens: Any) -> YamlatorRuleset:
         """Transforms the ruleset tokens into a YamlerRuleset object"""
         name = tokens[0].value
         rules = tokens[1:]
         self.seen_constructs[name] = SchemaTypes.RULESET
-        return YamlerRuleset(name, rules)
+        return YamlatorRuleset(name, rules)
 
-    def start(self, instructions: Iterator[YamlerType]) -> dict:
+    def start(self, instructions: Iterator[YamlatorType]) -> dict:
         """Transforms the instructions into a dict that sorts the rulesets,
         enums and entry point to validate YAML data"""
         root = None
@@ -149,7 +149,7 @@ class YamlerTransformer(Transformer):
         name, value = tokens
         return EnumItem(name=name.value, value=value.value)
 
-    def enum(self, tokens: Any) -> YamlerEnum:
+    def enum(self, tokens: Any) -> YamlatorEnum:
         """Transforms a enum token into a YamlerEnum object"""
         enums = {}
 
@@ -159,7 +159,7 @@ class YamlerTransformer(Transformer):
         for item in items:
             enums[item.value] = item
         self.seen_constructs[name] = SchemaTypes.ENUM
-        return YamlerEnum(name.value, enums)
+        return YamlatorEnum(name.value, enums)
 
     def container_type(self, token: Any) -> RuleType:
         """Transforms a container type token into a RuleType object
@@ -180,11 +180,11 @@ class YamlerTransformer(Transformer):
         (t, ) = tokens
         return t
 
-    def schema_entry(self, rules: list) -> YamlerRuleset:
+    def schema_entry(self, rules: list) -> YamlatorRuleset:
         """Transforms the schema entry point token into a YamlerRuleset called
         main that will act as the entry point for validaiting the YAML data
         """
-        return YamlerRuleset('main', rules)
+        return YamlatorRuleset('main', rules)
 
 
 class _InstructionHandler:
@@ -194,7 +194,7 @@ class _InstructionHandler:
         self._next_handler = handler
         return handler
 
-    def handle(self, instruction: YamlerType) -> None:
+    def handle(self, instruction: YamlatorType) -> None:
         if self._next_handler is not None:
             self._next_handler.handle(instruction)
 
@@ -204,7 +204,7 @@ class _EnumInstructionHandler(_InstructionHandler):
         super().__init__()
         self._enums = enums
 
-    def handle(self, instruction: YamlerType) -> None:
+    def handle(self, instruction: YamlatorType) -> None:
         if instruction.type != ContainerTypes.ENUM:
             super().handle(instruction)
             return
@@ -217,7 +217,7 @@ class _RulesetInstructionHandler(_InstructionHandler):
         super().__init__()
         self._rulesets = rulesets
 
-    def handle(self, instruction: YamlerType) -> None:
+    def handle(self, instruction: YamlatorType) -> None:
         if instruction.type != ContainerTypes.RULESET:
             super().handle(instruction)
             return
