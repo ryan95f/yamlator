@@ -7,7 +7,7 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 VERSION = '0.0.1'
 PACKAGE_NAME = 'yamlator'
-DESCRIPTION = 'yamlator is a CLI tool that allows a YAML file to be validated using a lightweight schema language'  # nopep8
+DESCRIPTION = 'Yamlator is a CLI tool that allows a YAML file to be validated using a lightweight schema language'  # nopep8
 
 setuptools.setup(
     name=PACKAGE_NAME,

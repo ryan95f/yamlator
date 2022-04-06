@@ -20,7 +20,7 @@ schema {
 }
 ```
 
-Rules in the schema block following the exact same pattern that can be used in `rulesets`. For more information on [rules](#rules).
+Rules in the schema block following the exact same pattern that can be used in `rulesets`. See [rules](#rules) for more information.
 
 ## Rulesets
 

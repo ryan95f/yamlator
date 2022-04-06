@@ -1,8 +1,8 @@
 # Yamlator
 
-[![Test](https://github.com/Ryan95Z/Yamlator/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/Yamlator/actions/workflows/test.yaml)
+[![Test](https://github.com/Ryan95Z/yamlator/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/yamlator/actions/workflows/test.yaml)
 
-Yamlator is a CLI tool that allows a YAML file to be validated against a light weight schema that defines the expected structure. When executed, the YAML data structure is compared against the rules to validate that the required keys and data types are present. Once validated, a list of violations will be returned that can be used to amend the file.
+Yamlator is a CLI tool that allows a YAML file to be validated against a lightweight schema that defines the expected structure. When executed, the YAML data structure is compared against the rules to validate that the required keys and data types are present. Once validated, a list of violations will be returned that can be used to amend the file.
 
 ## Installing the package
 
@@ -64,6 +64,8 @@ employees:
 ```
 
 More information on the different components that make up a schema can be found in the [schema components document](./docs/schema_components.md).
+
+Some examples of a schema file with a YAML file can be found in the [examples directory](./example/)
 
 ## How to run the CLI
 
