@@ -15,7 +15,7 @@ setuptools.setup(
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/Ryan95Z/yamler',
+    url='https://github.com/Ryan95Z/yamlator',
     author='Ryan Flynn',
     packages=setuptools.find_packages(include=['src']),
     install_requires=[
@@ -24,6 +24,7 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     classifiers=[
+        'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',

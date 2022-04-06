@@ -50,7 +50,7 @@ def main() -> int:
 
 
 def _create_args_parser():
-    description = 'A YAML validation tool that determines if a YAML file matches a given schema'  # nopep8
+    description = 'Yamlator is a CLI tool that allows a YAML file to be validated using a lightweight schema language'  # nopep8
 
     parser = argparse.ArgumentParser(prog='yamlator', description=description)
     parser.add_argument('file', type=str,
