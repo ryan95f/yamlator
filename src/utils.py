@@ -1,9 +1,9 @@
 import yaml
 import re
 
-from yamler.exceptions import InvalidYamlerFilenameError
+from src.exceptions import InvalidSchemaFilenameError
 
-_YAMLER_SCHEMA_REGEX = re.compile(r'^[.\/\\]?[a-zA-Z0-9_\-\/\\]+.yamler')
+_YAMLER_SCHEMA_REGEX = re.compile(r'.ys$')
 _BACKSLASH_REGEX = re.compile(r'[\\]{1,2}')
 
 
@@ -31,19 +31,19 @@ def load_yaml_file(filename: str) -> dict:
         return yaml.load(f, Loader=yaml.Loader)
 
 
-def load_yamler_ruleset(filename: str) -> str:
-    """Load the contents of a Yamler file as a string
+def load_schema(filename: str) -> str:
+    """Load the contents of a schema file
 
     Args:
-        filename (str): The path to the Yamler file
+        filename (str): The path to the schema file
 
     Returns:
         The content of the file as a string
 
     Raises:
         ValueError: If `filename` is None or an empty string
-        InvalidYamlerFilenameError: If the filename does not match
-        a file with a `.yamler` extention
+        InvalidSchemaFilenameError: If the filename does not match
+        a file with a `.ys` extention
     """
     if filename is None:
         raise ValueError('filename cannot be None')
@@ -51,8 +51,8 @@ def load_yamler_ruleset(filename: str) -> str:
     if len(filename) == 0:
         raise ValueError('filename cannot be an empty string')
 
-    if not _YAMLER_SCHEMA_REGEX.match(filename):
-        raise InvalidYamlerFilenameError(filename)
+    if not _YAMLER_SCHEMA_REGEX.search(filename):
+        raise InvalidSchemaFilenameError(filename)
 
     filename = _BACKSLASH_REGEX.sub('/', filename)
 

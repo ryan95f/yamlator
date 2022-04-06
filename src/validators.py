@@ -2,15 +2,15 @@ from __future__ import annotations
 from typing import Iterable
 from collections import deque, namedtuple
 
-from yamler.violations import RequiredViolation
-from yamler.violations import RulesetTypeViolation
-from yamler.violations import TypeViolation
+from src.violations import RequiredViolation
+from src.violations import RulesetTypeViolation
+from src.violations import TypeViolation
 
-from yamler.types import Data
-from yamler.types import Rule
-from yamler.types import RuleType
-from yamler.types import YamlerRuleset
-from yamler.types import SchemaTypes
+from src.types import Data
+from src.types import Rule
+from src.types import RuleType
+from src.types import YamlatorRuleset
+from src.types import SchemaTypes
 
 
 def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
@@ -37,7 +37,7 @@ def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
 
     entry_parent = '-'
     violations = deque()
-    entry_point: YamlerRuleset = instructions.get('main', YamlerRuleset('main', []))
+    entry_point: YamlatorRuleset = instructions.get('main', YamlatorRuleset('main', []))
 
     validators = _create_validators_chain(
         ruleset_lookups=instructions.get('rules', {}),
@@ -119,11 +119,11 @@ class Validator:
         """Validate the data against the next validator in the chain
 
         Args:
-            key         (str):      The key to the data
-            data        (Data):     The data to validate
-            parent      (str):      The parent key of the data
+            key              (str): The key to the data
+            data            (Data): The data to validate
+            parent           (str): The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool):     Is the rule required
+            is_required     (bool): Is the rule required
         """
 
         if self._next_validator is not None:
@@ -144,11 +144,11 @@ class OptionalValidator(Validator):
         """Validate a key is an optional.
 
         Args:
-            key         (str):      The key to the data
-            data        (Data):     The data to validate
-            parent      (str):      The parent key of the data
+            key              (str): The key to the data
+            data            (Data): The data to validate
+            parent           (str): The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool):     Is the rule required
+            is_required     (bool): Is the rule required
         """
 
         missing_data = data is None
@@ -166,11 +166,11 @@ class RequiredValidator(Validator):
         """Validate a key is a required rule
 
         Args:
-            key         (str):      The key to the data
-            data        (Data):     The data to validate
-            parent      (str):      The parent key of the data
+            key              (str): The key to the data
+            data            (Data): The data to validate
+            parent           (str): The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool):     Is the rule required
+            is_required     (bool): Is the rule required
         """
 
         missing_data = data is None
@@ -188,14 +188,13 @@ class RulesetValidator(Validator):
     _ruleset_validator: Validator = None
 
     def __init__(self, violations: deque, instructions: dict):
-        """RuleSetvalidator init
+        """RulesetValidator init
 
         Args:
             violations  (deque):  Contains violations that have been detected
             whilst processing the data
 
-            instructions (dict): A dict containering references to
-            other rulesets
+            instructions (dict): A dict containing references to other rulesets
         """
         self.instructions = instructions
         super().__init__(violations)
@@ -213,11 +212,11 @@ class RulesetValidator(Validator):
         """Validate the data against a ruleset
 
         Args:
-            key         (str):      The key to the data
-            data        (Data):     The data to validate
-            parent      (str):      The parent key of the data
+            key              (str): The key to the data
+            data            (Data): The data to validate
+            parent           (str): The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool):     Is the rule required
+            is_required     (bool): Is the rule required
         """
 
         is_ruleset_rule = (rtype.type == SchemaTypes.RULESET)
@@ -246,7 +245,7 @@ class RulesetValidator(Validator):
                 )
 
     def _retrieve_next_ruleset(self, ruleset_name: str) -> Iterable[Rule]:
-        default_missing_ruleset = YamlerRuleset(ruleset_name, [])
+        default_missing_ruleset = YamlatorRuleset(ruleset_name, [])
         ruleset = self.instructions.get(ruleset_name, default_missing_ruleset)
         return ruleset.rules
 
@@ -270,11 +269,11 @@ class ListValidator(Validator):
         nested lists are detected in the rule
 
         Args:
-            key         (str):      The key to the data
-            data        (Data):     The data to validate
-            parent      (str):      The parent key of the data
+            key              (str): The key to the data
+            data            (Data): The data to validate
+            parent           (str): The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool):     Is the rule required
+            is_required     (bool): Is the rule required
         """
         is_list_rule = (rtype.type == SchemaTypes.LIST)
         is_list_data = (type(data) != list)
@@ -345,11 +344,11 @@ class BuildInTypeValidator(Validator):
         to the list of violations
 
         Args:
-            key         (str):      The key to the data
-            data        (Data):     The data to validate
-            parent      (str):      The parent key of the data
+            key              (str): The key to the data
+            data            (Data): The data to validate
+            parent           (str): The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool):     Is the rule required
+            is_required     (bool): Is the rule required
         """
         buildin_type = self._built_in_lookups.get(rtype.type)
         is_not_build_in_type = (buildin_type is None)
@@ -374,11 +373,11 @@ class MapValidator(Validator):
         """Validate the data contained within in a map
 
         Args:
-            key         (str):      The key to the data
-            data        (Data):     The data to validate
-            parent      (str):      The parent key of the data
+            key              (str): The key to the data
+            data            (Data): The data to validate
+            parent           (str): The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool):     Is the rule required
+            is_required     (bool): Is the rule required
         """
         is_map_rule = (rtype.type == SchemaTypes.MAP)
         is_map_data = (type(data) == dict)
@@ -403,11 +402,11 @@ class AnyTypeValidator(Validator):
         """Validate any rules that have the data marked as the `any` type
 
         Args:
-            key         (str):      The key to the data
-            data        (Data):     The data to validate
-            parent      (str):      The parent key of the data
+            key              (str): The key to the data
+            data            (Data): The data to validate
+            parent           (str): The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool):     Is the rule required
+            is_required     (bool): Is the rule required
         """
 
         is_any_type = (rtype.type == SchemaTypes.ANY)
@@ -439,11 +438,11 @@ class EnumTypeValidator(Validator):
         in the enum, then a `TypeViolation` is added to the violation list
 
         Args:
-            key         (str):      The key to the data
-            data        (Data):     The data to validate
-            parent      (str):      The parent key of the data
+            key              (str): The key to the data
+            data            (Data): The data to validate
+            parent           (str): The parent key of the data
             rtype       (RuleType): The type assigned to the rule
-            is_required (bool):     Is the rule required
+            is_required     (bool): Is the rule required
         """
         is_enum_type = (rtype.type == SchemaTypes.ENUM)
         if not is_enum_type:

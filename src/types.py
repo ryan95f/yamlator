@@ -11,7 +11,7 @@ Data = Union[dict, list, int, float, str]
 
 
 class SchemaTypes(Enum):
-    """Represents the support types that can be defined in a ruleset"""
+    """Represents the support types that can be defined in a schema"""
     STR = auto()
     INT = auto()
     FLOAT = auto()
@@ -58,11 +58,11 @@ class ContainerTypes(Enum):
     ENUM = 1
 
 
-class YamlerType:
+class YamlatorType:
     """Base Class for custom types"""
 
     def __init__(self, name: str, type: ContainerTypes):
-        """YamlerType init
+        """YamlatorType init
 
         Args:
             name            (str): The object name of the type
@@ -75,13 +75,13 @@ class YamlerType:
         return f"{self.type}({self.name})"
 
 
-class YamlerRuleset(YamlerType):
+class YamlatorRuleset(YamlatorType):
     """Represent a Ruleset Type. A ruleset will contain a list of
     rules of `RuleType` which will validated against
     """
 
     def __init__(self, name: str, rules: list):
-        """YamlerRuleSet init
+        """YamlatorRuleset init
 
         Args:
             name     (str): The name of the ruleset
@@ -91,7 +91,7 @@ class YamlerRuleset(YamlerType):
         self.rules = rules
 
 
-class YamlerEnum(YamlerType):
+class YamlatorEnum(YamlatorType):
     """Represents a Enum Type that will contain a dict of valid
     values. The dict of items will be in the format: {<value>: EnumItem(<name>, <value>)}
 
@@ -103,7 +103,7 @@ class YamlerEnum(YamlerType):
     """
 
     def __init__(self, name: str, items: dict):
-        """YamlerEnum init
+        """YamlatorEnum init
 
         Args:
             name     (str): The name of the enum

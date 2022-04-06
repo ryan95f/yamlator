@@ -6,11 +6,11 @@ from typing import Iterator
 from unittest.mock import patch
 from parameterized import parameterized
 
-from yamler.cmd import ERR
-from yamler.cmd import SUCCESS
-from yamler.cmd import display_violations
-from yamler.cmd import DisplayMethod
-from yamler.violations import RequiredViolation, ViolationType
+from src.cmd import ERR
+from src.cmd import SUCCESS
+from src.cmd import display_violations
+from src.cmd import DisplayMethod
+from src.violations import RequiredViolation, ViolationType
 
 
 class TestDisplayViolations(unittest.TestCase):

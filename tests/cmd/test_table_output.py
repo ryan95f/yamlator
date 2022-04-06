@@ -5,10 +5,10 @@ from typing import Iterator
 from unittest.mock import patch
 from parameterized import parameterized
 
-from yamler.cmd import ERR, SUCCESS, TableOutput
-from yamler.violations import RequiredViolation
-from yamler.violations import TypeViolation
-from yamler.violations import ViolationType
+from src.cmd import ERR, SUCCESS, TableOutput
+from src.violations import RequiredViolation
+from src.violations import TypeViolation
+from src.violations import ViolationType
 
 
 class TestTableOutput(unittest.TestCase):

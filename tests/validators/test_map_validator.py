@@ -3,10 +3,10 @@ import unittest
 
 from unittest.mock import patch, Mock
 from parameterized import parameterized
-from yamler.types import Data, RuleType, SchemaTypes
+from src.types import Data, RuleType, SchemaTypes
 
 from .base import BaseValidatorTest
-from yamler.validators import MapValidator
+from src.validators import MapValidator
 
 
 class TestMapValidator(BaseValidatorTest):
@@ -26,7 +26,7 @@ class TestMapValidator(BaseValidatorTest):
             )
         ), 1)
     ])
-    @patch('yamler.validators.Validator.validate')
+    @patch('src.validators.Validator.validate')
     def test_map_validator(self, name: str, data: Data, rtype: RuleType,
                            expected_parent_call_count: int, mock_parent_validator: Mock):
         validator = MapValidator(self.violations)

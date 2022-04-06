@@ -5,12 +5,12 @@ from abc import ABC
 from typing import Iterator
 from enum import Enum
 
-from yamler.parser import YamlerSyntaxError, parse_rulesets
-from yamler.validators import validate_yaml
-from yamler.utils import load_yaml_file
-from yamler.utils import load_yamler_ruleset
-from yamler.exceptions import InvalidYamlerFilenameError, YamlerParseError
-from yamler.violations import ViolationJSONEncoder, ViolationType
+from src.parser import SchemaSyntaxError, parse_schema
+from src.validators import validate_yaml
+from src.utils import load_yaml_file
+from src.utils import load_schema
+from src.exceptions import InvalidSchemaFilenameError, SchemaParseError
+from src.violations import ViolationJSONEncoder, ViolationType
 
 
 SUCCESS = 0
@@ -29,16 +29,16 @@ def main() -> int:
 
     try:
         violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
-    except YamlerParseError as ex:
+    except SchemaParseError as ex:
         print(ex)
         return ERR
-    except YamlerSyntaxError as ex:
+    except SchemaSyntaxError as ex:
         print(ex)
         return ERR
     except FileNotFoundError as ex:
         print(ex)
         return ERR
-    except InvalidYamlerFilenameError as ex:
+    except InvalidSchemaFilenameError as ex:
         print(ex)
         return ERR
     except ValueError as ex:
@@ -50,9 +50,9 @@ def main() -> int:
 
 
 def _create_args_parser():
-    description = 'A YAML validation tool that determines if a YAML file matches a given schema'  # nopep8
+    description = 'Yamlator is a CLI tool that allows a YAML file to be validated using a lightweight schema language'  # nopep8
 
-    parser = argparse.ArgumentParser(prog="yamler", description=description)
+    parser = argparse.ArgumentParser(prog='yamlator', description=description)
     parser.add_argument('file', type=str,
                         help='The YAML file to be validated')
 
@@ -66,12 +66,12 @@ def _create_args_parser():
 
 
 def validate_yaml_data_from_file(yaml_filepath: str,
-                                 yamler_filepath: str) -> Iterator[ViolationType]:
-    """Validate a YAML file with a yamler schema file
+                                 schema_filepath: str) -> Iterator[ViolationType]:
+    """Validate a YAML file with a schema file
 
     Args:
         yaml_filepath   (str): The path to the YAML data file
-        yamler_filepath (str): The path to the yamler file
+        schema_filepath (str): The path to the schema file
 
     Returns:
         A Iterator collection of ViolationType objects that contains
@@ -80,13 +80,13 @@ def validate_yaml_data_from_file(yaml_filepath: str,
     Raises:
         ValueError: If either argument is `None` or an empty string
         FileNotFoundError: If either argument cannot be found on the file system
-        InvalidYamlerFilenameError: If `yamler_filepath` does not have a valid filename
-        that ends with the `.yamler` extension.
+        InvalidSchemaFilenameError: If `schema_filepath` does not have a valid filename
+        that ends with the `.ys` extension.
     """
     yaml_data = load_yaml_file(yaml_filepath)
-    ruleset_data = load_yamler_ruleset(yamler_filepath)
+    ruleset_data = load_schema(schema_filepath)
 
-    instructions = parse_rulesets(ruleset_data)
+    instructions = parse_schema(ruleset_data)
     return validate_yaml(yaml_data, instructions)
 
 
@@ -187,7 +187,10 @@ class JSONOutput(ViolationOutput):
             and -1 = violations were found
         """
         violation_count = len(violations)
-        pre_json_data = {'violatons': violations, 'violation_count': violation_count}
+        pre_json_data = {
+            'violatons': violations,
+            'violation_count': violation_count
+        }
 
         json_data = json.dumps(pre_json_data, cls=ViolationJSONEncoder, indent=4)
         print(json_data)

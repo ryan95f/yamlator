@@ -4,8 +4,8 @@ from .base import BaseValidatorTest
 
 from unittest.mock import Mock, patch
 from parameterized import parameterized
-from yamler.types import Data
-from yamler.validators import OptionalValidator
+from src.types import Data
+from src.validators import OptionalValidator
 
 
 class TestOptionalValidator(BaseValidatorTest):
@@ -16,7 +16,7 @@ class TestOptionalValidator(BaseValidatorTest):
         ('with_optional_and_none_data', False, None, 0),
         ('with_required_and_none_data', True, None, 1),
     ])
-    @patch('yamler.validators.Validator.validate')
+    @patch('src.validators.Validator.validate')
     def test_optional_validator(self, name: str, is_required: bool, data: Data,
                                 next_validator_call_count: int,
                                 mock_parent_validator: Mock):

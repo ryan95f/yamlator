@@ -9,54 +9,54 @@ from lark import UnexpectedInput
 from lark.exceptions import VisitError
 from typing import Any
 
-from yamler.types import Rule
-from yamler.types import ContainerTypes
-from yamler.types import YamlerRuleset
-from yamler.types import YamlerEnum
-from yamler.types import YamlerType
-from yamler.types import RuleType
-from yamler.types import EnumItem
-from yamler.types import SchemaTypes
-from yamler.exceptions import ConstructNotFoundError
-from yamler.exceptions import YamlerParseError
+from src.types import Rule
+from src.types import ContainerTypes
+from src.types import YamlatorRuleset
+from src.types import YamlatorEnum
+from src.types import YamlatorType
+from src.types import RuleType
+from src.types import EnumItem
+from src.types import SchemaTypes
+from src.exceptions import ConstructNotFoundError
+from src.exceptions import SchemaParseError
 
 
 _package_dir = Path(__file__).parent.absolute()
 _GRAMMER_FILE = os.path.join(_package_dir, 'grammer/grammer.lark')
 
 
-def parse_rulesets(ruleset_content: str) -> dict:
-    """Parses a ruleset into a set of instructions that can be
+def parse_schema(schema_content: str) -> dict:
+    """Parses a schema into a set of instructions that can be
     used to validate a YAML file.
 
     Args:
-        ruleset_content (str): The string contnet of a ruleset schema
+        schema_content (str): The content of a schema
 
     Returns:
         A `dict` that contains the instructions to validate the YAML file
 
     Raises:
-        ValueError: Raised when `ruleset_content` is `None`
-        YamlerParseError: Raised when the parsing process is interrupted
-        YamlerSyntaxError: Raised when a syntax error is detected in the schema
+        ValueError: Raised when `schema_content` is `None`
+        SchemaParseError: Raised when the parsing process is interrupted
+        SchemaSyntaxError: Raised when a syntax error is detected in the schema
     """
-    if ruleset_content is None:
-        raise ValueError("ruleset_content should not be None")
+    if schema_content is None:
+        raise ValueError("schema_content should not be None")
 
     lark_parser = Lark.open(_GRAMMER_FILE)
-    transformer = YamlerTransformer()
+    transformer = SchemaTransformer()
 
     try:
-        tokens = lark_parser.parse(ruleset_content)
+        tokens = lark_parser.parse(schema_content)
         return transformer.transform(tokens)
     except VisitError as ve:
-        raise YamlerParseError(ve.__context__)
+        raise SchemaParseError(ve.__context__)
     except UnexpectedInput as u:
-        _handle_syntax_errors(u, lark_parser, ruleset_content)
+        _handle_syntax_errors(u, lark_parser, schema_content)
 
 
-class YamlerTransformer(Transformer):
-    """Transforms the Yamler schema contents into a set of objects that
+class SchemaTransformer(Transformer):
+    """Transforms the schema contents into a set of objects that
     can be used to validate a YAML file. This class will be used by Lark
     during the parsing process.
 
@@ -72,7 +72,7 @@ class YamlerTransformer(Transformer):
     seen_constructs = {}
 
     def __init__(self, visit_tokens: bool = True) -> None:
-        """YamlerTransformer init
+        """SchemaTransformer init
 
         Args:
             visit_tokens (bool): Should the transformer visit tokens in addition
@@ -90,14 +90,14 @@ class YamlerTransformer(Transformer):
         (name, rtype) = tokens
         return Rule(name.value, rtype, False)
 
-    def ruleset(self, tokens: Any) -> YamlerRuleset:
-        """Transforms the ruleset tokens into a YamlerRuleset object"""
+    def ruleset(self, tokens: Any) -> YamlatorRuleset:
+        """Transforms the ruleset tokens into a YamlatorRuleset object"""
         name = tokens[0].value
         rules = tokens[1:]
         self.seen_constructs[name] = SchemaTypes.RULESET
-        return YamlerRuleset(name, rules)
+        return YamlatorRuleset(name, rules)
 
-    def start(self, instructions: Iterator[YamlerType]) -> dict:
+    def start(self, instructions: Iterator[YamlatorType]) -> dict:
         """Transforms the instructions into a dict that sorts the rulesets,
         enums and entry point to validate YAML data"""
         root = None
@@ -149,8 +149,8 @@ class YamlerTransformer(Transformer):
         name, value = tokens
         return EnumItem(name=name.value, value=value.value)
 
-    def enum(self, tokens: Any) -> YamlerEnum:
-        """Transforms a enum token into a YamlerEnum object"""
+    def enum(self, tokens: Any) -> YamlatorEnum:
+        """Transforms a enum token into a YamlatorEnum object"""
         enums = {}
 
         name = tokens[0]
@@ -159,7 +159,7 @@ class YamlerTransformer(Transformer):
         for item in items:
             enums[item.value] = item
         self.seen_constructs[name] = SchemaTypes.ENUM
-        return YamlerEnum(name.value, enums)
+        return YamlatorEnum(name.value, enums)
 
     def container_type(self, token: Any) -> RuleType:
         """Transforms a container type token into a RuleType object
@@ -180,11 +180,11 @@ class YamlerTransformer(Transformer):
         (t, ) = tokens
         return t
 
-    def schema_entry(self, rules: list) -> YamlerRuleset:
-        """Transforms the schema entry point token into a YamlerRuleset called
+    def schema_entry(self, rules: list) -> YamlatorRuleset:
+        """Transforms the schema entry point token into a YamlatorRuleset called
         main that will act as the entry point for validaiting the YAML data
         """
-        return YamlerRuleset('main', rules)
+        return YamlatorRuleset('main', rules)
 
 
 class _InstructionHandler:
@@ -194,7 +194,7 @@ class _InstructionHandler:
         self._next_handler = handler
         return handler
 
-    def handle(self, instruction: YamlerType) -> None:
+    def handle(self, instruction: YamlatorType) -> None:
         if self._next_handler is not None:
             self._next_handler.handle(instruction)
 
@@ -204,7 +204,7 @@ class _EnumInstructionHandler(_InstructionHandler):
         super().__init__()
         self._enums = enums
 
-    def handle(self, instruction: YamlerType) -> None:
+    def handle(self, instruction: YamlatorType) -> None:
         if instruction.type != ContainerTypes.ENUM:
             super().handle(instruction)
             return
@@ -217,7 +217,7 @@ class _RulesetInstructionHandler(_InstructionHandler):
         super().__init__()
         self._rulesets = rulesets
 
-    def handle(self, instruction: YamlerType) -> None:
+    def handle(self, instruction: YamlatorType) -> None:
         if instruction.type != ContainerTypes.RULESET:
             super().handle(instruction)
             return
@@ -225,8 +225,8 @@ class _RulesetInstructionHandler(_InstructionHandler):
         self._rulesets[instruction.name] = instruction
 
 
-class YamlerSyntaxError(SyntaxError):
-    """A generic syntax error in the Yamler content"""
+class SchemaSyntaxError(SyntaxError):
+    """A generic syntax error in the schema content"""
 
     label = None
 
@@ -237,38 +237,38 @@ class YamlerSyntaxError(SyntaxError):
         return f'{self.label} at line {line}, column {column}.\n\n{context}'
 
 
-class YamlerMalformedRulesetNameError(YamlerSyntaxError):
+class MalformedRulesetNameError(SchemaSyntaxError):
     """Indicates an error in the ruleset name"""
     label = 'Invalid ruleset name'
 
 
-class YamlerMalformedEnumNameError(YamlerSyntaxError):
+class MalformedEnumNameError(SchemaSyntaxError):
     """Indicates an error in the enum name"""
     label = 'Invalid enum name'
 
 
-class YamlerMissingRulesError(YamlerSyntaxError):
+class MissingRulesError(SchemaSyntaxError):
     """Indicates that a ruleset or schema block is missing rules"""
     label = 'Missing rules'
 
 
 def _handle_syntax_errors(u: UnexpectedInput, parser: Lark, content: str) -> None:
     exc_class = u.match_examples(parser.parse, {
-        YamlerMalformedRulesetNameError: [
+        MalformedRulesetNameError: [
             'ruleset foo',
             'ruleset 1234Foo',
             'ruleset FOO',
         ],
-        YamlerMalformedEnumNameError: [
+        MalformedEnumNameError: [
             'enum foo',
             'enum 1234Foo',
             'enum FOO',
         ],
-        YamlerMissingRulesError: [
+        MissingRulesError: [
             'ruleset Foo {}',
             'schema {}'
         ]
     }, use_accepts=True)
     if not exc_class:
-        raise YamlerSyntaxError(u.get_context(content), u.line, u.column)
+        raise SchemaSyntaxError(u.get_context(content), u.line, u.column)
     raise exc_class(u.get_context(content), u.line, u.column)
