@@ -2,7 +2,7 @@
 
 [![Test](https://github.com/Ryan95Z/Yamlator/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/Yamlator/actions/workflows/test.yaml)
 
-Yamlator is a CLI tool that allows a YAML file to be validated against a schema. When executed, the YAML data structure is compared against the rules to validate that the required keys are present and the data types are correct. Once the YAML file has been validated, a list of violations will be returned that can be used to amend the file.
+Yamlator is a CLI tool that allows a YAML file to be validated against a light weight schema that defines the expected structure. When executed, the YAML data structure is compared against the rules to validate that the required keys and data types are present. Once validated, a list of violations will be returned that can be used to amend the file.
 
 ## Installing the package
 
@@ -14,7 +14,9 @@ pip install yamlator
 
 ## Creating a basic schema
 
-Schemas in Yamlator are comprised of rules, rulesets and enums. As a minimum, a `.ys` file needs to be created with a schema block. For example:
+Schemas in Yamlator are comprised of rules, rulesets and enums in a `.ys` file.
+
+In the Yamlator schema file, the entry point is defined in a `schema` block, which is the required as a minimum to valiate a file. For example:
 
 ```text
 schema {
@@ -23,14 +25,14 @@ schema {
 }
 ```
 
-Once a `.Yamlator` file has been defined, it can be used to validate the following YAML file:
+Once this block has been placed into a Yamlator schema file, it can be used to validate the following YAML file:
 
 ```yaml
 name: Name
 age: 100
 ```
 
-With Yamlator, more complex structures can be defined to validate nested structures. For example:
+With Yamlator, more complex structures can be defined as `rulesets` to validate nested structures. For example:
 
 ```text
 ruleset Employee {
@@ -68,10 +70,10 @@ More information on the different components that make up a schema can be found 
 Assuming you have a YAML and Yamlator files, the CLI can be executed with:
 
 ```bash
-Yamlator <path-to-yaml-file> -s <path-to-Yamlator-schema>
+yamlator <path-to-yaml-file> -s <path-to-yamlator-schema>
 ```
 
-Where `<path-to-yaml-file>` is replaced with the path to your YAML file and `<path-to-Yamlator-schema>` is the path to the schema.
+Where `<path-to-yaml-file>` is replaced with the path to your YAML file and `<path-to-yamlator-schema>` is the path to the schema, which has the extension `.ys`.
 
 The first argument for the CLI is always the path to the YAML file.
 
