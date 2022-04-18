@@ -1,7 +1,8 @@
 name: Test
-on: [pull_request]
+on:
+  - push
 jobs:
-  build:
+  validate-python-versions:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,7 +22,23 @@ jobs:
     - name: Lint with pycodestyle
       run: |
         pycodestyle .
-    - name: Tests & Coverage Report
+    - name: Run Unit Tests
+      run: |
+        python -m unittest
+  code-coverage:
+    needs: validate-python-versions
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-dev.txt
+    - name: Code Coverage
       run: |
         coverage run -m unittest
         coverage report -m
