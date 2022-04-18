@@ -16,7 +16,7 @@ pip install yamlator
 
 Schemas in Yamlator are comprised of rules, rulesets and enums in a `.ys` file.
 
-In the Yamlator schema file, the entry point is defined in a `schema` block, which is the required as a minimum to valiate a file. For example:
+In the Yamlator schema file, the entry point is defined in a `schema` block, which is the required as a minimum to validate a file. For example:
 
 ```text
 schema {
