@@ -27,6 +27,7 @@ type: int_type
      | map_type
      | any_type
      | container_type
+     | regex_type
 
 str_type: "str"
 int_type: "int"
@@ -35,6 +36,7 @@ float_type: "float"
 list_type: "list""(" type ")"
 map_type: "map""(" type ")"
 container_type: /[A-Z]{1}[a-z0-9_]+/
+regex_type: "regex""(" ESCAPED_STRING ")"
 
 NEW_LINES: "\n"+
 

@@ -173,6 +173,11 @@ class SchemaTransformer(Transformer):
             raise ConstructNotFoundError(name)
         return RuleType(type=schema_type, lookup=name)
 
+    def regex_type(self, tokens: Any) -> RuleType:
+        """Transforms a regex type token into a RuleType object"""
+        (regex_str, ) = tokens
+        return RuleType(type=SchemaTypes.REGEX, regex=regex_str)
+
     def type(self, tokens: Any) -> Any:
         """Extracts the type tokens and passes them through onto
         the next stage in the transformer
