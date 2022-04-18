@@ -1,6 +1,6 @@
 # Yamlator
 
-[![Test](https://github.com/Ryan95Z/yamlator/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/yamlator/actions/workflows/test.yaml) [![License](https://img.shields.io/github/license/Ryan95Z/yamlator)](https://github.com/Ryan95Z/yamlator/blob/main/LICENSE)
+[![Test](https://github.com/Ryan95Z/yamlator/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/yamlator/actions/workflows/test.yaml) [![License](https://img.shields.io/github/license/Ryan95Z/yamlator)](https://github.com/Ryan95Z/yamlator/blob/main/LICENSE) [![PyPi Version](https://img.shields.io/pypi/v/yamlator)](https://pypi.org/project/yamlator/)
 
 Yamlator is a CLI tool that allows a YAML file to be validated against a lightweight schema that defines the expected structure. When executed, the YAML data structure is compared against the rules to validate that the required keys and data types are present. Once validated, a list of violations will be returned that can be used to amend the file.
 
