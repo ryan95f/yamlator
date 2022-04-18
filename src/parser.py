@@ -175,7 +175,9 @@ class SchemaTransformer(Transformer):
 
     def regex_type(self, tokens: Any) -> RuleType:
         """Transforms a regex type token into a RuleType object"""
-        (regex_str, ) = tokens
+        (regex, ) = tokens
+        regex_str = regex.value
+        regex_str = regex_str[1: len(regex_str) - 1]
         return RuleType(type=SchemaTypes.REGEX, regex=regex_str)
 
     def type(self, tokens: Any) -> Any:

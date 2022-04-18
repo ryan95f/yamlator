@@ -1,10 +1,13 @@
 from __future__ import annotations
+import re
+
 from typing import Iterable
 from collections import deque, namedtuple
 
 from src.violations import RequiredViolation
 from src.violations import RulesetTypeViolation
 from src.violations import TypeViolation
+from src.violations import RegexTypeViolation
 
 from src.types import Data
 from src.types import Rule
@@ -72,6 +75,7 @@ def _create_validators_chain(ruleset_lookups: dict,
     list_validator = ListValidator(violations)
     enum_validator = EnumTypeValidator(violations, enum_looksups)
     type_validator = BuildInTypeValidator(violations)
+    regex_validator = RegexValidator(violations)
 
     root.set_next_validator(required_validator)
     required_validator.set_next_validator(map_validator)
@@ -84,7 +88,8 @@ def _create_validators_chain(ruleset_lookups: dict,
     list_validator.set_next_validator(enum_validator)
 
     enum_validator.set_next_validator(any_type_validator)
-    any_type_validator.set_next_validator(type_validator)
+    any_type_validator.set_next_validator(regex_validator)
+    regex_validator.set_next_validator(type_validator)
     return root
 
 
@@ -472,3 +477,19 @@ class EnumTypeValidator(Validator):
         message = f'{key} does not match any value in enum {enum_name}'
         violation = TypeViolation(key, parent, message)
         self._violations.append(violation)
+
+
+class RegexValidator(Validator):
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False) -> None:
+
+        is_regex_type = rtype.type == SchemaTypes.REGEX
+        if not is_regex_type:
+            super().validate(key, data, parent, rtype, is_required)
+            return
+
+        rule_regex = re.compile(rtype.regex)
+        if not rule_regex.match(data):
+            violation = RegexTypeViolation(key, parent, rtype.regex)
+            self._violations.append(violation)
+            return

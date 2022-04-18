@@ -22,5 +22,5 @@ ruleset Project {
 
 schema {
     project Project
-    test regex("hello")
+    test regex("^t{1}")
 }

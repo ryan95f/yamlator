@@ -59,7 +59,7 @@ class RequiredViolation(Violation):
     """Violation for when a required field is missing"""
 
     def __init__(self, key: str, parent: str):
-        """RequiredViolation constructor
+        """RequiredViolation init
 
         Args:
             key     (str):  The key name in the YAML file
@@ -73,7 +73,7 @@ class TypeViolation(Violation):
     """Violation when a value in the YAML file has an incorrect type"""
 
     def __init__(self, key: str, parent: str, message: str):
-        """TypeViolation constructor
+        """TypeViolation init
 
         Args:
             key     (str):  The key name in the YAML file
@@ -89,7 +89,7 @@ class BuiltInTypeViolation(TypeViolation):
     """
 
     def __init__(self, key: str, parent: str, expected_type: type):
-        """BuiltInTypeViolation constructor
+        """BuiltInTypeViolation init
 
         Args:
             key             (str):  The key name in the YAML file
@@ -104,11 +104,24 @@ class RulesetTypeViolation(TypeViolation):
     """Type violation when a field is not a ruleset (dict) in the file"""
 
     def __init__(self, key: str, parent: str):
-        """RulesetTypeViolation constructor
+        """RulesetTypeViolation init
 
         Args:
             key     (str):  The key name in the YAML file
             parent  (str):  The parent key in the YAML file
         """
         message = f'{key} should be a ruleset'
+        super().__init__(key, parent, message)
+
+
+class RegexTypeViolation(TypeViolation):
+    def __init__(self, key: str, parent: str, regex_str: str):
+        """RegexTypeViolation init
+
+        Args:
+            key         (str):  The key name in the YAML file
+            parent      (str):  The parent key in the YAML file
+            regex_str   (str):  The regex string
+        """
+        message = f'{key} does not match regex {regex_str}'
         super().__init__(key, parent, message)
