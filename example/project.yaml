@@ -10,4 +10,3 @@ project:
   labels:
     cost: value
     team: value
-test: roles/wow

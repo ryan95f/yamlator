@@ -14,7 +14,7 @@ ruleset Project {
     version str
     projectId str
     displayName str
-    iam_permission list(str)
+    iam_permission list(regex("^role{1}[0-9]{1}"))
     labels map(str)
     status Status
     project_details Details
@@ -22,5 +22,4 @@ ruleset Project {
 
 schema {
     project Project
-    test regex("roles/*")
 }

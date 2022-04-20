@@ -483,7 +483,7 @@ class RegexValidator(Validator):
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
 
-        is_regex_type = rtype.type == SchemaTypes.REGEX
+        is_regex_type = (rtype.type == SchemaTypes.REGEX)
         if not is_regex_type:
             super().validate(key, data, parent, rtype, is_required)
             return
