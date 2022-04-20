@@ -1,4 +1,6 @@
 from __future__ import annotations
+import re
+
 from enum import Enum, auto
 from typing import Union
 from collections import namedtuple
@@ -24,6 +26,8 @@ class SchemaTypes(Enum):
 
 
 class RuleType:
+    regex = None
+
     def __init__(self, type: SchemaTypes, lookup: str = None, sub_type: RuleType = None,
                  regex: str = None) -> None:
         """RuleType init
@@ -42,7 +46,9 @@ class RuleType:
         self.type = type
         self.lookup = lookup
         self.sub_type = sub_type
-        self.regex = regex
+
+        if regex is not None:
+            self.regex = re.compile(regex)
 
     def __repr__(self) -> str:
         if self.type == SchemaTypes.RULESET:

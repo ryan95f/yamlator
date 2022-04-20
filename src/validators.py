@@ -1,5 +1,4 @@
 from __future__ import annotations
-import re
 
 from typing import Iterable
 from collections import deque, namedtuple
@@ -508,8 +507,7 @@ class RegexValidator(Validator):
             self._violations.append(violation)
             return
 
-        rule_regex = re.compile(rtype.regex)
-        if not rule_regex.search(data):
+        if not rtype.regex.search(data):
             violation = RegexTypeViolation(key, parent, data, rtype.regex)
             self._violations.append(violation)
             return

@@ -115,12 +115,15 @@ class RulesetTypeViolation(TypeViolation):
 
 
 class RegexTypeViolation(TypeViolation):
+    """Type violation when a field does not match the regex rule"""
+
     def __init__(self, key: str, parent: str, data: str, regex_str: str):
         """RegexTypeViolation init
 
         Args:
             key         (str):  The key name in the YAML file
             parent      (str):  The parent key in the YAML file
+            data        (str):  The string that did not match the regex
             regex_str   (str):  The regex string
         """
         message = f'{data} does not match regex "{regex_str}"'
