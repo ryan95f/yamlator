@@ -489,7 +489,7 @@ class RegexValidator(Validator):
             return
 
         rule_regex = re.compile(rtype.regex)
-        if not rule_regex.match(data):
-            violation = RegexTypeViolation(key, parent, rtype.regex)
+        if not rule_regex.search(data):
+            violation = RegexTypeViolation(key, parent, data, rtype.regex)
             self._violations.append(violation)
             return

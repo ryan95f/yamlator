@@ -115,7 +115,7 @@ class RulesetTypeViolation(TypeViolation):
 
 
 class RegexTypeViolation(TypeViolation):
-    def __init__(self, key: str, parent: str, regex_str: str):
+    def __init__(self, key: str, parent: str, data: str, regex_str: str):
         """RegexTypeViolation init
 
         Args:
@@ -123,5 +123,5 @@ class RegexTypeViolation(TypeViolation):
             parent      (str):  The parent key in the YAML file
             regex_str   (str):  The regex string
         """
-        message = f'{key} does not match regex {regex_str}'
+        message = f'{data} does not match regex "{regex_str}"'
         super().__init__(key, parent, message)
