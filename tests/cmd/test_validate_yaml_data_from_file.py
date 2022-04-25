@@ -5,6 +5,7 @@ from collections import namedtuple
 from src.cmd import validate_yaml_data_from_file
 from src.exceptions import InvalidSchemaFilenameError
 
+EMPTY_STR = ""
 VALID_YAML_DATA_FILE_PATH = './tests/files/hello.yaml'
 VALID_SCHEMA_FILE_PATH = './tests/files/hello.ys'
 
@@ -15,6 +16,18 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
     @parameterized.expand([
         ('none_yaml_path', ValidateArgs(None, VALID_SCHEMA_FILE_PATH), ValueError),
         ('none_schema_path', ValidateArgs(VALID_YAML_DATA_FILE_PATH, None), ValueError),
+        ('none_yaml_and_schema_path', ValidateArgs(None, None), ValueError),
+        ('empty_yaml_path_str', ValidateArgs(
+            EMPTY_STR, VALID_SCHEMA_FILE_PATH
+        ), ValueError),
+        ('empty_schema_path_str', ValidateArgs(
+            VALID_YAML_DATA_FILE_PATH,
+            EMPTY_STR
+        ), ValueError),
+        ('empty_yaml_and_path_str', ValidateArgs(
+            EMPTY_STR,
+            EMPTY_STR
+        ), ValueError),
         ('yaml_data_file_not_found', ValidateArgs(
             'not_found.yaml',
             VALID_SCHEMA_FILE_PATH
