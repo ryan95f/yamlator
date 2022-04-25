@@ -10,7 +10,7 @@ from src.validators import validate_yaml
 from src.utils import load_yaml_file
 from src.utils import load_schema
 from src.exceptions import InvalidSchemaFilenameError, SchemaParseError
-from src.violations import ViolationJSONEncoder, ViolationType
+from src.violations import Violation, ViolationJSONEncoder, ViolationType
 
 
 SUCCESS = 0
@@ -66,7 +66,7 @@ def _create_args_parser():
 
 
 def validate_yaml_data_from_file(yaml_filepath: str,
-                                 schema_filepath: str) -> Iterator[ViolationType]:
+                                 schema_filepath: str) -> Iterator[Violation]:
     """Validate a YAML file with a schema file
 
     Args:
@@ -74,7 +74,7 @@ def validate_yaml_data_from_file(yaml_filepath: str,
         schema_filepath (str): The path to the schema file
 
     Returns:
-        A Iterator collection of ViolationType objects that contains
+        A Iterator collection of `Violation` objects that contains
         the violations detected in the YAML data against the rulesets.
 
     Raises:
@@ -96,12 +96,12 @@ class DisplayMethod(Enum):
     JSON = "json"
 
 
-def display_violations(violations: Iterator[ViolationType],
+def display_violations(violations: Iterator[Violation],
                        method: DisplayMethod = DisplayMethod.TABLE) -> int:
     """Displays the violations to standard output
 
     Args:
-        violations (Iterator[ViolationType]): A collection of violations
+        violations (Iterator[Violation]): A collection of violations
 
         method               (DisplayMethod): Defines how the violations will be
         displayed. By default table will be used specified
@@ -127,11 +127,11 @@ def display_violations(violations: Iterator[ViolationType],
 class ViolationOutput(ABC):
     """Base class for displaying violations"""
 
-    def display(violations: Iterator[ViolationType]) -> int:
+    def display(violations: Iterator[Violation]) -> int:
         """Display the violations to the user
 
         Args:
-            violations (Iterator[ViolationType]): A collection of violations
+            violations (Iterator[Violation]): A collection of violations
 
         Returns:
             The status code if violations were found. 0 = no violations were found
@@ -143,16 +143,19 @@ class ViolationOutput(ABC):
 class TableOutput(ViolationOutput):
     """Displays violations as a table"""
 
-    def display(violations: Iterator[ViolationType]) -> int:
+    def display(violations: Iterator[Violation]) -> int:
         """Display the violations to the user as a table
 
         Args:
-            violations (Iterator[ViolationType]): A collection of violations
+            violations (Iterator[Violation]): A collection of violations
 
         Returns:
             The status code if violations were found. 0 = no violations were found
             and -1 = violations were found
         """
+        if violations is None:
+            raise ValueError("violations should not be None")
+
         violation_count = len(violations)
         print("\n{:<4} violation(s) found".format(violation_count))
 
@@ -176,16 +179,19 @@ class TableOutput(ViolationOutput):
 class JSONOutput(ViolationOutput):
     """Displays violations as JSON"""
 
-    def display(violations: Iterator[ViolationType]) -> int:
+    def display(violations: Iterator[Violation]) -> int:
         """Display the violations to the user as JSON
 
         Args:
-            violations (Iterator[ViolationType]): A collection of violations
+            violations (Iterator[Violation]): A collection of violations
 
         Returns:
             The status code if violations were found. 0 = no violations were found
             and -1 = violations were found
         """
+        if violations is None:
+            raise ValueError("violations should not be None")
+
         violation_count = len(violations)
         pre_json_data = {
             'violatons': violations,
