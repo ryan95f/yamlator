@@ -1,4 +1,6 @@
 from __future__ import annotations
+import re
+
 from enum import Enum, auto
 from typing import Union
 from collections import namedtuple
@@ -20,24 +22,33 @@ class SchemaTypes(Enum):
     ENUM = auto()
     RULESET = auto()
     ANY = auto()
+    REGEX = auto()
 
 
 class RuleType:
-    def __init__(self, type: SchemaTypes, lookup: str = None, sub_type: RuleType = None):
+    regex = None
+
+    def __init__(self, type: SchemaTypes, lookup: str = None, sub_type: RuleType = None,
+                 regex: str = None) -> None:
         """RuleType init
 
         Args:
             type        (SchemaTypes): The expected type for a field
 
             lookup              (str): Used when type=`ruleset` or type=`enum`.
-            This specifies the custom type to lookup when processing the data.
+            This specifies the custom type to lookup when processing the data
 
             sub_type       (RuleType): A nested subtype for the type. Used when there are
             nested list types e.g list(list(int))
+
+            regex               (str): The regex string that is used when type=`regex`
         """
         self.type = type
         self.lookup = lookup
         self.sub_type = sub_type
+
+        if regex is not None:
+            self.regex = re.compile(regex)
 
     def __repr__(self) -> str:
         if self.type == SchemaTypes.RULESET:

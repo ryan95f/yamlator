@@ -1,4 +1,3 @@
-from turtle import rt
 import unittest
 
 from unittest.mock import patch, Mock

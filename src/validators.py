@@ -1,10 +1,12 @@
 from __future__ import annotations
+
 from typing import Iterable
 from collections import deque, namedtuple
 
 from src.violations import RequiredViolation
 from src.violations import RulesetTypeViolation
 from src.violations import TypeViolation
+from src.violations import RegexTypeViolation
 
 from src.types import Data
 from src.types import Rule
@@ -72,6 +74,7 @@ def _create_validators_chain(ruleset_lookups: dict,
     list_validator = ListValidator(violations)
     enum_validator = EnumTypeValidator(violations, enum_looksups)
     type_validator = BuildInTypeValidator(violations)
+    regex_validator = RegexValidator(violations)
 
     root.set_next_validator(required_validator)
     required_validator.set_next_validator(map_validator)
@@ -84,7 +87,8 @@ def _create_validators_chain(ruleset_lookups: dict,
     list_validator.set_next_validator(enum_validator)
 
     enum_validator.set_next_validator(any_type_validator)
-    any_type_validator.set_next_validator(type_validator)
+    any_type_validator.set_next_validator(regex_validator)
+    regex_validator.set_next_validator(type_validator)
     return root
 
 
@@ -472,3 +476,37 @@ class EnumTypeValidator(Validator):
         message = f'{key} does not match any value in enum {enum_name}'
         violation = TypeViolation(key, parent, message)
         self._violations.append(violation)
+
+
+class RegexValidator(Validator):
+    """Validator to handle the regex type in a schema"""
+
+    def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
+                 is_required: bool = False) -> None:
+        """Validate a regex rule type against some string data. If the data
+        is a string type, then a `TypeViolation` is added to the violation list.
+        If the string does not match the regex rule, then a `RegexTypeViolation`
+        is added to the violation list.
+
+        Args:
+            key              (str): The key to the data
+            data            (Data): The data to validate
+            parent           (str): The parent key of the data
+            rtype       (RuleType): The type assigned to the rule
+            is_required     (bool): Is the rule required
+        """
+        is_regex_type = (rtype.type == SchemaTypes.REGEX)
+        if not is_regex_type:
+            super().validate(key, data, parent, rtype, is_required)
+            return
+
+        if not isinstance(data, str):
+            message = f'{key} should be of type str'
+            violation = TypeViolation(key, parent, message)
+            self._violations.append(violation)
+            return
+
+        if not rtype.regex.search(data):
+            violation = RegexTypeViolation(key, parent, data, rtype.regex)
+            self._violations.append(violation)
+            return

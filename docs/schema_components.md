@@ -115,6 +115,47 @@ ruleset <ruleset-name> {
 }
 ```
 
+### Regex Type
+
+The `regex` type allows for a string value to be compared against a regular expression. For example, given the following string in YAML:
+
+```yaml
+name: Person1
+```
+
+The following regex rule can be defined in a schema block:
+
+```text
+schema {
+    name regex("^Person")
+}
+```
+
+Or using a ruleset with:
+
+```text
+ruleset <ruleset-name> {
+    name regex("^Person")
+}
+```
+
+The regex type can also be nested in the `map` or `list` types. For example, when applied to a list allows for a collection of strings to be validated:
+
+```yaml
+roles:
+    - role/user
+    - role/admin
+    - role/editor
+```
+
+With the following rule in a schema block:
+
+```text
+schema {
+    roles list(regex("^role/[a-z]+"))
+}
+```
+
 ### Ruleset Type
 
 Rulesets can be referenced as a type to validate complicated YAML structures. For example, if the following YAML data existed:
