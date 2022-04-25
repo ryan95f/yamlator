@@ -495,7 +495,6 @@ class RegexValidator(Validator):
             rtype       (RuleType): The type assigned to the rule
             is_required     (bool): Is the rule required
         """
-
         is_regex_type = (rtype.type == SchemaTypes.REGEX)
         if not is_regex_type:
             super().validate(key, data, parent, rtype, is_required)
