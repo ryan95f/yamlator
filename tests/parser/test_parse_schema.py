@@ -34,11 +34,6 @@ class TestParseSchema(unittest.TestCase):
         self.assertIsNotNone(main)
         self.assertEqual('main', main.name)
 
-    def test_parse_with_invalid_content(self):
-        yaml_content = load_yaml_file(self.invalid_schema_file)
-        with self.assertRaises(SchemaSyntaxError):
-            parse_schema(str(yaml_content))
-
     @parameterized.expand([
         (
             'with_schema_missing_rules',
@@ -64,6 +59,11 @@ class TestParseSchema(unittest.TestCase):
             'with_ruleset_not_defined',
             './tests/files/invalid_files/missing_defined_ruleset.ys',
             SchemaParseError
+        ),
+        (
+            'with_invalid_schema_syntax',
+            './tests/files/hello.yaml',
+            SchemaSyntaxError
         )
     ])
     def test_parse_syntax_errors(self, name: str, schema_file_path: str, exception_type):
