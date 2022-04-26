@@ -17,11 +17,16 @@ class TestViolationJSONEncoder(unittest.TestCase):
         ('encode_type_violation', TypeViolation('data', '-', "Should be a string")),
         ('encode_required_violation', RequiredViolation('data', '-')),
         ('encode_ruleset_type_violation', RulesetTypeViolation('data', '-')),
-        ('encode_build_in_type_violation', BuiltInTypeViolation('data', '-', int))
+        ('encode_build_in_type_violation', BuiltInTypeViolation('data', '-', int)),
+        ('encode_int', 42),
+        ('encode_bool', True),
+        ('encode_string', 'hello world'),
+        ('encode_dict', {'message': 'Hello World', 'number': 43}),
+        ('encode_list', [0, 1, 2, 3, 4])
     ])
     def test_json_encoding(self, name: str, data: Any):
         encoder = ViolationJSONEncoder()
-        encoded_json = encoder.default(data)
+        encoded_json = encoder.encode(data)
         self.assertIsNotNone(encoded_json)
 
 
