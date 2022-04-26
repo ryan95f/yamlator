@@ -1,6 +1,0 @@
-ruleset main {
-    first_name str
-    middle_name str optional
-    last_name str
-    age int
-}
