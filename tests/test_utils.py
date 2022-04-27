@@ -18,7 +18,7 @@ class TestLoadYamlFile(unittest.TestCase):
             load_yaml_file(filename)
 
     @parameterized.expand([
-        ('yaml_file', 'tests/files/hello.yaml')
+        ('yaml_file', 'tests/files/example/example.yaml')
     ])
     def test_load_yaml_file(self, name: str, filename: str):
         results = load_yaml_file(filename)
@@ -38,8 +38,8 @@ class TestLoadSchema(unittest.TestCase):
             load_schema(filename)
 
     @parameterized.expand([
-        ('with_unix_style_path', 'tests/files/hello.ys'),
-        ('with_windows_style_path', 'tests\\files\\hello.ys')
+        ('with_unix_style_path', 'tests/files/example/example.ys'),
+        ('with_windows_style_path', 'tests\\files\\example\\example.ys')
     ])
     def test_successfully_load_schema(self, name, filename):
         results = load_schema(filename)

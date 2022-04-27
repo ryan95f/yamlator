@@ -14,8 +14,8 @@ from src.parser import SchemaSyntaxError
 
 class TestParseSchema(unittest.TestCase):
     def setUp(self):
-        self.valid_schema_file = './tests/files/hello.ys'
-        self.invalid_schema_file = './tests/files/hello.yaml'
+        self.valid_schema_file = './tests/files/example/example.ys'
+        self.invalid_schema_file = './tests/files/example/example.yaml'
 
     def test_parse_with_none_text(self):
         with self.assertRaises(ValueError):
@@ -62,7 +62,7 @@ class TestParseSchema(unittest.TestCase):
         ),
         (
             'with_invalid_schema_syntax',
-            './tests/files/hello.yaml',
+            './tests/files/example/example.yaml',
             SchemaSyntaxError
         )
     ])

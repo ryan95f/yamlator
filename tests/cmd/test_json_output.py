@@ -6,7 +6,9 @@ from unittest.mock import patch
 from parameterized import parameterized
 
 from src.cmd import ERR, SUCCESS, JSONOutput
-from src.violations import RequiredViolation, TypeViolation, Violation
+from src.violations import RequiredViolation
+from src.violations import TypeViolation
+from src.violations import Violation
 
 
 class TestJSONOutput(unittest.TestCase):

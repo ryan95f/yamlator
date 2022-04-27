@@ -1,13 +1,15 @@
 import unittest
 
-from parameterized import parameterized
+from typing import Type
 from collections import namedtuple
+from parameterized import parameterized
+
 from src.cmd import validate_yaml_data_from_file
 from src.exceptions import InvalidSchemaFilenameError
 
 EMPTY_STR = ""
-VALID_YAML_DATA_FILE_PATH = './tests/files/hello.yaml'
-VALID_SCHEMA_FILE_PATH = './tests/files/hello.ys'
+VALID_YAML_DATA_FILE_PATH = './tests/files/example/example.yaml'
+VALID_SCHEMA_FILE_PATH = './tests/files/example/example.ys'
 
 ValidateArgs = namedtuple('ValidateArgs', ['yaml_filepath', 'schema_filepath'])
 
@@ -43,7 +45,7 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
     ])
     def test_validate_yaml_data_from_file_with_invalid_args(self, name: str,
                                                             args: ValidateArgs,
-                                                            expected_exception: Exception):  # nopep8
+                                                            expected_exception: Type[Exception]):  # nopep8
         with self.assertRaises(expected_exception):
             validate_yaml_data_from_file(args.yaml_filepath, args.schema_filepath)
 
