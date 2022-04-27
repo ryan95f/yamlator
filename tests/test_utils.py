@@ -1,4 +1,5 @@
 import unittest
+from typing import Type
 from parameterized import parameterized
 
 from src.utils import load_yaml_file
@@ -8,34 +9,32 @@ from src.exceptions import InvalidSchemaFilenameError
 
 class TestLoadYamlFile(unittest.TestCase):
     @parameterized.expand([
-        ('with_empty_str', ''),
-        ('with_none', None)
+        ('with_empty_str', '', ValueError),
+        ('with_none', None, ValueError)
     ])
-    def test_yaml_file_invalid_filename(self, name, filename):
-        with self.assertRaises(ValueError):
+    def test_yaml_file_invalid_filename(self, name: str, filename: str,
+                                        expected_exception: Type[Exception]):
+        with self.assertRaises(expected_exception):
             load_yaml_file(filename)
 
-    def test_successfully_load_yaml_file(self):
-        yaml_file_path = 'tests/files/hello.yaml'
-        results = load_yaml_file(yaml_file_path)
+    @parameterized.expand([
+        ('yaml_file', 'tests/files/hello.yaml')
+    ])
+    def test_load_yaml_file(self, name: str, filename: str):
+        results = load_yaml_file(filename)
         self.assertIsNotNone(results)
 
 
 class TestLoadSchema(unittest.TestCase):
     @parameterized.expand([
-        ('with_empty_str', ''),
-        ('with_none', None)
+        ('with_empty_str', '', ValueError),
+        ('with_none', None, ValueError),
+        ('with_yaml_extension', 'test.yaml', InvalidSchemaFilenameError),
+        ('with_txt_extension', 'test/test.txt', InvalidSchemaFilenameError),
     ])
-    def test_load_schema_invalid_filename(self, name, filename):
-        with self.assertRaises(ValueError):
-            load_schema(filename)
-
-    @parameterized.expand([
-        ('with_yaml_extension', 'test.yaml'),
-        ('with_txt_extension', 'test/test.txt'),
-    ])
-    def test_load_schema_malfromed_filename(self, name, filename):
-        with self.assertRaises(InvalidSchemaFilenameError):
+    def test_load_schema_with_invalid_filename(self, name: str, filename: str,
+                                               expected_exception: Type[Exception]):
+        with self.assertRaises(expected_exception):
             load_schema(filename)
 
     @parameterized.expand([
