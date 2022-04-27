@@ -19,7 +19,9 @@ class TestBuildInTypeValidator(BaseValidatorTest):
         ('float_type_match', RuleType(type=SchemaTypes.FLOAT), 3.14, False),
         ('int_type_mismatch', RuleType(type=SchemaTypes.INT), 'hello', True),
         ('str_type_mismatch', RuleType(type=SchemaTypes.STR), None, True),
-        ('float_type_mismatch', RuleType(type=SchemaTypes.FLOAT), 3, True)
+        ('float_type_mismatch', RuleType(type=SchemaTypes.FLOAT), 3, True),
+        ('regex_type', RuleType(SchemaTypes.REGEX, regex='^test'), "test", False),
+        ('regex_mismatch', RuleType(SchemaTypes.REGEX, regex='^test'), 100, False),
     ])
     def test_build_in_type_validator(self, name: str, rtype: RuleType, data: Data,
                                      expect_violations: bool):

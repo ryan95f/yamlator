@@ -1,3 +1,4 @@
+from typing import Type
 import unittest
 
 from parameterized import parameterized
@@ -66,7 +67,8 @@ class TestParseSchema(unittest.TestCase):
             SchemaSyntaxError
         )
     ])
-    def test_parse_syntax_errors(self, name: str, schema_file_path: str, exception_type):
+    def test_parse_syntax_errors(self, name: str, schema_file_path: str,
+                                 exception_type: Type[Exception]):
         schema_content = load_yaml_file(schema_file_path)
         with self.assertRaises(exception_type):
             parse_schema(str(schema_content))
