@@ -40,6 +40,9 @@ class TestListValidator(BaseValidatorTest):
         ('with_list_type_none_data', RuleType(
             type=SchemaTypes.LIST,
             sub_type=RuleType(type=SchemaTypes.INT)), None, 0, 1),
+        ('with_list_type_str', RuleType(
+            type=SchemaTypes.LIST,
+            sub_type=RuleType(type=SchemaTypes.INT)), "hello world", 0, 1),
     ])
     def test_list_validator(self, name: str, rtype: RuleType, data: Any,
                             ruleset_validate_call_count: int,
