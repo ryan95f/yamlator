@@ -279,11 +279,16 @@ class ListValidator(Validator):
             rtype       (RuleType): The type assigned to the rule
             is_required     (bool): Is the rule required
         """
+        is_list_data = isinstance(data, list)
         is_list_rule = (rtype.type == SchemaTypes.LIST)
-        is_list_data = (type(data) != list)
 
-        if not is_list_rule or is_list_data:
+        if not is_list_rule:
             super().validate(key, data, parent, rtype, is_required)
+            return
+
+        if not is_list_data:
+            violation = TypeViolation(key, parent, f'{key} should be of type list')
+            self._violations.append(violation)
             return
 
         for idx, item in enumerate(data):
