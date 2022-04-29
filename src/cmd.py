@@ -5,13 +5,16 @@ from abc import ABC
 from typing import Iterator
 from enum import Enum
 
-from src.parser import SchemaSyntaxError, parse_schema
-from src.validators import validate_yaml
 from src.utils import load_yaml_file
 from src.utils import load_schema
-from src.exceptions import InvalidSchemaFilenameError, SchemaParseError
-from src.violations import Violation, ViolationJSONEncoder, ViolationType
+from src.parser import SchemaSyntaxError
+from src.parser import parse_schema
+from src.validators import validate_yaml
 
+from src.exceptions import InvalidSchemaFilenameError
+from src.exceptions import SchemaParseError
+from src.violations import Violation
+from src.violations import ViolationJSONEncoder
 
 SUCCESS = 0
 ERR = -1
@@ -75,7 +78,7 @@ def validate_yaml_data_from_file(yaml_filepath: str,
 
     Returns:
         A Iterator collection of `Violation` objects that contains
-        the violations detected in the YAML data against the rulesets.
+        the violations detected in the YAML data against the schema.
 
     Raises:
         ValueError: If either argument is `None` or an empty string
