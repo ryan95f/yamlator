@@ -228,7 +228,7 @@ class RulesetValidator(Validator):
             super().validate(key, data, parent, rtype, is_required)
             return
 
-        is_ruleset_data = (type(data) == dict)
+        is_ruleset_data = isinstance(data, dict)
         if not is_ruleset_data:
             violation = RulesetTypeViolation(key, parent)
             self._violations.append(violation)

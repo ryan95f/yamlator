@@ -4,6 +4,7 @@ from .base import BaseValidatorTest
 
 from unittest.mock import Mock, patch
 from parameterized import parameterized
+
 from src.types import Data
 from src.validators import OptionalValidator
 
