@@ -4,11 +4,15 @@ import unittest
 from collections import namedtuple
 from parameterized import parameterized
 from unittest.mock import MagicMock, Mock, patch
-from src.cmd import main, SUCCESS, ERR, DisplayMethod
 
-HELLO_YAML_FILE_PATH = './tests/files/hello.yaml'
-HELLO_RULESET_FILE_PATH = './tests/files/hello.ys'
-INVALID_HELLO_YAML_FILE_PATH = './tests/files/invalid_hello.yaml'
+from src.cmd import ERR
+from src.cmd import SUCCESS
+from src.cmd import main
+from src.cmd import DisplayMethod
+
+HELLO_YAML_FILE_PATH = './tests/files/example/example.yaml'
+HELLO_RULESET_FILE_PATH = './tests/files/example/example.ys'
+INVALID_HELLO_YAML_FILE_PATH = './tests/files/example/invalid_example.yaml'
 
 ValidateArgs = namedtuple('ValidateArgs', ['file', 'ruleset_schema', 'output'])
 
@@ -63,7 +67,8 @@ class TestMain(unittest.TestCase):
         ), ERR)
     ])
     @patch('argparse.ArgumentParser')
-    def test_main(self, name, args, expected_status_code: int, mock_args_parser: Mock):
+    def test_main(self, name: str, args: ValidateArgs, expected_status_code: int,
+                  mock_args_parser: Mock):
         mock_parser = MagicMock()
         mock_parser.parse_args.return_value = args
         mock_args_parser.return_value = mock_parser

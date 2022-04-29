@@ -1,3 +1,4 @@
+import re
 import unittest
 
 from collections import namedtuple
@@ -141,6 +142,14 @@ class TestSchemaTransformer(unittest.TestCase):
         self.transformer.seen_constructs = seen_constructs
         with self.assertRaises(ConstructNotFoundError):
             self.transformer.container_type(token)
+
+    def test_regex_type(self):
+        token = Token("\"test{1}\"")
+        expected_regex_str = re.compile("test{1}")
+
+        rule_type = self.transformer.regex_type((token, ))
+        self.assertEqual(expected_regex_str, rule_type.regex)
+        self.assertEqual(rule_type.type, SchemaTypes.REGEX)
 
     def test_type(self):
         type_token = self.transformer.type((self.name_token, ))

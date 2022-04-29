@@ -1,9 +1,11 @@
 import unittest
 
 from .base import BaseValidatorTest
-
 from parameterized import parameterized
-from src.types import Data, RuleType, SchemaTypes
+
+from src.types import Data
+from src.types import RuleType
+from src.types import SchemaTypes
 from src.validators import RegexValidator
 
 

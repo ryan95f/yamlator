@@ -228,7 +228,7 @@ class RulesetValidator(Validator):
             super().validate(key, data, parent, rtype, is_required)
             return
 
-        is_ruleset_data = (type(data) == dict)
+        is_ruleset_data = isinstance(data, dict)
         if not is_ruleset_data:
             violation = RulesetTypeViolation(key, parent)
             self._violations.append(violation)
@@ -279,11 +279,16 @@ class ListValidator(Validator):
             rtype       (RuleType): The type assigned to the rule
             is_required     (bool): Is the rule required
         """
+        is_list_data = isinstance(data, list)
         is_list_rule = (rtype.type == SchemaTypes.LIST)
-        is_list_data = (type(data) != list)
 
-        if not is_list_rule or is_list_data:
+        if not is_list_rule:
             super().validate(key, data, parent, rtype, is_required)
+            return
+
+        if not is_list_data:
+            violation = TypeViolation(key, parent, f'{key} should be of type list')
+            self._violations.append(violation)
             return
 
         for idx, item in enumerate(data):
@@ -356,11 +361,12 @@ class BuildInTypeValidator(Validator):
         """
         buildin_type = self._built_in_lookups.get(rtype.type)
         is_not_build_in_type = (buildin_type is None)
+
         if is_not_build_in_type:
             super().validate(key, data, parent, rtype, is_required)
             return
 
-        if type(data) != buildin_type.type:
+        if not isinstance(data, buildin_type.type):
             message = f'{key} should be of type {buildin_type.friendly_name}'
             violation = TypeViolation(key, parent, message)
             self._violations.append(violation)
@@ -384,10 +390,15 @@ class MapValidator(Validator):
             is_required     (bool): Is the rule required
         """
         is_map_rule = (rtype.type == SchemaTypes.MAP)
-        is_map_data = (type(data) == dict)
+        is_map_data = isinstance(data, dict)
 
-        if not is_map_rule or not is_map_data:
+        if not is_map_rule:
             super().validate(key, data, parent, rtype, is_required)
+            return
+
+        if not is_map_data:
+            violation = TypeViolation(key, parent, f'{key} should be of type map')
+            self._violations.append(violation)
             return
 
         for child_key, value in data.items():

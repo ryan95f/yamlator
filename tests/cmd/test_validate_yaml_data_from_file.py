@@ -1,12 +1,15 @@
 import unittest
 
-from parameterized import parameterized
+from typing import Type
 from collections import namedtuple
+from parameterized import parameterized
+
 from src.cmd import validate_yaml_data_from_file
 from src.exceptions import InvalidSchemaFilenameError
 
-VALID_YAML_DATA_FILE_PATH = './tests/files/hello.yaml'
-VALID_SCHEMA_FILE_PATH = './tests/files/hello.ys'
+EMPTY_STR = ""
+VALID_YAML_DATA_FILE_PATH = './tests/files/example/example.yaml'
+VALID_SCHEMA_FILE_PATH = './tests/files/example/example.ys'
 
 ValidateArgs = namedtuple('ValidateArgs', ['yaml_filepath', 'schema_filepath'])
 
@@ -15,6 +18,18 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
     @parameterized.expand([
         ('none_yaml_path', ValidateArgs(None, VALID_SCHEMA_FILE_PATH), ValueError),
         ('none_schema_path', ValidateArgs(VALID_YAML_DATA_FILE_PATH, None), ValueError),
+        ('none_yaml_and_schema_path', ValidateArgs(None, None), ValueError),
+        ('empty_yaml_path_str', ValidateArgs(
+            EMPTY_STR, VALID_SCHEMA_FILE_PATH
+        ), ValueError),
+        ('empty_schema_path_str', ValidateArgs(
+            VALID_YAML_DATA_FILE_PATH,
+            EMPTY_STR
+        ), ValueError),
+        ('empty_yaml_and_path_str', ValidateArgs(
+            EMPTY_STR,
+            EMPTY_STR
+        ), ValueError),
         ('yaml_data_file_not_found', ValidateArgs(
             'not_found.yaml',
             VALID_SCHEMA_FILE_PATH
@@ -30,7 +45,7 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
     ])
     def test_validate_yaml_data_from_file_with_invalid_args(self, name: str,
                                                             args: ValidateArgs,
-                                                            expected_exception: Exception):  # nopep8
+                                                            expected_exception: Type[Exception]):  # nopep8
         with self.assertRaises(expected_exception):
             validate_yaml_data_from_file(args.yaml_filepath, args.schema_filepath)
 

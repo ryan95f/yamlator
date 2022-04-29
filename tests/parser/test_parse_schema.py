@@ -1,3 +1,4 @@
+from typing import Type
 import unittest
 
 from parameterized import parameterized
@@ -14,8 +15,8 @@ from src.parser import SchemaSyntaxError
 
 class TestParseSchema(unittest.TestCase):
     def setUp(self):
-        self.valid_schema_file = './tests/files/hello.ys'
-        self.invalid_schema_file = './tests/files/hello.yaml'
+        self.valid_schema_file = './tests/files/example/example.ys'
+        self.invalid_schema_file = './tests/files/example/example.yaml'
 
     def test_parse_with_none_text(self):
         with self.assertRaises(ValueError):
@@ -33,11 +34,6 @@ class TestParseSchema(unittest.TestCase):
         self.assertIsNotNone(instructions)
         self.assertIsNotNone(main)
         self.assertEqual('main', main.name)
-
-    def test_parse_with_invalid_content(self):
-        yaml_content = load_yaml_file(self.invalid_schema_file)
-        with self.assertRaises(SchemaSyntaxError):
-            parse_schema(str(yaml_content))
 
     @parameterized.expand([
         (
@@ -64,9 +60,15 @@ class TestParseSchema(unittest.TestCase):
             'with_ruleset_not_defined',
             './tests/files/invalid_files/missing_defined_ruleset.ys',
             SchemaParseError
+        ),
+        (
+            'with_invalid_schema_syntax',
+            './tests/files/example/example.yaml',
+            SchemaSyntaxError
         )
     ])
-    def test_parse_syntax_errors(self, name: str, schema_file_path: str, exception_type):
+    def test_parse_syntax_errors(self, name: str, schema_file_path: str,
+                                 exception_type: Type[Exception]):
         schema_content = load_yaml_file(schema_file_path)
         with self.assertRaises(exception_type):
             parse_schema(str(schema_content))

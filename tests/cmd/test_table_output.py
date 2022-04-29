@@ -1,12 +1,12 @@
 import io
 import unittest
 
-from typing import Iterator
+from typing import Iterator, Type
 from unittest.mock import patch
 from parameterized import parameterized
 
 from src.cmd import ERR, SUCCESS, TableOutput
-from src.violations import RequiredViolation
+from src.violations import RequiredViolation, Violation
 from src.violations import TypeViolation
 from src.violations import ViolationType
 
@@ -28,6 +28,15 @@ class TestTableOutput(unittest.TestCase):
         with patch('sys.stdout', new=io.StringIO()):
             status_code = TableOutput.display(violations)
             self.assertEqual(expected_status_code, status_code)
+
+    @parameterized.expand([
+        ('with_non_violations', None, ValueError)
+    ])
+    def test_json_output_invalid_args(self, name: str,
+                                      violations: Iterator[Violation],
+                                      expected_exception: Type[Exception]):
+        with self.assertRaises(expected_exception):
+            TableOutput.display(violations)
 
 
 if __name__ == '__main__':

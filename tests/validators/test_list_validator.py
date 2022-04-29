@@ -1,10 +1,14 @@
 import unittest
 
 from .base import BaseValidatorTest
+
+from typing import Any
 from unittest.mock import MagicMock
 from parameterized import parameterized
+
 from src.validators import ListValidator
-from src.types import RuleType, SchemaTypes
+from src.types import RuleType
+from src.types import SchemaTypes
 
 
 class TestListValidator(BaseValidatorTest):
@@ -14,24 +18,36 @@ class TestListValidator(BaseValidatorTest):
         self.mock_ruleset_validator.validate.return_value = None
 
     @parameterized.expand([
-        ('with_non_list_type', RuleType(type=SchemaTypes.STR), 'hello', 0),
+        ('with_str_type', RuleType(type=SchemaTypes.STR), 'hello', 0, 0),
+        ('with_int_type', RuleType(type=SchemaTypes.INT), 42, 0, 0),
+        ('with_map_type', RuleType(type=SchemaTypes.MAP), {'value': 42}, 0, 0),
+        ('with_regex_type', RuleType(
+            type=SchemaTypes.REGEX, regex='value'), "value", 0, 0),
+        ('with_str_type_none_data', RuleType(type=SchemaTypes.STR), None, 0, 0),
         ('with_list_type', RuleType(
             type=SchemaTypes.LIST,
-            sub_type=RuleType(type=SchemaTypes.INT)), [0, 1, 2, 3], 0),
+            sub_type=RuleType(type=SchemaTypes.INT)), [0, 1, 2, 3], 0, 0),
         ('with_ruleset_list_type', RuleType(
             type=SchemaTypes.LIST, sub_type=RuleType(
                 type=SchemaTypes.RULESET, lookup='message'
             )
-        ), [{'msg': 'hello'}, {'msg': 'world'}], 2),
+        ), [{'msg': 'hello'}, {'msg': 'world'}], 2, 0),
         ('with_nested_list', RuleType(
             type=SchemaTypes.LIST, sub_type=RuleType(
                 type=SchemaTypes.LIST, sub_type=RuleType(
                     type=SchemaTypes.INT)
                 )
-        ), [[0, 1, 2], [3, 4, 5]], 0)
+        ), [[0, 1, 2], [3, 4, 5]], 0, 0),
+        ('with_list_type_none_data', RuleType(
+            type=SchemaTypes.LIST,
+            sub_type=RuleType(type=SchemaTypes.INT)), None, 0, 1),
+        ('with_list_type_str', RuleType(
+            type=SchemaTypes.LIST,
+            sub_type=RuleType(type=SchemaTypes.INT)), "hello world", 0, 1),
     ])
-    def test_list_validator(self, name: str, rtype: RuleType, data: str,
-                            ruleset_validate_call_count: int):
+    def test_list_validator(self, name: str, rtype: RuleType, data: Any,
+                            ruleset_validate_call_count: int,
+                            expected_violation_count: int):
         validator = ListValidator(self.violations)
         validator.set_ruleset_validator(self.mock_ruleset_validator)
 
@@ -45,6 +61,9 @@ class TestListValidator(BaseValidatorTest):
             ruleset_validate_call_count,
             self.mock_ruleset_validator.validate.call_count
         )
+
+        actual_violation_count = len(self.violations)
+        self.assertEqual(expected_violation_count, actual_violation_count)
 
 
 if __name__ == '__main__':

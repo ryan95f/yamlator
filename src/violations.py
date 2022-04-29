@@ -25,7 +25,7 @@ class ViolationJSONEncoder(json.JSONEncoder):
                 'message': o.message,
                 'violation_type': o.violation_type
             }
-        return super().default(o)
+        return json.JSONEncoder.default(self, o)
 
 
 class Violation:
