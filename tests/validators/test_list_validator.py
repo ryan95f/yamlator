@@ -7,7 +7,8 @@ from unittest.mock import MagicMock
 from parameterized import parameterized
 
 from src.validators import ListValidator
-from src.types import RuleType, SchemaTypes
+from src.types import RuleType
+from src.types import SchemaTypes
 
 
 class TestListValidator(BaseValidatorTest):

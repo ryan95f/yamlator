@@ -1,9 +1,14 @@
 import unittest
 
 from .base import BaseValidatorTest
+
+from unittest.mock import Mock
+from unittest.mock import patch
 from parameterized import parameterized
-from unittest.mock import patch, Mock
-from src.types import Data, RuleType, SchemaTypes
+
+from src.types import Data
+from src.types import RuleType
+from src.types import SchemaTypes
 from src.validators import AnyTypeValidator
 
 

@@ -2,7 +2,8 @@ import unittest
 
 from .base import BaseValidatorTest
 
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
+from unittest.mock import patch
 from parameterized import parameterized
 
 from src.types import Data

@@ -1,9 +1,15 @@
 import unittest
 
 from parameterized import parameterized
+
+from src.types import Data
+from src.types import Rule
+from src.types import RuleType
+from src.types import EnumItem
+from src.types import YamlatorEnum
+from src.types import YamlatorRuleset
+from src.types import SchemaTypes
 from src.validators import validate_yaml
-from src.types import Data, EnumItem, Rule, RuleType
-from src.types import YamlatorEnum, YamlatorRuleset, SchemaTypes
 
 
 def create_flat_schema():
