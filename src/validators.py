@@ -479,7 +479,6 @@ class EnumTypeValidator(Validator):
 
         if target_enum is None:
             return False
-
         enum_value = target_enum.items.get(data, None)
         return enum_value is not None
 

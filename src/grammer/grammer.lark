@@ -9,7 +9,8 @@ start: instructions*
 schema_entry: "schema" "{" rule+ "}"
 ruleset: "ruleset" /[A-Z]{1}[a-z0-9_]+/ "{" rule+ "}"
 enum: "enum" /[A-Z]{1}[a-z0-9_]+/ "{" enum_item+ "}"
-enum_item: /[A-Z0-9_]+/ "=" /[A-Za-z0-9_]+/
+enum_item: /[A-Z0-9_]+/ "=" ESCAPED_STRING
+         | /[A-Z0-9_]+/ "=" NUMBER
 
 // Rule Definitions
 ?rule: required_rule
@@ -40,8 +41,8 @@ regex_type: "regex""(" ESCAPED_STRING ")"
 
 NEW_LINES: "\n"+
 
-%import common.INT
 %import common.ESCAPED_STRING
+%import common.NUMBER
 %import common.WS
 %ignore WS
 %ignore NEW_LINES

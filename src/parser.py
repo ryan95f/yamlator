@@ -147,7 +147,11 @@ class SchemaTransformer(Transformer):
     def enum_item(self, tokens: Any) -> EnumItem:
         """Transforms a enum item token into a EnumItem object"""
         name, value = tokens
-        return EnumItem(name=name.value, value=value.value)
+
+        # Remove the speech marks from the value
+        value = value.value
+        value = value[1:len(value) - 1]
+        return EnumItem(name=name.value, value=value)
 
     def enum(self, tokens: Any) -> YamlatorEnum:
         """Transforms a enum token into a YamlatorEnum object"""
