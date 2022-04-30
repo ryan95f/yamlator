@@ -102,18 +102,14 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(SchemaTypes.ANY, any_type.type)
 
     def test_enum_item(self):
-        expected_enum_val = "success"
-        enum_name = Token('StatusCode')
-
-        # Additional speech marks are added to align with how
-        # lark would transform this string
-        enum_value = Token('"success"')
+        enum_name = 'StatusCode'
+        enum_value = 'success'
 
         tokens = (enum_name, enum_value)
         enum_item = self.transformer.enum_item(tokens)
 
-        self.assertEqual(enum_name.value, enum_item.name)
-        self.assertEqual(expected_enum_val, enum_item.value)
+        self.assertEqual(enum_name, enum_item.name)
+        self.assertEqual(enum_value, enum_item.value)
 
     def test_enum(self):
         enum_items = [
@@ -148,7 +144,7 @@ class TestSchemaTransformer(unittest.TestCase):
             self.transformer.container_type(token)
 
     def test_regex_type(self):
-        token = Token("\"test{1}\"")
+        token = "test{1}"
         expected_regex_str = re.compile("test{1}")
 
         rule_type = self.transformer.regex_type((token, ))

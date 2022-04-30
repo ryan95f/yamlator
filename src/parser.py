@@ -147,11 +147,7 @@ class SchemaTransformer(Transformer):
     def enum_item(self, tokens: Any) -> EnumItem:
         """Transforms a enum item token into a EnumItem object"""
         name, value = tokens
-
-        # Remove the speech marks from the value
-        value = value.value
-        value = value[1:len(value) - 1]
-        return EnumItem(name=name.value, value=value)
+        return EnumItem(name=name, value=value)
 
     def enum(self, tokens: Any) -> YamlatorEnum:
         """Transforms a enum token into a YamlatorEnum object"""
@@ -180,9 +176,7 @@ class SchemaTransformer(Transformer):
     def regex_type(self, tokens: Any) -> RuleType:
         """Transforms a regex type token into a RuleType object"""
         (regex, ) = tokens
-        regex_str = regex.value
-        regex_str = regex_str[1: len(regex_str) - 1]
-        return RuleType(type=SchemaTypes.REGEX, regex=regex_str)
+        return RuleType(type=SchemaTypes.REGEX, regex=regex)
 
     def type(self, tokens: Any) -> Any:
         """Extracts the type tokens and passes them through onto
@@ -190,6 +184,16 @@ class SchemaTransformer(Transformer):
         """
         (t, ) = tokens
         return t
+
+    def INT(self, token):
+        return int(token)
+
+    def FLOAT(self, token):
+        return float(token)
+
+    def ESCAPED_STRING(self, token):
+        token = token[1:len(token) - 1]
+        return token
 
     def schema_entry(self, rules: list) -> YamlatorRuleset:
         """Transforms the schema entry point token into a YamlatorRuleset called

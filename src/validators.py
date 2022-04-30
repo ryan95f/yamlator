@@ -464,8 +464,8 @@ class EnumTypeValidator(Validator):
             super().validate(key, data, parent, rtype, is_required)
             return
 
-        is_enum_str_data = isinstance(data, str)
-        if not is_enum_str_data:
+        is_enum_data = isinstance(data, (str, float, int))
+        if not is_enum_data:
             self._add_enum_violation(key, parent, rtype.lookup)
             return
 
@@ -476,9 +476,9 @@ class EnumTypeValidator(Validator):
 
     def _matches_enum_data(self, data: Data, enum_name: str) -> bool:
         target_enum = self.enums.get(enum_name, None)
-
         if target_enum is None:
             return False
+
         enum_value = target_enum.items.get(data, None)
         return enum_value is not None
 

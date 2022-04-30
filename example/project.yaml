@@ -1,6 +1,5 @@
 project:
   version: v1
-  status: created
   projectId: my-test-project
   displayName: my-test-project
   iam_permission:
