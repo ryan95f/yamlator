@@ -1,2 +1,12 @@
 [report]
 omit=tests/*
+exclude_lines = 
+    # Don't complain about missing debug-only code:
+    def __repr__
+    def __str__
+
+    # Don't test pass calls
+    pass
+
+    # Don't test entry point statements in the src files
+    if __name__ == __main__:
