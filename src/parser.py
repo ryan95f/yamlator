@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import re
 import os
+
 from pathlib import Path
 from typing import Iterator
 from lark import Lark
@@ -23,6 +25,8 @@ from src.exceptions import SchemaParseError
 
 _package_dir = Path(__file__).parent.absolute()
 _GRAMMER_FILE = os.path.join(_package_dir, 'grammer/grammer.lark')
+
+_SPEECH_MARKS_REGEX = re.compile(r'\"|\'')
 
 
 def parse_schema(schema_content: str) -> dict:
@@ -147,7 +151,7 @@ class SchemaTransformer(Transformer):
     def enum_item(self, tokens: Any) -> EnumItem:
         """Transforms a enum item token into a EnumItem object"""
         name, value = tokens
-        return EnumItem(name=name.value, value=value.value)
+        return EnumItem(name=name, value=value)
 
     def enum(self, tokens: Any) -> YamlatorEnum:
         """Transforms a enum token into a YamlatorEnum object"""
@@ -176,9 +180,7 @@ class SchemaTransformer(Transformer):
     def regex_type(self, tokens: Any) -> RuleType:
         """Transforms a regex type token into a RuleType object"""
         (regex, ) = tokens
-        regex_str = regex.value
-        regex_str = regex_str[1: len(regex_str) - 1]
-        return RuleType(type=SchemaTypes.REGEX, regex=regex_str)
+        return RuleType(type=SchemaTypes.REGEX, regex=regex)
 
     def type(self, tokens: Any) -> Any:
         """Extracts the type tokens and passes them through onto
@@ -192,6 +194,18 @@ class SchemaTransformer(Transformer):
         main that will act as the entry point for validaiting the YAML data
         """
         return YamlatorRuleset('main', rules)
+
+    def INT(self, token: str) -> int:
+        """Convers a integer string into a int type"""
+        return int(token)
+
+    def FLOAT(self, token: str) -> float:
+        """Convers a float string into a int type"""
+        return float(token)
+
+    def ESCAPED_STRING(self, token: str) -> str:
+        """Transforms the escaped string by removing speech marks from the value"""
+        return _SPEECH_MARKS_REGEX.sub('', token)
 
 
 class _InstructionHandler:

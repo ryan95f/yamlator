@@ -102,14 +102,14 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(SchemaTypes.ANY, any_type.type)
 
     def test_enum_item(self):
-        enum_name = Token('StatusCode')
-        enum_value = Token('success')
+        enum_name = 'StatusCode'
+        enum_value = 'success'
 
         tokens = (enum_name, enum_value)
         enum_item = self.transformer.enum_item(tokens)
 
-        self.assertEqual(enum_name.value, enum_item.name)
-        self.assertEqual(enum_value.value, enum_item.value)
+        self.assertEqual(enum_name, enum_item.name)
+        self.assertEqual(enum_value, enum_item.value)
 
     def test_enum(self):
         enum_items = [
@@ -130,13 +130,13 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(rule.type, SchemaTypes.RULESET)
 
     @parameterized.expand([
-        ('with_existing_constructs', 'Employee', {
+        ('with_existing_constructs', {
             'Details': SchemaTypes.RULESET,
             'Status': SchemaTypes.ENUM
         }),
-        ('without_existing_constructs', 'Employee', {})
+        ('without_existing_constructs', {})
     ])
-    def test_container_type_construct_does_not_exist(self, name: str, construct_name: str,
+    def test_container_type_construct_does_not_exist(self, name: str,
                                                      seen_constructs: dict):
         token = Token(name)
         self.transformer.seen_constructs = seen_constructs
@@ -144,7 +144,7 @@ class TestSchemaTransformer(unittest.TestCase):
             self.transformer.container_type(token)
 
     def test_regex_type(self):
-        token = Token("\"test{1}\"")
+        token = "test{1}"
         expected_regex_str = re.compile("test{1}")
 
         rule_type = self.transformer.regex_type((token, ))
@@ -162,6 +162,26 @@ class TestSchemaTransformer(unittest.TestCase):
 
         self.assertEqual(expected_ruleset_name, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
+
+    def test_int_transform(self):
+        expected_value = 42
+        actual_value = self.transformer.INT("42")
+        self.assertEqual(expected_value, actual_value)
+
+    def test_float_transform(self):
+        expected_value = 3.142
+        actual_value = self.transformer.FLOAT("3.142")
+        self.assertEqual(expected_value, actual_value)
+
+    @parameterized.expand([
+        ('string_with_double_speech_marks', '\"hello\"', 'hello'),
+        ('string_with_single_speech_marks', '\'hello\'', 'hello'),
+        ('string_without_speech_marks', 'hello', 'hello'),
+        ('empty_string', '', '')
+    ])
+    def test_escaped_string_transform(self, name: str, string_token: str, expected: str):
+        actual = self.transformer.ESCAPED_STRING(string_token)
+        self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

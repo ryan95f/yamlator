@@ -1,17 +1,22 @@
 // Entry point
 start: instructions*
 
-// Collection data structure Definitions
+// Collection constructs
 ?instructions: enum
             | ruleset
             | schema_entry
 
 schema_entry: "schema" "{" rule+ "}"
-ruleset: "ruleset" /[A-Z]{1}[a-z0-9_]+/ "{" rule+ "}"
-enum: "enum" /[A-Z]{1}[a-z0-9_]+/ "{" enum_item+ "}"
-enum_item: /[A-Z0-9_]+/ "=" /[A-Za-z0-9_]+/
 
-// Rule Definitions
+ruleset: "ruleset" /[A-Z]{1}[a-z0-9_]+/ "{" rule+ "}"
+
+// Enum constructs
+enum: "enum" /[A-Z]{1}[a-z0-9_]+/ "{" enum_item+ "}"
+enum_item: /[A-Z0-9_]+/ "=" INT
+         | /[A-Z0-9_]+/ "=" FLOAT
+         | /[A-Z0-9_]+/ "=" ESCAPED_STRING
+
+// Rule definitions
 ?rule: required_rule
      | optional_rule
 
@@ -40,8 +45,12 @@ regex_type: "regex""(" ESCAPED_STRING ")"
 
 NEW_LINES: "\n"+
 
-%import common.INT
+%import common.SH_COMMENT
 %import common.ESCAPED_STRING
+%import common.INT
+%import common.FLOAT
 %import common.WS
+
 %ignore WS
 %ignore NEW_LINES
+%ignore SH_COMMENT

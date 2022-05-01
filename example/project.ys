@@ -1,7 +1,7 @@
 enum Status {
-    CREATED = created
-    ACTIVE = active
-    DELETED = deleted
+    CREATED = "created"
+    ACTIVE = "active"
+    DELETED = "deleted"
 }
 
 ruleset Details {
