@@ -163,6 +163,26 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(expected_ruleset_name, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
 
+    def test_int_transform(self):
+        expected_value = 42
+        actual_value = self.transformer.INT("42")
+        self.assertEqual(expected_value, actual_value)
+
+    def test_float_transform(self):
+        expected_value = 3.142
+        actual_value = self.transformer.FLOAT("3.142")
+        self.assertEqual(expected_value, actual_value)
+
+    @parameterized.expand([
+        ('string_with_double_speech_marks', '\"hello\"', 'hello'),
+        ('string_with_single_speech_marks', '\'hello\'', 'hello'),
+        ('string_without_speech_marks', 'hello', 'hello'),
+        ('empty_string', '', '')
+    ])
+    def test_escaped_string_transform(self, name: str, string_token: str, expected: str):
+        actual = self.transformer.ESCAPED_STRING(string_token)
+        self.assertEqual(expected, actual)
+
 
 if __name__ == '__main__':
     unittest.main()

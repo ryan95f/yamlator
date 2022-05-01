@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import re
 import os
+
 from pathlib import Path
 from typing import Iterator
 from lark import Lark
@@ -23,6 +25,8 @@ from src.exceptions import SchemaParseError
 
 _package_dir = Path(__file__).parent.absolute()
 _GRAMMER_FILE = os.path.join(_package_dir, 'grammer/grammer.lark')
+
+_SPEECH_MARKS_REGEX = re.compile(r'\"|\'')
 
 
 def parse_schema(schema_content: str) -> dict:
@@ -185,21 +189,23 @@ class SchemaTransformer(Transformer):
         (t, ) = tokens
         return t
 
-    def INT(self, token):
-        return int(token)
-
-    def FLOAT(self, token):
-        return float(token)
-
-    def ESCAPED_STRING(self, token):
-        token = token[1:len(token) - 1]
-        return token
-
     def schema_entry(self, rules: list) -> YamlatorRuleset:
         """Transforms the schema entry point token into a YamlatorRuleset called
         main that will act as the entry point for validaiting the YAML data
         """
         return YamlatorRuleset('main', rules)
+
+    def INT(self, token: str) -> int:
+        """Convers a integer string into a int type"""
+        return int(token)
+
+    def FLOAT(self, token: str) -> float:
+        """Convers a float string into a int type"""
+        return float(token)
+
+    def ESCAPED_STRING(self, token: str) -> str:
+        """Transforms the escaped string by removing speech marks from the value"""
+        return _SPEECH_MARKS_REGEX.sub('', token)
 
 
 class _InstructionHandler:
