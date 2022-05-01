@@ -130,13 +130,13 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(rule.type, SchemaTypes.RULESET)
 
     @parameterized.expand([
-        ('with_existing_constructs', 'Employee', {
+        ('with_existing_constructs', {
             'Details': SchemaTypes.RULESET,
             'Status': SchemaTypes.ENUM
         }),
-        ('without_existing_constructs', 'Employee', {})
+        ('without_existing_constructs', {})
     ])
-    def test_container_type_construct_does_not_exist(self, name: str, construct_name: str,
+    def test_container_type_construct_does_not_exist(self, name: str,
                                                      seen_constructs: dict):
         token = Token(name)
         self.transformer.seen_constructs = seen_constructs

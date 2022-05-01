@@ -139,7 +139,7 @@ ruleset <ruleset-name> {
 }
 ```
 
-The regex type can also be nested in the `map` or `list` types. For example, when applied to a list allows for a collection of strings to be validated:
+The regex type can also be nested in the `map` or `list` types. For example, when applied to a list, it allows for a collection of strings to be validated:
 
 ```yaml
 roles:
@@ -148,7 +148,7 @@ roles:
     - role/editor
 ```
 
-With the following rule in a schema block:
+Then the rule within a schema block:
 
 ```text
 schema {
@@ -158,7 +158,7 @@ schema {
 
 ### Ruleset Type
 
-Rulesets can be referenced as a type to validate complicated YAML structures. For example, if the following YAML data existed:
+Rulesets can be referenced as a type to validate complex YAML structures. For example, if the following YAML data existed:
 
 ```yaml
 project:
@@ -204,7 +204,7 @@ schema {
 
 ### Enum Type
 
-Enums can be used to define string constant in a schema. This can be used to enforce specific string values in the YAML data. An enum must start with a capital letter. A enum can be defined with:
+Enums can be used to define a collection of string, integer and float constants. An enum name must start with a capital letter. A enum can be defined with:
 
 ```text
 enum <enum-name> {
@@ -212,13 +212,22 @@ enum <enum-name> {
 }
 ```
 
-For example, a enum for log levels could be:
+For example, a enum of string constants for log levels:
 
 ```text
 enum LogLevel {
-    ERR = error
-    INFO = info
-    DEBUG = debug
+    ERR = "error"
+    INFO = "info"
+    DEBUG = "debug"
+}
+```
+
+An example of an enum with integers and floats:
+
+```text
+enum Numbers {
+    LIFE = 42
+    PI = 3.142
 }
 ```
 
