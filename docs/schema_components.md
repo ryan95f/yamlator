@@ -148,7 +148,7 @@ roles:
     - role/editor
 ```
 
-Then the rule within a schema block:
+Then the following rule within a schema block can be used to validate this list:
 
 ```text
 schema {
