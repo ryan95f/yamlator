@@ -8,5 +8,5 @@ exclude_lines =
     # Don't test pass calls
     pass
 
-    # Don't test entry point statements in src files
+    # Don't test entry point statements in the src files
     if __name__ == __main__:
