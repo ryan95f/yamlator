@@ -11,38 +11,62 @@ from src.types import SchemaTypes
 from src.validators import EnumTypeValidator
 
 
-class TestEnumTypeValidator(BaseValidatorTest):
-    def setUp(self):
-        super().setUp()
-        self.enums = {
-            'message': YamlatorEnum('message', {
-                'success': EnumItem('VALID', 'success'),
-                'failure': EnumItem('INVALID', 'failure')
-            })
-        }
+string_enum = {
+    'message': YamlatorEnum('message', {
+        'success': EnumItem('VALID', 'success'),
+        'failure': EnumItem('INVALID', 'failure')
+    })
+}
 
+int_enum = {
+    'message': YamlatorEnum('message', {
+        0: EnumItem('VALID', 0),
+        1: EnumItem('INVALID', 1)
+    })
+}
+
+float_enum = {
+    'digits': YamlatorEnum('digits', {
+        3.142: EnumItem('PI', 3.142),
+    })
+}
+
+
+class TestEnumTypeValidator(BaseValidatorTest):
     @parameterized.expand([
-        ('with_valid_enum_value', 'success', RuleType(
-            type=SchemaTypes.ENUM, lookup='message'), 0),
-        ('with_invalid_enum_value', 'not_found',
-            RuleType(type=SchemaTypes.ENUM, lookup='message'), 1),
-        ('with_empty_str_enum_value', '',
-            RuleType(type=SchemaTypes.ENUM, lookup='message'), 1),
-        ('with_str_rule_type', 'success', RuleType(type=SchemaTypes.STR), 0),
+        ('with_str_enum_valid_value', 'success', RuleType(
+            type=SchemaTypes.ENUM, lookup='message'), string_enum, 0),
+        ('with_str_enum_invalid_value', 'not_found',
+            RuleType(type=SchemaTypes.ENUM, lookup='message'), string_enum, 1),
+        ('with_str_enum_empty_str_value', '',
+            RuleType(type=SchemaTypes.ENUM, lookup='message'), string_enum, 1),
+        ('with_str_rule_type', 'success', RuleType(type=SchemaTypes.STR), string_enum, 0),
         ('with_enum_not_found', 'success', RuleType(
-            type=SchemaTypes.ENUM, lookup='errors'), 1),
+            type=SchemaTypes.ENUM, lookup='errors'), string_enum, 1),
         ('with_non_str_data_type', [0, 1, 2], RuleType(
-            type=SchemaTypes.ENUM, lookup='message'), 1),
+            type=SchemaTypes.ENUM, lookup='message'), string_enum, 1),
         ('with_none_type', None, RuleType(
-            type=SchemaTypes.ENUM, lookup='message'), 1),
-        ('with_int_rule_type', 1, RuleType(SchemaTypes.INT), 0),
-        ('with_str_rule_type', 'test', RuleType(SchemaTypes.STR), 0),
+            type=SchemaTypes.ENUM, lookup='message'), string_enum, 1),
+        ('with_int_rule_type', 1, RuleType(SchemaTypes.INT), string_enum, 0),
+        ('with_str_rule_type', 'test', RuleType(SchemaTypes.STR), string_enum, 0),
         ('with_list_rule_type', [0, 1, 2], RuleType(
-            SchemaTypes.LIST, sub_type=RuleType(SchemaTypes.INT)), 0),
+            SchemaTypes.LIST, sub_type=RuleType(SchemaTypes.INT)), string_enum, 0),
+        ('with_int_enum_valid_value', 1,  RuleType(
+            type=SchemaTypes.ENUM, lookup='message'), int_enum, 0),
+        ('with_int_enum_invalid_value', 100,  RuleType(
+            type=SchemaTypes.ENUM, lookup='message'), int_enum, 1),
+        ('with_int_enum_invalid_str_value', '1',  RuleType(
+            type=SchemaTypes.ENUM, lookup='message'), int_enum, 1),
+        ('with_float_enum_valid_value', 3.142,  RuleType(
+            type=SchemaTypes.ENUM, lookup='digits'), float_enum, 0),
+        ('with_float_enum_invalid_value', 4.2,  RuleType(
+            type=SchemaTypes.ENUM, lookup='digits'), float_enum, 1),
+        ('with_float_enum_invalid_str_value', '3.142',  RuleType(
+            type=SchemaTypes.ENUM, lookup='digits'), float_enum, 1),
     ])
     def test_enum_type_validator(self, name, data: Data, rtype: RuleType,
-                                 expected_violation_count: int):
-        validator = EnumTypeValidator(self.violations, self.enums)
+                                 enum: YamlatorEnum, expected_violation_count: int):
+        validator = EnumTypeValidator(self.violations, enum)
         validator.validate(
             key=self.key,
             data=data,
