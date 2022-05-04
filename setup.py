@@ -13,21 +13,20 @@ def create_long_description():
 
         # Replace the relative paths in the ReadMe.md
         # to be links to the documentation in GitHub
-        long_description.replace(
+        long_description = long_description.replace(
             './docs/schema_components.md',
             'https://github.com/Ryan95Z/yamlator/blob/main/docs/schema_components.md'
         )
 
-        long_description.replace(
+        long_description = long_description.replace(
             './example/',
             'https://github.com/Ryan95Z/yamlator/tree/main/example'
         )
 
-        long_description.replace(
+        long_description = long_description.replace(
             './docs/setting_up_the_environment.md',
             'https://github.com/Ryan95Z/yamlator/blob/main/docs/setting_up_the_environment.md'  # nopep8
         )
-
         return long_description
 
 
