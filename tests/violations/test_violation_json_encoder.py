@@ -3,12 +3,18 @@ import unittest
 from typing import Any
 from collections import deque
 from parameterized import parameterized
+from dataclasses import dataclass
 
 from src.violations import BuiltInTypeViolation, RegexTypeViolation
 from src.violations import RequiredViolation
 from src.violations import RulesetTypeViolation
 from src.violations import TypeViolation
 from src.violations import ViolationJSONEncoder
+
+
+@dataclass
+class FakeViolation:
+    msg: str
 
 
 class TestViolationJSONEncoder(unittest.TestCase):
@@ -27,10 +33,19 @@ class TestViolationJSONEncoder(unittest.TestCase):
         ('encode_list', [0, 1, 2, 3, 4]),
         ('encode_none', None)
     ])
-    def test_json_encoding(self, name: str, data: Any):
+    def test_violation_json_encoding(self, name: str, data: Any):
         encoder = ViolationJSONEncoder()
         encoded_json = encoder.encode(data)
         self.assertIsNotNone(encoded_json)
+
+    @parameterized.expand([
+        ('encode_base_object', object()),
+        ('encode_custom_unsupported_object', FakeViolation("A fake error"))
+    ])
+    def test_violation_json_encoded_not_support_type_error(self, name, data: Any):
+        encoder = ViolationJSONEncoder()
+        with self.assertRaises(TypeError):
+            encoder.encode(data)
 
 
 if __name__ == 'main':

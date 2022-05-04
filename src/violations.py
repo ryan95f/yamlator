@@ -15,6 +15,10 @@ class ViolationJSONEncoder(json.JSONEncoder):
     """Custom JSON encoder to handle the Violation classes"""
 
     def default(self, o: Any) -> Any:
+        """Encode the a deque or violation types into a JSON serializable object.
+        If the object cannot be serialized, then raise the default base class behaviour
+        with the `TypeError` exception
+        """
         if isinstance(o, deque):
             return list(o)
 
