@@ -1,11 +1,11 @@
 # Yamlator
 
-[![Test](https://github.com/Ryan95Z/yamlator/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/yamlator/actions/workflows/test.yaml) 
+[![Test](https://github.com/Ryan95Z/yamlator/actions/workflows/test.yaml/badge.svg)](https://github.com/Ryan95Z/yamlator/actions/workflows/test.yaml)
 [![codecov](https://codecov.io/gh/Ryan95Z/yamlator/branch/main/graph/badge.svg)](https://codecov.io/gh/Ryan95Z/yamlator)
 [![License](https://img.shields.io/github/license/Ryan95Z/yamlator)](https://github.com/Ryan95Z/yamlator/blob/main/LICENSE)
 [![PyPi Version](https://img.shields.io/pypi/v/yamlator)](https://pypi.org/project/yamlator/)
 
-Yamlator is a CLI tool that allows a YAML file to be validated against a lightweight schema that defines the expected structure. When executed, the YAML data structure is compared against the rules to validate that the required keys and data types are present. Once validated, a list of violations will be returned that can be used to amend the file.
+Yamlator is a CLI tool that allows a YAML file to be validated against a lightweight schema that defines the expected structure for the YAML file. When executed, the YAML data is compared against the rules to validate that the relevant keys and data types are present. Once validated, a list of violations will be displayed to help amend the YAML data.
 
 ## Installing the package
 
@@ -17,9 +17,9 @@ pip install yamlator
 
 ## Creating a basic schema
 
-Schemas in Yamlator are comprised of rules, rulesets and enums in a `.ys` file.
+Schemas in Yamlator are comprised of rules, rulesets and enums, which are defined in a Yamlator schema (with a `.ys` extension) file.
 
-In the Yamlator schema file, the entry point is defined in a `schema` block, which is the required as a minimum to validate a file. For example:
+In the Yamlator schema, the entry point is defined in a `schema` block. As a minimum, a schema block must be defined for Yamlator to validate a file. For example:
 
 ```text
 schema {
@@ -28,7 +28,7 @@ schema {
 }
 ```
 
-Once this block has been placed into a Yamlator schema file, it can be used to validate the following YAML file:
+This can be used to validate the following YAML file:
 
 ```yaml
 name: Name
@@ -55,11 +55,11 @@ This can then be used to validate the following YAML data:
 employees:
     - firstName: employee
       lastName: one
-      departments:
+      roles:
         - manager
     - firstName: employee
       lastName: two
-      departments:
+      roles:
         - engineer
         - manager
     - firstName: employee
@@ -72,7 +72,7 @@ Some examples of a schema file with a YAML file can be found in the [examples di
 
 ## How to run the CLI
 
-Assuming you have a YAML and Yamlator files, the CLI can be executed with:
+Assuming you have the YAML and Yamlator files, the CLI can be executed with:
 
 ```bash
 yamlator <path-to-yaml-file> -s <path-to-yamlator-schema>
@@ -85,7 +85,7 @@ The first argument for the CLI is always the path to the YAML file.
 | Flag | Alias | Description | Is Required |
 |:-----|:------|:------------|:------------|
 | `--schema` | `-s` | The schema that will be used to validate the YAML file | True |
-| `--output` | `-o` | Defines the format that will be displayed for the violations. Support values are `table` or `json`. Defaults to `table` if not specified. | False |
+| `--output` | `-o` | Defines the format that will be displayed for the violations. Supported values are `table` or `json`. Defaults to `table` if not specified. | False |
 
 To see the help options for the CLI, run `yamlator -h` or `yamlator --help`
 
