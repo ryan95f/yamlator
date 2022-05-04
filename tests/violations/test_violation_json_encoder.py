@@ -33,7 +33,7 @@ class TestViolationJSONEncoder(unittest.TestCase):
         ('encode_list', [0, 1, 2, 3, 4]),
         ('encode_none', None)
     ])
-    def test_violation_json_encoding(self, name: str, data: Any):
+    def test_violation_json_encoder(self, name: str, data: Any):
         encoder = ViolationJSONEncoder()
         encoded_json = encoder.encode(data)
         self.assertIsNotNone(encoded_json)
@@ -42,7 +42,7 @@ class TestViolationJSONEncoder(unittest.TestCase):
         ('encode_base_object', object()),
         ('encode_custom_unsupported_object', FakeViolation("A fake error"))
     ])
-    def test_violation_json_encoded_not_support_type_error(self, name, data: Any):
+    def test_violation_json_encoder_raises_type_error(self, name, data: Any):
         encoder = ViolationJSONEncoder()
         with self.assertRaises(TypeError):
             encoder.encode(data)
