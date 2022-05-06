@@ -56,7 +56,7 @@ Additional examples of a schema file with some YAML can be found in the [example
 
 ## How to run the CLI
 
-Assuming you have the YAML and Yamlator files, the CLI can be executed with:
+Assuming you have a YAML and Yamlator file, the CLI can be executed with:
 
 ```bash
 yamlator <path-to-yaml-file> -s <path-to-yamlator-schema>
