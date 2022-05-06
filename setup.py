@@ -12,7 +12,7 @@ def create_long_description():
         long_description = fh.read()
 
         # Replace the relative paths in the ReadMe.md
-        # to be links to the documentation in GitHub
+        # with links to the documentation in GitHub
         long_description = long_description.replace(
             './docs/schema_components.md',
             'https://github.com/Ryan95Z/yamlator/blob/main/docs/schema_components.md'

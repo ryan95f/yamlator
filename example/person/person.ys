@@ -1,0 +1,23 @@
+enum Employeedstatus {
+    EMPLOYED = "employed"
+    UNEMPLOYED = "unemployed"
+}
+
+ruleset Address {
+    houseNumber int
+    street str
+    city str
+    postCode str
+}
+
+ruleset Person {
+    name str
+    age int
+    address Address
+    isEmployee Employeedstatus optional
+}
+
+schema {
+    version str
+    person Person
+}
