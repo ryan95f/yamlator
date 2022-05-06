@@ -1,0 +1,9 @@
+version: v1
+person:
+  name: Test
+  age: 42
+  address:
+    houseNumber: 12
+    street: Fake Street
+    city: Fake City
+    postCode: FAKE 123

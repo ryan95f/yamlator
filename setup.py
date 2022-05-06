@@ -2,12 +2,35 @@
 
 import setuptools
 
-with open('README.md', 'r', encoding='utf-8') as fh:
-    long_description = fh.read()
-
 VERSION = '0.0.1'
 PACKAGE_NAME = 'yamlator'
 DESCRIPTION = 'Yamlator is a CLI tool that allows a YAML file to be validated using a lightweight schema language'  # nopep8
+
+
+def create_long_description():
+    with open('README.md', 'r', encoding='utf-8') as fh:
+        long_description = fh.read()
+
+        # Replace the relative paths in the ReadMe.md
+        # with links to the documentation in GitHub
+        long_description = long_description.replace(
+            './docs/schema_components.md',
+            'https://github.com/Ryan95Z/yamlator/blob/main/docs/schema_components.md'
+        )
+
+        long_description = long_description.replace(
+            './example/',
+            'https://github.com/Ryan95Z/yamlator/tree/main/example'
+        )
+
+        long_description = long_description.replace(
+            './docs/setting_up_the_environment.md',
+            'https://github.com/Ryan95Z/yamlator/blob/main/docs/setting_up_the_environment.md'  # nopep8
+        )
+        return long_description
+
+
+long_description = create_long_description()
 
 setuptools.setup(
     name=PACKAGE_NAME,
