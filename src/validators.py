@@ -139,6 +139,10 @@ class Validator:
                 is_required=is_required
             )
 
+    def _add_type_violation(self, key: str, parent: str, message: str) -> None:
+        violation = TypeViolation(key, parent, message)
+        self._violations.append(violation)
+
 
 class OptionalValidator(Validator):
     """Validator for handling optional rules"""
@@ -287,8 +291,7 @@ class ListValidator(Validator):
             return
 
         if not is_list_data:
-            violation = TypeViolation(key, parent, f'{key} should be of type list')
-            self._violations.append(violation)
+            self._add_type_violation(key, parent, f'{key} should be of type list')
             return
 
         for idx, item in enumerate(data):
@@ -369,8 +372,7 @@ class BuildInTypeValidator(Validator):
 
         if not isinstance(data, buildin_type.type):
             message = f'{key} should be of type {buildin_type.friendly_name}'
-            violation = TypeViolation(key, parent, message)
-            self._violations.append(violation)
+            self._add_type_violation(key, parent, message)
             return
 
         super().validate(key, data, parent, rtype, is_required)
@@ -398,8 +400,7 @@ class MapValidator(Validator):
             return
 
         if not is_map_data:
-            violation = TypeViolation(key, parent, f'{key} should be of type map')
-            self._violations.append(violation)
+            self._add_type_violation(key, parent, f'{key} should be of type map')
             return
 
         for child_key, value in data.items():
@@ -485,8 +486,7 @@ class EnumTypeValidator(Validator):
 
     def _add_enum_violation(self, key: str, parent: str, enum_name: str):
         message = f'{key} does not match any value in enum {enum_name}'
-        violation = TypeViolation(key, parent, message)
-        self._violations.append(violation)
+        self._add_type_violation(key, parent, message)
 
 
 class RegexValidator(Validator):
@@ -512,9 +512,7 @@ class RegexValidator(Validator):
             return
 
         if not isinstance(data, str):
-            message = f'{key} should be of type str'
-            violation = TypeViolation(key, parent, message)
-            self._violations.append(violation)
+            self._add_type_violation(key, parent, f'{key} should be of type str')
             return
 
         if not rtype.regex.search(data):
