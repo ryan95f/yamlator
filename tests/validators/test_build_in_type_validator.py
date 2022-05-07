@@ -26,8 +26,7 @@ class TestBuildInTypeValidator(BaseValidatorTest):
         ('bool_type_match_true', RuleType(SchemaTypes.BOOL), True, False),
         ('bool_type_match_false', RuleType(SchemaTypes.BOOL), False, False),
         ('bool_type_mismatch', RuleType(SchemaTypes.BOOL), "true", True),
-        ('regex_type', RuleType(SchemaTypes.REGEX, regex='^test'), "test", False),
-        ('regex_mismatch', RuleType(SchemaTypes.REGEX, regex='^test'), 100, False),
+        ('non_builtin_type', RuleType(SchemaTypes.REGEX, regex='^test'), "test", False),
     ])
     def test_build_in_type_validator(self, name: str, rtype: RuleType, data: Data,
                                      expect_violations: bool):

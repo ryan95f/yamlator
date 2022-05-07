@@ -101,6 +101,10 @@ class TestSchemaTransformer(unittest.TestCase):
         any_type = self.transformer.any_type(())
         self.assertEqual(SchemaTypes.ANY, any_type.type)
 
+    def test_bool_type(self):
+        bool_type = self.transformer.bool_type(())
+        self.assertEqual(SchemaTypes.BOOL, bool_type.type)
+
     def test_enum_item(self):
         enum_name = 'StatusCode'
         enum_value = 'success'
