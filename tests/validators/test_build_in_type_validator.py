@@ -3,7 +3,7 @@ import unittest
 from .base import BaseValidatorTest
 from parameterized import parameterized
 
-from src.types import Data
+from src.types import Data, Rule
 from src.types import RuleType
 from src.types import SchemaTypes
 from src.validators import BuildInTypeValidator
@@ -23,6 +23,9 @@ class TestBuildInTypeValidator(BaseValidatorTest):
         ('int_type_mismatch', RuleType(type=SchemaTypes.INT), 'hello', True),
         ('str_type_mismatch', RuleType(type=SchemaTypes.STR), None, True),
         ('float_type_mismatch', RuleType(type=SchemaTypes.FLOAT), 3, True),
+        ('bool_type_match_true', RuleType(SchemaTypes.BOOL), True, False),
+        ('bool_type_match_false', RuleType(SchemaTypes.BOOL), False, False),
+        ('bool_type_mismatch', RuleType(SchemaTypes.BOOL), "true", True),
         ('regex_type', RuleType(SchemaTypes.REGEX, regex='^test'), "test", False),
         ('regex_mismatch', RuleType(SchemaTypes.REGEX, regex='^test'), 100, False),
     ])

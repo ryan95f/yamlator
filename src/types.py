@@ -23,6 +23,7 @@ class SchemaTypes(Enum):
     RULESET = auto()
     ANY = auto()
     REGEX = auto()
+    BOOL = auto()
 
 
 class RuleType:

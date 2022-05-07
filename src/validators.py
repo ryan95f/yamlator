@@ -344,6 +344,7 @@ class BuildInTypeValidator(Validator):
             SchemaTypes.FLOAT: _SchemaTypeDecoder(float, "float"),
             SchemaTypes.LIST: _SchemaTypeDecoder(list, "list"),
             SchemaTypes.MAP: _SchemaTypeDecoder(dict, "map"),
+            SchemaTypes.BOOL: _SchemaTypeDecoder(bool, "bool"),
         }
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
