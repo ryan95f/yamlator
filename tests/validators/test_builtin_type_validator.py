@@ -6,10 +6,10 @@ from parameterized import parameterized
 from src.types import Data, Rule
 from src.types import RuleType
 from src.types import SchemaTypes
-from src.validators import BuildInTypeValidator
+from src.validators import BuiltInTypeValidator
 
 
-class TestBuildInTypeValidator(BaseValidatorTest):
+class TestBuiltInTypeValidator(BaseValidatorTest):
 
     @parameterized.expand([
         ('int_type_match', RuleType(type=SchemaTypes.INT), 1, False),
@@ -30,7 +30,7 @@ class TestBuildInTypeValidator(BaseValidatorTest):
     ])
     def test_build_in_type_validator(self, name: str, rtype: RuleType, data: Data,
                                      expect_violations: bool):
-        validator = BuildInTypeValidator(self.violations)
+        validator = BuiltInTypeValidator(self.violations)
         validator.validate(
             key=self.key,
             data=data,

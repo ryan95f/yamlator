@@ -7,7 +7,7 @@ from src.types import YamlatorRuleset
 
 from .any_type_validator import AnyTypeValidator
 from .base_validator import Validator
-from .builtin_type_validator import BuildInTypeValidator
+from .builtin_type_validator import BuiltInTypeValidator
 from .enum_type_validator import EnumTypeValidator
 from .list_validator import ListValidator
 from .map_validator import MapValidator
@@ -75,7 +75,7 @@ def _create_validators_chain(ruleset_lookups: dict,
     ruleset_validator = RulesetValidator(violations, ruleset_lookups)
     list_validator = ListValidator(violations)
     enum_validator = EnumTypeValidator(violations, enum_looksups)
-    type_validator = BuildInTypeValidator(violations)
+    type_validator = BuiltInTypeValidator(violations)
     regex_validator = RegexValidator(violations)
 
     root.set_next_validator(required_validator)

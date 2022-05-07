@@ -9,11 +9,11 @@ from .base_validator import Validator
 _SchemaTypeDecoder = namedtuple("SchemaTypeDecoder", ["type", "friendly_name"])
 
 
-class BuildInTypeValidator(Validator):
+class BuiltInTypeValidator(Validator):
     """Validator to handle the build in types. e.g `int`, `list` & `str`"""
 
     def __init__(self, violations: deque) -> None:
-        """BuildInTypeValidator init
+        """BuiltInTypeValidator init
 
         Args:
             violations (deque): Contains violations that have been detected
