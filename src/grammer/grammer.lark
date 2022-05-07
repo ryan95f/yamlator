@@ -33,11 +33,13 @@ type: int_type
      | any_type
      | container_type
      | regex_type
+     | bool_type
 
 str_type: "str"
 int_type: "int"
 any_type: "any"
 float_type: "float"
+bool_type: "bool"
 list_type: "list""(" type ")"
 map_type: "map""(" type ")"
 container_type: /[A-Z]{1}[a-z0-9_]+/

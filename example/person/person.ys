@@ -1,8 +1,3 @@
-enum Employeedstatus {
-    EMPLOYED = "employed"
-    UNEMPLOYED = "unemployed"
-}
-
 ruleset Address {
     houseNumber int
     street str
@@ -14,7 +9,7 @@ ruleset Person {
     name str
     age int
     address Address
-    isEmployee Employeedstatus optional
+    isEmployed bool optional
 }
 
 schema {

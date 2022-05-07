@@ -85,6 +85,7 @@ For each rule, the following basic types are supported:
 * `int` - Integer type
 * `float` - Float type
 * `str` - String type
+* `bool` - Boolean type
 * `list(<type>)` - List type where `<type>` defines the expected type of each item in the list.
 * `map(<type>)` - Map Type where `<type>` defines the expected type of the value.
 
