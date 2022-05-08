@@ -1,2 +1,6 @@
 message: hello world
 number: 42
+person:
+  name: Test Tester
+  age: 42
+  isEmployed: true

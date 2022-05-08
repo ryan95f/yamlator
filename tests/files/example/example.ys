@@ -1,4 +1,25 @@
+# Test the use of underscores
+enum Employee_department {
+    MANAGER = "manager"
+    LEAD = "lead"
+}
+
+ruleset PersonAddress {
+    houseNumber int
+    street str
+    city str
+    post_code str
+}
+
+ruleset Person {
+    name str
+    age int
+    address PersonAddress optional
+    isEmployed bool
+}
+
 schema {
     message str
     number int
+    person Person optional
 }
