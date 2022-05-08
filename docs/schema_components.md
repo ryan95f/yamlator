@@ -2,6 +2,16 @@
 
 Below are the various components that can be used to construct a schema with Yamlator. These constructs must be placed into a `.ys` file.
 
+* [Schema](#schema)
+* [Rulesets](#rulesets)
+* [Rules](#rules)
+* [RuleTypes](#rule-types)
+  * [Basic Types](#basic-types)
+  * [Any Type](#any-type)
+  * [Regex Type](#regex-type)
+  * [Ruleset Type](#ruleset-type)
+* [Enums](#enums)
+
 ## Schema
 
 A schema block defines the entry point that will be used during the validation process. Within the block a list of rules can be defined to indicate the root keys of a YAML file. For example, given the following YAML data:
@@ -24,7 +34,15 @@ Rules in the schema block following the exact same pattern that can be used in `
 
 ## Rulesets
 
-A ruleset allows for complex YAML structures to be defined. A ruleset is made up or 1 or more [rules](#rules) and the name of the ruleset must begin with a capital letter.
+A ruleset allows for complex YAML structures to be defined. A ruleset is made up or 1 or more [rules](#rules). T name of the ruleset must begin with a capital letter followed by lowercase letters, uppercase letters and underscores.
+
+The following are valid ruleset names:
+
+* `Employee`
+* `EmployeeDetails`
+* `Employee_Details`
+* `Employeedetails`
+* `Employee_details`
 
 Below is the basic definition of a user defined ruleset:
 
@@ -76,7 +94,7 @@ Required rules validate that the key is present in the YAML data. If the require
 
 ## Rule Types
 
-For each rule, a type can be specified to ensure that data meet the expect type.
+For each rule, a type can be specified to ensure that data aligns the expect type.
 
 ### Basic Types
 
@@ -203,9 +221,19 @@ schema {
 }
 ```
 
-### Enum Type
+## Enums
 
-Enums can be used to define a collection of string, integer and float constants. An enum name must start with a capital letter. A enum can be defined with:
+Enums can be used to define a collection of string, integer and float constants. An enum name must start with a capital letter followed by lowercase letters, uppercase letters or underscores.
+
+The following are valid enum names:
+
+* `Status`
+* `EmployeeStatus`
+* `Employee_Status`
+* `Employeestatus`
+* `Employee_status`
+
+A enum can be defined with:
 
 ```text
 enum <enum-name> {

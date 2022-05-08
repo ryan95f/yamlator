@@ -4,3 +4,4 @@ person:
   name: Test Tester
   age: 42
   isEmployed: true
+  department: lead

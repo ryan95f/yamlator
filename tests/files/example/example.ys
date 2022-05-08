@@ -16,6 +16,7 @@ ruleset Person {
     age int
     address PersonAddress optional
     isEmployed bool
+    department Employee_department
 }
 
 schema {
