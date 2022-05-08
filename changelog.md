@@ -4,7 +4,8 @@
 
 * Initial release of the Yamlator package
 
-## v0.0.2 (TBC)
+## v0.1.0 (TBC)
 
 * Added a `Regex` type to the schema to support regex validation
 * Added support for `integers` and `floats` in the `Enum` construct
+* Fixed bug with the the `Enum` and `Ruleset` construct names that prevented camel case from working

@@ -8,7 +8,7 @@ The project requires the following:
 
 ## Creating the virtual environment
 
-Before creating a virtual environment, ensure that the virtualenv package has been installed. This can be added to Python with:
+Before creating a virtual environment, ensure that the `virtualenv` package has been installed. This can be installed with:
 
 ```bash
 pip install virtualenv
@@ -17,7 +17,7 @@ pip install virtualenv
 Once `virtualenv` has been installed. A new virtual environment can be created with:
 
 ```bash
-python -m venv env
+python3 -m venv env
 ```
 
 Then activate the virtual environment with:
