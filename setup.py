@@ -37,6 +37,7 @@ setuptools.setup(
     version=VERSION,
     description=DESCRIPTION,
     long_description=long_description,
+    license='MIT',
     long_description_content_type='text/markdown',
     url='https://github.com/Ryan95Z/yamlator',
     author='Ryan Flynn',
