@@ -30,11 +30,11 @@ schema {
 }
 ```
 
-Rules in the schema block following the exact same pattern that can be used in `rulesets`. See [rules](#rules) for more information.
+Rules in the schema block follow the exact same pattern that can be used in `rulesets`. See [rules](#rules) for more information.
 
 ## Rulesets
 
-A ruleset allows for complex YAML structures to be defined. A ruleset is made up or 1 or more [rules](#rules). T name of the ruleset must begin with a capital letter followed by lowercase letters, uppercase letters and underscores.
+A ruleset allows for complex YAML structures to be defined. A ruleset is made up of 1 or more [rules](#rules). The name of the ruleset must begin with a capital letter followed by lowercase letters, uppercase letters or underscores.
 
 The following are valid ruleset names:
 
@@ -94,7 +94,7 @@ Required rules validate that the key is present in the YAML data. If the require
 
 ## Rule Types
 
-For each rule, a type can be specified to ensure that data aligns the expect type.
+For each rule, a type can be specified to validate the expected data type is present.
 
 ### Basic Types
 
@@ -107,7 +107,7 @@ For each rule, the following basic types are supported:
 * `list(<type>)` - List type where `<type>` defines the expected type of each item in the list.
 * `map(<type>)` - Map Type where `<type>` defines the expected type of the value.
 
-The list and map types support multiple nested structures which allows for complicated structures to be validated. The `<type>` for a map or list can be a ruleset, enum, any or a basic type.
+The list and map types support multiple nested structures which allows for complicated structures to be validated. The `<type>` for a map or list can be a ruleset, enum, list, map, any, regex or a basic type.
 
 A nested list in a rule can be defined as:
 
@@ -123,7 +123,7 @@ employees map(Employee)
 
 ### Any Type
 
-The `any` type allows for a key to be defined that does not require a type check. When the `any` type key is defind, all type checks are ignored and any data type may be used. When used only the required and optional checks are applied.
+The `any` type allows for a key to be defined that does not require a type check. When the `any` type key is used, all type checks are ignored and any data type may be used in the YAML data. When used only the required and optional checks are applied.
 
 An example of it in a ruleset:
 
