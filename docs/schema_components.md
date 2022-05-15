@@ -5,12 +5,13 @@ Below are the various components that can be used to construct a schema with Yam
 * [Schema](#schema)
 * [Rulesets](#rulesets)
 * [Rules](#rules)
+* [Enums](#enums)
 * [RuleTypes](#rule-types)
   * [Basic Types](#basic-types)
   * [Any Type](#any-type)
   * [Regex Type](#regex-type)
   * [Ruleset Type](#ruleset-type)
-* [Enums](#enums)
+  * [Enum Type](#enum-type)
 
 ## Schema
 
@@ -61,6 +62,45 @@ ruleset Project {
     name str
     users list(str) optional
     labels map(str) optional
+}
+```
+
+## Enums
+
+Enums can be used to define a collection of string, integer and float constants. An enum name must start with a capital letter followed by lowercase letters, uppercase letters or underscores.
+
+The following are valid enum names:
+
+* `Status`
+* `EmployeeStatus`
+* `Employee_Status`
+* `Employeestatus`
+* `Employee_status`
+
+A enum can be defined with:
+
+```text
+enum <enum-name> {
+    <key> = <value>
+}
+```
+
+For example, a enum of string constants for log levels:
+
+```text
+enum LogLevel {
+    ERR = "error"
+    INFO = "info"
+    DEBUG = "debug"
+}
+```
+
+An example of an enum with integers and floats:
+
+```text
+enum Numbers {
+    LIFE = 42
+    PI = 3.142
 }
 ```
 
@@ -205,10 +245,10 @@ ruleset Project {
 }
 ```
 
-Once the `Project` ruleset has been defined, it can be used within a ruleset with:
+Once the `Project` ruleset has been defined, it can be used as a rule type within a ruleset:
 
 ```text
-ruleset <name> {
+ruleset <ruleset-name> {
     project Project
 }
 ```
@@ -221,46 +261,28 @@ schema {
 }
 ```
 
-## Enums
+### Enum Type
 
-Enums can be used to define a collection of string, integer and float constants. An enum name must start with a capital letter followed by lowercase letters, uppercase letters or underscores.
+Enums can be referenced as a type within a rule to validate a key matches the constant value. For example, given the following YAML data:
 
-The following are valid enum names:
-
-* `Status`
-* `EmployeeStatus`
-* `Employee_Status`
-* `Employeestatus`
-* `Employee_status`
-
-A enum can be defined with:
-
-```text
-enum <enum-name> {
-    <key> = <value>
-}
+```yaml
+logMessage:
+    logLevel: error
+    message: An issue has occurred
 ```
 
-For example, a enum of string constants for log levels:
+Then a enum could represent the log levels with:
 
 ```text
 enum LogLevel {
     ERR = "error"
+    WARNING = "warning"
     INFO = "info"
-    DEBUG = "debug"
+    SUCCESS = "success"
 }
 ```
 
-An example of an enum with integers and floats:
-
-```text
-enum Numbers {
-    LIFE = 42
-    PI = 3.142
-}
-```
-
-Like a ruleset, enums can be referenced as a type within a rule. For example in a ruleset:
+Once we have the Enum, it can be used as a rule type for a ruleset with:
 
 ```text
 ruleset <ruleset-name> {
