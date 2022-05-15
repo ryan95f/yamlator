@@ -1,6 +1,6 @@
 # Schema components
 
-Below are the various components that can be used to construct a schema with Yamlator. These constructs must be placed into a `.ys` file.
+Below are the various components that can be used to construct a schema with Yamlator. These constructs must be placed into a schema file which ends with `.ys` extension.
 
 * [Schema](#schema)
 * [Rulesets](#rulesets)
@@ -145,7 +145,7 @@ For each rule, the following basic types are supported:
 * `str` - String type
 * `bool` - Boolean type
 * `list(<type>)` - List type where `<type>` defines the expected type of each item in the list.
-* `map(<type>)` - Map Type where `<type>` defines the expected type of the value.
+* `map(<type>)` - Map type where `<type>` defines the expected type of the value.
 
 The list and map types support multiple nested structures which allows for complicated structures to be validated. The `<type>` for a map or list can be a ruleset, enum, list, map, any, regex or a basic type.
 
@@ -263,7 +263,7 @@ schema {
 
 ### Enum Type
 
-Enums can be referenced as a type within a rule to validate a key matches the constant value. For example, given the following YAML data:
+Enums can be referenced as a type within a rule to validate that a key matches the constant value. For example, given the following YAML data:
 
 ```yaml
 logMessage:
