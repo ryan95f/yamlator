@@ -3,12 +3,12 @@ import unittest
 from .base import BaseValidatorTest
 from parameterized import parameterized
 
-from src.types import Data
-from src.types import Rule
-from src.types import RuleType
-from src.types import SchemaTypes
-from src.types import YamlatorRuleset
-from src.validators import RulesetValidator
+from yamlator.types import Data
+from yamlator.types import Rule
+from yamlator.types import RuleType
+from yamlator.types import SchemaTypes
+from yamlator.types import YamlatorRuleset
+from yamlator.validators import RulesetValidator
 
 
 class TestRuleSetValidator(BaseValidatorTest):

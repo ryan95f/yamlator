@@ -5,12 +5,12 @@ from typing import Iterator
 from unittest.mock import patch
 from parameterized import parameterized
 
-from src.cmd import ERR
-from src.cmd import SUCCESS
-from src.cmd import display_violations
-from src.cmd import DisplayMethod
-from src.violations import RequiredViolation
-from src.violations import Violation
+from yamlator.cmd import ERR
+from yamlator.cmd import SUCCESS
+from yamlator.cmd import display_violations
+from yamlator.cmd import DisplayMethod
+from yamlator.violations import RequiredViolation
+from yamlator.violations import Violation
 
 
 class TestDisplayViolations(unittest.TestCase):

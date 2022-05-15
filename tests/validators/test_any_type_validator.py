@@ -6,10 +6,10 @@ from unittest.mock import Mock
 from unittest.mock import patch
 from parameterized import parameterized
 
-from src.types import Data
-from src.types import RuleType
-from src.types import SchemaTypes
-from src.validators import AnyTypeValidator
+from yamlator.types import Data
+from yamlator.types import RuleType
+from yamlator.types import SchemaTypes
+from yamlator.validators import AnyTypeValidator
 
 
 class TestAnyTypeValidator(BaseValidatorTest):
@@ -25,7 +25,7 @@ class TestAnyTypeValidator(BaseValidatorTest):
             type=SchemaTypes.RULESET, lookup='value'), 1),
         ('is_int_type', 100, RuleType(type=SchemaTypes.INT), 1)
     ])
-    @patch('src.validators.Validator.validate')
+    @patch('yamlator.validators.Validator.validate')
     def test_any_type_validator(self, name: str, data: Data, rtype: RuleType,
                                 expected_validator_call_count: int,
                                 mock_parent_validator: Mock):

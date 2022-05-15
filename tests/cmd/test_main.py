@@ -5,10 +5,10 @@ from collections import namedtuple
 from parameterized import parameterized
 from unittest.mock import MagicMock, Mock, patch
 
-from src.cmd import ERR
-from src.cmd import SUCCESS
-from src.cmd import main
-from src.cmd import DisplayMethod
+from yamlator.cmd import ERR
+from yamlator.cmd import SUCCESS
+from yamlator.cmd import main
+from yamlator.cmd import DisplayMethod
 
 HELLO_YAML_FILE_PATH = './tests/files/example/example.yaml'
 HELLO_RULESET_FILE_PATH = './tests/files/example/example.ys'

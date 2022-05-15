@@ -3,8 +3,8 @@ import unittest
 from .base import BaseValidatorTest
 from parameterized import parameterized
 
-from src.types import Data
-from src.validators import RequiredValidator
+from yamlator.types import Data
+from yamlator.validators import RequiredValidator
 
 
 class TestRequiredValidator(BaseValidatorTest):

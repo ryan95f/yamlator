@@ -1,9 +1,9 @@
 from __future__ import annotations
 from collections import deque
 
-from src.types import Data
-from src.types import RuleType
-from src.violations import TypeViolation
+from yamlator.types import Data
+from yamlator.types import RuleType
+from yamlator.violations import TypeViolation
 
 
 class Validator:

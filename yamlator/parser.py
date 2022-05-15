@@ -11,16 +11,16 @@ from lark import UnexpectedInput
 from lark.exceptions import VisitError
 from typing import Any
 
-from src.types import Rule
-from src.types import ContainerTypes
-from src.types import YamlatorRuleset
-from src.types import YamlatorEnum
-from src.types import YamlatorType
-from src.types import RuleType
-from src.types import EnumItem
-from src.types import SchemaTypes
-from src.exceptions import ConstructNotFoundError
-from src.exceptions import SchemaParseError
+from yamlator.types import Rule
+from yamlator.types import ContainerTypes
+from yamlator.types import YamlatorRuleset
+from yamlator.types import YamlatorEnum
+from yamlator.types import YamlatorType
+from yamlator.types import RuleType
+from yamlator.types import EnumItem
+from yamlator.types import SchemaTypes
+from yamlator.exceptions import ConstructNotFoundError
+from yamlator.exceptions import SchemaParseError
 
 
 _package_dir = Path(__file__).parent.absolute()

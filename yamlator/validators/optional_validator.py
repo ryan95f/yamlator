@@ -1,15 +1,14 @@
-from src.types import Data
-from src.types import RuleType
-from src.types import SchemaTypes
+from yamlator.types import Data
+from yamlator.types import RuleType
 from .base_validator import Validator
 
 
-class AnyTypeValidator(Validator):
-    """Validator to handle the `any` type. This type ignores all type checks"""
+class OptionalValidator(Validator):
+    """Validator for handling optional rules"""
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
-        """Validate any rules that have the data marked as the `any` type
+        """Validate a key is an optional.
 
         Args:
             key              (str): The key to the data
@@ -19,8 +18,8 @@ class AnyTypeValidator(Validator):
             is_required     (bool): Is the rule required
         """
 
-        is_any_type = (rtype.type == SchemaTypes.ANY)
-        if is_any_type:
+        missing_data = data is None
+        if not is_required and missing_data:
             return
 
         super().validate(key, data, parent, rtype, is_required)

@@ -5,10 +5,10 @@ from typing import Iterator, Type
 from unittest.mock import patch
 from parameterized import parameterized
 
-from src.cmd import ERR, SUCCESS, JSONOutput
-from src.violations import RequiredViolation
-from src.violations import TypeViolation
-from src.violations import Violation
+from yamlator.cmd import ERR, SUCCESS, JSONOutput
+from yamlator.violations import RequiredViolation
+from yamlator.violations import TypeViolation
+from yamlator.violations import Violation
 
 
 class TestJSONOutput(unittest.TestCase):

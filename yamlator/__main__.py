@@ -1,5 +1,5 @@
 import sys
-from src.cmd import main
+from yamlator.cmd import main
 
 
 if __name__ == '__main__':

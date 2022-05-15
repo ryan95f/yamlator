@@ -1,14 +1,15 @@
-from src.types import Data
-from src.types import RuleType
+from yamlator.types import Data
+from yamlator.types import RuleType
+from yamlator.violations import RequiredViolation
 from .base_validator import Validator
 
 
-class OptionalValidator(Validator):
-    """Validator for handling optional rules"""
+class RequiredValidator(Validator):
+    """Validator for handling data that is required"""
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
-        """Validate a key is an optional.
+        """Validate a key is a required rule
 
         Args:
             key              (str): The key to the data
@@ -19,7 +20,9 @@ class OptionalValidator(Validator):
         """
 
         missing_data = data is None
-        if not is_required and missing_data:
+        if is_required and missing_data:
+            violation = RequiredViolation(key, parent)
+            self._violations.append(violation)
             return
 
         super().validate(key, data, parent, rtype, is_required)

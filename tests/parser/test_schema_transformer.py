@@ -3,11 +3,11 @@ import unittest
 
 from collections import namedtuple
 from parameterized import parameterized
-from src.exceptions import ConstructNotFoundError
+from yamlator.exceptions import ConstructNotFoundError
 
-from src.parser import SchemaTransformer
-from src.types import EnumItem, Rule, RuleType
-from src.types import YamlatorEnum, YamlatorRuleset, SchemaTypes
+from yamlator.parser import SchemaTransformer
+from yamlator.types import EnumItem, Rule, RuleType
+from yamlator.types import YamlatorEnum, YamlatorRuleset, SchemaTypes
 
 
 Token = namedtuple('Token', ['value'])

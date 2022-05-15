@@ -2,9 +2,9 @@ import unittest
 from typing import Type
 from parameterized import parameterized
 
-from src.utils import load_yaml_file
-from src.utils import load_schema
-from src.exceptions import InvalidSchemaFilenameError
+from yamlator.utils import load_yaml_file
+from yamlator.utils import load_schema
+from yamlator.exceptions import InvalidSchemaFilenameError
 
 
 class TestLoadYamlFile(unittest.TestCase):

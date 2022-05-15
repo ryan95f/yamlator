@@ -1,9 +1,9 @@
 from collections import deque
 from collections import namedtuple
 
-from src.types import Data
-from src.types import RuleType
-from src.types import SchemaTypes
+from yamlator.types import Data
+from yamlator.types import RuleType
+from yamlator.types import SchemaTypes
 from .base_validator import Validator
 
 _SchemaTypeDecoder = namedtuple("SchemaTypeDecoder", ["type", "friendly_name"])
