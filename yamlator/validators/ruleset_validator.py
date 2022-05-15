@@ -1,12 +1,12 @@
 from collections import deque
 from typing import Iterable
 
-from src.types import Data
-from src.types import Rule
-from src.types import RuleType
-from src.types import SchemaTypes
-from src.types import YamlatorRuleset
-from src.violations import RulesetTypeViolation
+from yamlator.types import Data
+from yamlator.types import Rule
+from yamlator.types import RuleType
+from yamlator.types import SchemaTypes
+from yamlator.types import YamlatorRuleset
+from yamlator.violations import RulesetTypeViolation
 from .base_validator import Validator
 
 

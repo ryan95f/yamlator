@@ -1,7 +1,7 @@
 import yaml
 import re
 
-from src.exceptions import InvalidSchemaFilenameError
+from yamlator.exceptions import InvalidSchemaFilenameError
 
 _YAMLER_SCHEMA_REGEX = re.compile(r'.ys$')
 _BACKSLASH_REGEX = re.compile(r'[\\]{1,2}')

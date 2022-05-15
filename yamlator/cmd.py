@@ -5,16 +5,16 @@ from abc import ABC
 from typing import Iterator
 from enum import Enum
 
-from src.utils import load_yaml_file
-from src.utils import load_schema
-from src.parser import SchemaSyntaxError
-from src.parser import parse_schema
-from src.validators import validate_yaml
+from yamlator.utils import load_yaml_file
+from yamlator.utils import load_schema
+from yamlator.parser import SchemaSyntaxError
+from yamlator.parser import parse_schema
+from yamlator.validators import validate_yaml
 
-from src.exceptions import InvalidSchemaFilenameError
-from src.exceptions import SchemaParseError
-from src.violations import Violation
-from src.violations import ViolationJSONEncoder
+from yamlator.exceptions import InvalidSchemaFilenameError
+from yamlator.exceptions import SchemaParseError
+from yamlator.violations import Violation
+from yamlator.violations import ViolationJSONEncoder
 
 SUCCESS = 0
 ERR = -1

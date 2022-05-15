@@ -3,14 +3,14 @@ import unittest
 
 from parameterized import parameterized
 
-from src.utils import load_schema
-from src.parser import parse_schema
-from src.utils import load_yaml_file
-from src.exceptions import SchemaParseError
-from src.parser import MalformedEnumNameError
-from src.parser import MalformedRulesetNameError
-from src.parser import MissingRulesError
-from src.parser import SchemaSyntaxError
+from yamlator.utils import load_schema
+from yamlator.parser import parse_schema
+from yamlator.utils import load_yaml_file
+from yamlator.exceptions import SchemaParseError
+from yamlator.parser import MalformedEnumNameError
+from yamlator.parser import MalformedRulesetNameError
+from yamlator.parser import MissingRulesError
+from yamlator.parser import SchemaSyntaxError
 
 
 class TestParseSchema(unittest.TestCase):

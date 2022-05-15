@@ -4,8 +4,8 @@ from typing import Type
 from collections import namedtuple
 from parameterized import parameterized
 
-from src.cmd import validate_yaml_data_from_file
-from src.exceptions import InvalidSchemaFilenameError
+from yamlator.cmd import validate_yaml_data_from_file
+from yamlator.exceptions import InvalidSchemaFilenameError
 
 EMPTY_STR = ""
 VALID_YAML_DATA_FILE_PATH = './tests/files/example/example.yaml'

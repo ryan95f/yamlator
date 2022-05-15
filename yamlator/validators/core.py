@@ -1,9 +1,9 @@
 from collections import deque
 from typing import Iterable
 
-from src.types import Data
-from src.types import Rule
-from src.types import YamlatorRuleset
+from yamlator.types import Data
+from yamlator.types import Rule
+from yamlator.types import YamlatorRuleset
 
 from .any_type_validator import AnyTypeValidator
 from .base_validator import Validator

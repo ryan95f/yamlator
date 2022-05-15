@@ -5,11 +5,11 @@ from collections import deque
 from parameterized import parameterized
 from dataclasses import dataclass
 
-from src.violations import BuiltInTypeViolation, RegexTypeViolation
-from src.violations import RequiredViolation
-from src.violations import RulesetTypeViolation
-from src.violations import TypeViolation
-from src.violations import ViolationJSONEncoder
+from yamlator.violations import BuiltInTypeViolation, RegexTypeViolation
+from yamlator.violations import RequiredViolation
+from yamlator.violations import RulesetTypeViolation
+from yamlator.violations import TypeViolation
+from yamlator.violations import ViolationJSONEncoder
 
 
 @dataclass

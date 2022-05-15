@@ -1,8 +1,8 @@
 import unittest
 
 from collections import deque
-from src.types import RuleType
-from src.types import SchemaTypes
+from yamlator.types import RuleType
+from yamlator.types import SchemaTypes
 
 
 class BaseValidatorTest(unittest.TestCase):

@@ -6,10 +6,10 @@ from unittest.mock import patch
 from unittest.mock import Mock
 from parameterized import parameterized
 
-from src.types import Data
-from src.types import RuleType
-from src.types import SchemaTypes
-from src.validators import MapValidator
+from yamlator.types import Data
+from yamlator.types import RuleType
+from yamlator.types import SchemaTypes
+from yamlator.validators import MapValidator
 
 
 class TestMapValidator(BaseValidatorTest):
@@ -38,7 +38,7 @@ class TestMapValidator(BaseValidatorTest):
             type=SchemaTypes.MAP, sub_type=RuleType(type=SchemaTypes.STR),
         ), 0, 1),
     ])
-    @patch('src.validators.Validator.validate')
+    @patch('yamlator.validators.Validator.validate')
     def test_map_validator(self, name: str, data: Data, rtype: RuleType,
                            expected_parent_call_count: int,
                            expected_violation_count: int,
