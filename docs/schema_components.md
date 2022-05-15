@@ -1,16 +1,17 @@
 # Schema components
 
-Below are the various components that can be used to construct a schema with Yamlator. These constructs must be placed into a `.ys` file.
+Below are the various components that can be used to construct a schema with Yamlator. These constructs must be placed into a schema file which ends with `.ys` extension.
 
 * [Schema](#schema)
 * [Rulesets](#rulesets)
 * [Rules](#rules)
+* [Enums](#enums)
 * [RuleTypes](#rule-types)
   * [Basic Types](#basic-types)
   * [Any Type](#any-type)
   * [Regex Type](#regex-type)
   * [Ruleset Type](#ruleset-type)
-* [Enums](#enums)
+  * [Enum Type](#enum-type)
 
 ## Schema
 
@@ -64,6 +65,45 @@ ruleset Project {
 }
 ```
 
+## Enums
+
+Enums can be used to define a collection of string, integer and float constants. An enum name must start with a capital letter followed by lowercase letters, uppercase letters or underscores.
+
+The following are valid enum names:
+
+* `Status`
+* `EmployeeStatus`
+* `Employee_Status`
+* `Employeestatus`
+* `Employee_status`
+
+A enum can be defined with:
+
+```text
+enum <enum-name> {
+    <key> = <value>
+}
+```
+
+For example, a enum of string constants for log levels:
+
+```text
+enum LogLevel {
+    ERR = "error"
+    INFO = "info"
+    DEBUG = "debug"
+}
+```
+
+An example of an enum with integers and floats:
+
+```text
+enum Numbers {
+    LIFE = 42
+    PI = 3.142
+}
+```
+
 ## Rules
 
 A rule defines the basic checks that will compared against the YAML file. The name of the rule should match the expected key in the YAML file. For example, if we had the following data:
@@ -105,7 +145,7 @@ For each rule, the following basic types are supported:
 * `str` - String type
 * `bool` - Boolean type
 * `list(<type>)` - List type where `<type>` defines the expected type of each item in the list.
-* `map(<type>)` - Map Type where `<type>` defines the expected type of the value.
+* `map(<type>)` - Map type where `<type>` defines the expected type of the value.
 
 The list and map types support multiple nested structures which allows for complicated structures to be validated. The `<type>` for a map or list can be a ruleset, enum, list, map, any, regex or a basic type.
 
@@ -205,10 +245,10 @@ ruleset Project {
 }
 ```
 
-Once the `Project` ruleset has been defined, it can be used within a ruleset with:
+Once the `Project` ruleset has been defined, it can be used as a rule type within a ruleset:
 
 ```text
-ruleset <name> {
+ruleset <ruleset-name> {
     project Project
 }
 ```
@@ -221,46 +261,28 @@ schema {
 }
 ```
 
-## Enums
+### Enum Type
 
-Enums can be used to define a collection of string, integer and float constants. An enum name must start with a capital letter followed by lowercase letters, uppercase letters or underscores.
+Enums can be referenced as a type within a rule to validate that a key matches the constant value. For example, given the following YAML data:
 
-The following are valid enum names:
-
-* `Status`
-* `EmployeeStatus`
-* `Employee_Status`
-* `Employeestatus`
-* `Employee_status`
-
-A enum can be defined with:
-
-```text
-enum <enum-name> {
-    <key> = <value>
-}
+```yaml
+logMessage:
+    logLevel: error
+    message: An issue has occurred
 ```
 
-For example, a enum of string constants for log levels:
+Then a enum could represent the log levels with:
 
 ```text
 enum LogLevel {
     ERR = "error"
+    WARNING = "warning"
     INFO = "info"
-    DEBUG = "debug"
+    SUCCESS = "success"
 }
 ```
 
-An example of an enum with integers and floats:
-
-```text
-enum Numbers {
-    LIFE = 42
-    PI = 3.142
-}
-```
-
-Like a ruleset, enums can be referenced as a type within a rule. For example in a ruleset:
+Once we have the Enum, it can be used as a rule type for a ruleset with:
 
 ```text
 ruleset <ruleset-name> {
