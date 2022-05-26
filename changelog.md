@@ -14,4 +14,4 @@
 
 ## v0.1.1 (26th May 2022)
 
-* Updated urls in the `README.md` and `setup.py` to username change
+* Updated urls in the `README.md` and `setup.py` to reflect the username change
