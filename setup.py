@@ -2,7 +2,7 @@
 
 import setuptools
 
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 PACKAGE_NAME = 'yamlator'
 DESCRIPTION = 'Yamlator is a CLI tool that allows a YAML file to be validated using a lightweight schema language'  # nopep8
 
@@ -15,17 +15,17 @@ def create_long_description():
         # with links to the documentation in GitHub
         long_description = long_description.replace(
             './docs/schema_components.md',
-            'https://github.com/Ryan95Z/yamlator/blob/main/docs/schema_components.md'
+            'https://github.com/ryan95f/yamlator/blob/main/docs/schema_components.md'
         )
 
         long_description = long_description.replace(
             './example/',
-            'https://github.com/Ryan95Z/yamlator/tree/main/example'
+            'https://github.com/ryan95f/yamlator/tree/main/example'
         )
 
         long_description = long_description.replace(
             './docs/setting_up_the_environment.md',
-            'https://github.com/Ryan95Z/yamlator/blob/main/docs/setting_up_the_environment.md'  # nopep8
+            'https://github.com/ryan95f/yamlator/blob/main/docs/setting_up_the_environment.md'  # nopep8
         )
         return long_description
 
@@ -39,7 +39,7 @@ setuptools.setup(
     long_description=long_description,
     license='MIT',
     long_description_content_type='text/markdown',
-    url='https://github.com/Ryan95Z/yamlator',
+    url='https://github.com/ryan95f/yamlator',
     author='Ryan Flynn',
     packages=setuptools.find_packages(include=['yamlator', 'yamlator.validators']),
     install_requires=[
