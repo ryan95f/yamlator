@@ -169,12 +169,12 @@ class TestSchemaTransformer(unittest.TestCase):
 
     def test_int_transform(self):
         expected_value = 42
-        actual_value = self.transformer.INT("42")
+        actual_value = self.transformer.integer("42")
         self.assertEqual(expected_value, actual_value)
 
     def test_float_transform(self):
         expected_value = 3.142
-        actual_value = self.transformer.FLOAT("3.142")
+        actual_value = self.transformer.float("3.142")
         self.assertEqual(expected_value, actual_value)
 
     @parameterized.expand([
@@ -184,7 +184,7 @@ class TestSchemaTransformer(unittest.TestCase):
         ('empty_string', '', '')
     ])
     def test_escaped_string_transform(self, name: str, string_token: str, expected: str):
-        actual = self.transformer.ESCAPED_STRING(string_token)
+        actual = self.transformer.string(string_token)
         self.assertEqual(expected, actual)
 
 
