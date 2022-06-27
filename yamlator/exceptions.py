@@ -1,3 +1,5 @@
+"""Custom exceptions used by Yamlator"""
+
 class InvalidSchemaFilenameError(RuntimeError):
     """When the schema filename does not match the expected pattern"""
 
@@ -22,7 +24,8 @@ class ConstructNotFoundError(RuntimeError):
         Args:
             construct_name (str): The name of the Enum or Ruleset construct
         """
-        message = f"Type {construct_name} was not found in the schema definition"
+        message = f'Type {construct_name} was not found in \
+                  the schema definition'
         super().__init__(message)
 
 
