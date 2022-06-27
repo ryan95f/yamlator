@@ -1,7 +1,10 @@
+"""Validator for the any time data type"""
+
+
 from yamlator.types import Data
 from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
-from .base_validator import Validator
+from yamlator.validators.base_validator import Validator
 
 
 class AnyTypeValidator(Validator):
