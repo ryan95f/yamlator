@@ -1,10 +1,13 @@
+"""Built in type validator"""
+
+
 from collections import deque
 from collections import namedtuple
 
 from yamlator.types import Data
 from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
-from yamlator.validators import Validator
+from yamlator.validators.base_validator import Validator
 
 _SchemaTypeDecoder = namedtuple('SchemaTypeDecoder', ['type', 'friendly_name'])
 

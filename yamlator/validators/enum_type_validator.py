@@ -1,9 +1,11 @@
+"""Validator for handling Enum constructs in the Yamlator schema"""
+
 from collections import deque
 
 from yamlator.types import Data
 from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
-from .base_validator import Validator
+from yamlator.validators.base_validator import Validator
 
 
 class EnumTypeValidator(Validator):

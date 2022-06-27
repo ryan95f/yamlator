@@ -1,3 +1,7 @@
+"""Provides the core functions and entry point to the
+validator handler chian.
+"""
+
 from collections import deque
 from typing import Iterable
 
@@ -41,7 +45,8 @@ def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
 
     entry_parent = '-'
     violations = deque()
-    entry_point: YamlatorRuleset = instructions.get('main', YamlatorRuleset('main', []))
+    entry_point: YamlatorRuleset = instructions.get('main',
+                                                    YamlatorRuleset('main', []))
 
     validators = _create_validators_chain(
         ruleset_lookups=instructions.get('rules', {}),
