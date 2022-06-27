@@ -1,3 +1,6 @@
+"""Validator for handling required rules in the Yamlator schema"""
+
+
 from yamlator.types import Data
 from yamlator.types import RuleType
 from yamlator.violations import RequiredViolation

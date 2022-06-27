@@ -1,3 +1,6 @@
+"""Validator for handling rulesets in the Yamlator schema"""
+
+
 from collections import deque
 from typing import Iterable
 
