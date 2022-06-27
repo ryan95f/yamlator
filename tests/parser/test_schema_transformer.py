@@ -19,10 +19,10 @@ class TestSchemaTransformer(unittest.TestCase):
         self.name_token = Token('message')
         self.status_code_token = Token('StatusCode')
 
-        self.str_rtype = RuleType(type=SchemaTypes.STR)
+        self.str_rtype = RuleType(schema_type=SchemaTypes.STR)
         self.ruleset_rules = [
-            Rule('name', RuleType(type=SchemaTypes.STR), True),
-            Rule('age', RuleType(type=SchemaTypes.INT), True),
+            Rule('name', RuleType(schema_type=SchemaTypes.STR), True),
+            Rule('age', RuleType(schema_type=SchemaTypes.INT), True),
         ]
 
     def test_required_rule(self):
@@ -59,7 +59,7 @@ class TestSchemaTransformer(unittest.TestCase):
                 'error': EnumItem('ERR', 'error')
             }),
             YamlatorRuleset('main', [
-                Rule('message', RuleType(type=SchemaTypes.STR), True)
+                Rule('message', RuleType(schema_type=SchemaTypes.STR), True)
             ])
         ]
 
@@ -73,37 +73,37 @@ class TestSchemaTransformer(unittest.TestCase):
 
     def test_str_type(self):
         str_rule_type = self.transformer.str_type(())
-        self.assertEqual(SchemaTypes.STR, str_rule_type.type)
+        self.assertEqual(SchemaTypes.STR, str_rule_type.schema_type)
 
     def test_int_type(self):
         int_rule_type = self.transformer.int_type(())
-        self.assertEqual(SchemaTypes.INT, int_rule_type.type)
+        self.assertEqual(SchemaTypes.INT, int_rule_type.schema_type)
 
     def test_float_type(self):
         float_rule_type = self.transformer.float_type(())
-        self.assertEqual(SchemaTypes.FLOAT, float_rule_type.type)
+        self.assertEqual(SchemaTypes.FLOAT, float_rule_type.schema_type)
 
     def test_list_type(self):
         tokens = (self.str_rtype, )
         list_type = self.transformer.list_type(tokens)
 
-        self.assertEqual(SchemaTypes.LIST, list_type.type)
+        self.assertEqual(SchemaTypes.LIST, list_type.schema_type)
         self.assertEqual(tokens[0], list_type.sub_type)
 
     def test_map_type(self):
         tokens = (self.str_rtype, )
         map_type = self.transformer.map_type(tokens)
 
-        self.assertEqual(SchemaTypes.MAP, map_type.type)
+        self.assertEqual(SchemaTypes.MAP, map_type.schema_type)
         self.assertEqual(tokens[0], map_type.sub_type)
 
     def test_any_type(self):
         any_type = self.transformer.any_type(())
-        self.assertEqual(SchemaTypes.ANY, any_type.type)
+        self.assertEqual(SchemaTypes.ANY, any_type.schema_type)
 
     def test_bool_type(self):
         bool_type = self.transformer.bool_type(())
-        self.assertEqual(SchemaTypes.BOOL, bool_type.type)
+        self.assertEqual(SchemaTypes.BOOL, bool_type.schema_type)
 
     def test_enum_item(self):
         enum_name = 'StatusCode'
@@ -131,7 +131,7 @@ class TestSchemaTransformer(unittest.TestCase):
         token = Token("Employee")
         self.transformer.seen_constructs = {'Employee': SchemaTypes.RULESET}
         rule = self.transformer.container_type(token)
-        self.assertEqual(rule.type, SchemaTypes.RULESET)
+        self.assertEqual(rule.schema_type, SchemaTypes.RULESET)
 
     @parameterized.expand([
         ('with_existing_constructs', {
@@ -153,7 +153,7 @@ class TestSchemaTransformer(unittest.TestCase):
 
         rule_type = self.transformer.regex_type((token, ))
         self.assertEqual(expected_regex_str, rule_type.regex)
-        self.assertEqual(rule_type.type, SchemaTypes.REGEX)
+        self.assertEqual(rule_type.schema_type, SchemaTypes.REGEX)
 
     def test_type(self):
         type_token = self.transformer.type((self.name_token, ))

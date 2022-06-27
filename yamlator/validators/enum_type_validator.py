@@ -34,7 +34,7 @@ class EnumTypeValidator(Validator):
             rtype       (RuleType): The type assigned to the rule
             is_required     (bool): Is the rule required
         """
-        is_enum_type = (rtype.type == SchemaTypes.ENUM)
+        is_enum_type = (rtype.schema_type == SchemaTypes.ENUM)
         if not is_enum_type:
             super().validate(key, data, parent, rtype, is_required)
             return

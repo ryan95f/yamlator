@@ -30,7 +30,7 @@ class ListValidator(Validator):
             is_required     (bool): Is the rule required
         """
         is_list_data = isinstance(data, list)
-        is_list_rule = (rtype.type == SchemaTypes.LIST)
+        is_list_rule = (rtype.schema_type == SchemaTypes.LIST)
 
         if not is_list_rule:
             super().validate(key, data, parent, rtype, is_required)
@@ -41,7 +41,7 @@ class ListValidator(Validator):
             return
 
         for idx, item in enumerate(data):
-            current_key = f"{key}[{idx}]"
+            current_key = f'{key}[{idx}]'
 
             # loop over any nested lists
             self.validate(
@@ -62,7 +62,7 @@ class ListValidator(Validator):
 
     def _run_ruleset_validator(self, key: str, parent: str, data: Data, rtype: RuleType):
         has_ruleset_validator = (self.ruleset_validator is not None)
-        is_ruleset_rule = (rtype.type == SchemaTypes.RULESET)
+        is_ruleset_rule = (rtype.schema_type == SchemaTypes.RULESET)
 
         if has_ruleset_validator and is_ruleset_rule:
             self.ruleset_validator.validate(

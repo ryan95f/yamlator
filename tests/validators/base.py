@@ -9,5 +9,5 @@ class BaseValidatorTest(unittest.TestCase):
     def setUp(self):
         self.parent = '-'
         self.key = 'msg'
-        self.rtype = RuleType(type=SchemaTypes.STR)
+        self.rtype = RuleType(schema_type=SchemaTypes.STR)
         self.violations = deque()

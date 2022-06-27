@@ -18,7 +18,7 @@ class MapValidator(Validator):
             rtype       (RuleType): The type assigned to the rule
             is_required     (bool): Is the rule required
         """
-        is_map_rule = (rtype.type == SchemaTypes.MAP)
+        is_map_rule = (rtype.schema_type == SchemaTypes.MAP)
         is_map_data = isinstance(data, dict)
 
         if not is_map_rule:

@@ -4,9 +4,9 @@ from collections import namedtuple
 from yamlator.types import Data
 from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
-from .base_validator import Validator
+from yamlator.validators import Validator
 
-_SchemaTypeDecoder = namedtuple("SchemaTypeDecoder", ["type", "friendly_name"])
+_SchemaTypeDecoder = namedtuple('SchemaTypeDecoder', ['type', 'friendly_name'])
 
 
 class BuiltInTypeValidator(Validator):
@@ -21,12 +21,12 @@ class BuiltInTypeValidator(Validator):
         """
         super().__init__(violations)
         self._built_in_lookups = {
-            SchemaTypes.INT: _SchemaTypeDecoder(int, "int"),
-            SchemaTypes.STR: _SchemaTypeDecoder(str, "str"),
-            SchemaTypes.FLOAT: _SchemaTypeDecoder(float, "float"),
-            SchemaTypes.LIST: _SchemaTypeDecoder(list, "list"),
-            SchemaTypes.MAP: _SchemaTypeDecoder(dict, "map"),
-            SchemaTypes.BOOL: _SchemaTypeDecoder(bool, "bool"),
+            SchemaTypes.INT: _SchemaTypeDecoder(int, 'int'),
+            SchemaTypes.STR: _SchemaTypeDecoder(str, 'str'),
+            SchemaTypes.FLOAT: _SchemaTypeDecoder(float, 'float'),
+            SchemaTypes.LIST: _SchemaTypeDecoder(list, 'list'),
+            SchemaTypes.MAP: _SchemaTypeDecoder(dict, 'map'),
+            SchemaTypes.BOOL: _SchemaTypeDecoder(bool, 'bool'),
         }
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
@@ -42,7 +42,7 @@ class BuiltInTypeValidator(Validator):
             rtype       (RuleType): The type assigned to the rule
             is_required     (bool): Is the rule required
         """
-        buildin_type = self._built_in_lookups.get(rtype.type)
+        buildin_type = self._built_in_lookups.get(rtype.schema_type)
         is_not_build_in_type = (buildin_type is None)
 
         if is_not_build_in_type:

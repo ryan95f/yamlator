@@ -14,28 +14,28 @@ from yamlator.validators import MapValidator
 
 class TestMapValidator(BaseValidatorTest):
     @parameterized.expand([
-        ('with_str_rule_type', 'hello', RuleType(type=SchemaTypes.STR), 1, 0),
+        ('with_str_rule_type', 'hello', RuleType(schema_type=SchemaTypes.STR), 1, 0),
         ('with_ruleset_rule_type', {'message': 'hello'}, RuleType(
-            type=SchemaTypes.RULESET, lookup='message'
+            schema_type=SchemaTypes.RULESET, lookup='message'
         ), 1, 0),
         ('with_map_rule_type', {'message1': 'wow', 'message2': 'wow'}, RuleType(
-            type=SchemaTypes.MAP, sub_type=RuleType(type=SchemaTypes.STR)
+            schema_type=SchemaTypes.MAP, sub_type=RuleType(schema_type=SchemaTypes.STR)
         ), 2, 0),
         ('with_nested_map_rule_type', {'hello': {'message1': 'test'}}, RuleType(
-            type=SchemaTypes.MAP,
+            schema_type=SchemaTypes.MAP,
             sub_type=RuleType(
-                type=SchemaTypes.MAP,
-                sub_type=RuleType(type=SchemaTypes.STR)
+                schema_type=SchemaTypes.MAP,
+                sub_type=RuleType(schema_type=SchemaTypes.STR)
             )
         ), 1, 0),
         ('with_map_rule_none_data', None, RuleType(
-            type=SchemaTypes.MAP, sub_type=RuleType(type=SchemaTypes.STR),
+            schema_type=SchemaTypes.MAP, sub_type=RuleType(schema_type=SchemaTypes.STR),
         ), 0, 1),
         ('with_map_rule_str_data', "hello world", RuleType(
-            type=SchemaTypes.MAP, sub_type=RuleType(type=SchemaTypes.STR),
+            schema_type=SchemaTypes.MAP, sub_type=RuleType(schema_type=SchemaTypes.STR),
         ), 0, 1),
         ('with_map_rule_list_data', [0, 1, 2], RuleType(
-            type=SchemaTypes.MAP, sub_type=RuleType(type=SchemaTypes.STR),
+            schema_type=SchemaTypes.MAP, sub_type=RuleType(schema_type=SchemaTypes.STR),
         ), 0, 1),
     ])
     @patch('yamlator.validators.Validator.validate')

@@ -19,7 +19,7 @@ class AnyTypeValidator(Validator):
             is_required     (bool): Is the rule required
         """
 
-        is_any_type = (rtype.type == SchemaTypes.ANY)
+        is_any_type = (rtype.schema_type == SchemaTypes.ANY)
         if is_any_type:
             return
 

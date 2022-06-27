@@ -126,31 +126,31 @@ class SchemaTransformer(Transformer):
 
     def str_type(self, _: Any) -> RuleType:
         """Transforms a string type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.STR)
+        return RuleType(schema_type=SchemaTypes.STR)
 
     def int_type(self, _: Any) -> RuleType:
         """Transforms a int type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.INT)
+        return RuleType(schema_type=SchemaTypes.INT)
 
     def float_type(self, _: Any) -> RuleType:
         """Transforms a float type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.FLOAT)
+        return RuleType(schema_type=SchemaTypes.FLOAT)
 
     def list_type(self, tokens: Any) -> RuleType:
         """Transforms a list type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.LIST, sub_type=tokens[0])
+        return RuleType(schema_type=SchemaTypes.LIST, sub_type=tokens[0])
 
     def map_type(self, tokens: Any) -> RuleType:
         """Transforms a map type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.MAP, sub_type=tokens[0])
+        return RuleType(schema_type=SchemaTypes.MAP, sub_type=tokens[0])
 
     def any_type(self, _: Any) -> RuleType:
         """Transforms the any type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.ANY)
+        return RuleType(schema_type=SchemaTypes.ANY)
 
     def bool_type(self, _: Any) -> RuleType:
         """Transforms a bool type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.BOOL)
+        return RuleType(schema_type=SchemaTypes.BOOL)
 
     def enum_item(self, tokens: Any) -> EnumItem:
         """Transforms a enum item token into a EnumItem object"""
@@ -179,12 +179,12 @@ class SchemaTransformer(Transformer):
         schema_type = self.seen_constructs.get(name)
         if schema_type is None:
             raise ConstructNotFoundError(name)
-        return RuleType(type=schema_type, lookup=name)
+        return RuleType(schema_type=schema_type, lookup=name)
 
     def regex_type(self, tokens: Any) -> RuleType:
         """Transforms a regex type token into a RuleType object"""
         (regex, ) = tokens
-        return RuleType(type=SchemaTypes.REGEX, regex=regex)
+        return RuleType(schema_type=SchemaTypes.REGEX, regex=regex)
 
     def type(self, tokens: Any) -> Any:
         """Extracts the type tokens and passes them through onto
@@ -230,7 +230,7 @@ class _EnumInstructionHandler(_InstructionHandler):
         self._enums = enums
 
     def handle(self, instruction: YamlatorType) -> None:
-        if instruction.type != ContainerTypes.ENUM:
+        if instruction.container_type != ContainerTypes.ENUM:
             super().handle(instruction)
             return
 
@@ -243,7 +243,7 @@ class _RulesetInstructionHandler(_InstructionHandler):
         self._rulesets = rulesets
 
     def handle(self, instruction: YamlatorType) -> None:
-        if instruction.type != ContainerTypes.RULESET:
+        if instruction.container_type != ContainerTypes.RULESET:
             super().handle(instruction)
             return
 
