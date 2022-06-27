@@ -1,3 +1,6 @@
+"""Handles the command line utility functions and entry point"""
+
+
 import argparse
 import json
 
@@ -31,7 +34,10 @@ def main() -> int:
     violations = []
 
     try:
-        violations = validate_yaml_data_from_file(args.file, args.ruleset_schema)
+        violations = validate_yaml_data_from_file(
+            yaml_filepath=args.file,
+            schema_filepath=args.ruleset_schema
+        )
     except SchemaParseError as ex:
         print(ex)
         return ERR
@@ -53,18 +59,22 @@ def main() -> int:
 
 
 def _create_args_parser():
-    description = 'Yamlator is a CLI tool that allows a YAML file to be validated using a lightweight schema language'  # nopep8
+    description = 'Yamlator is a CLI tool that allows a YAML file to be \
+                  validated using a lightweight schema language'
 
     parser = argparse.ArgumentParser(prog='yamlator', description=description)
     parser.add_argument('file', type=str,
                         help='The YAML file to be validated')
 
-    parser.add_argument('-s', '--schema', type=str, required=True, dest='ruleset_schema',
-                        help='The schama that will be used to validate the YAML file')
+    parser.add_argument('-s', '--schema', type=str, required=True,
+                        dest='ruleset_schema',
+                        help='The schama that will be used to \
+                        validate the YAML file')
 
-    parser.add_argument('-o', '--output', type=str, required=False, default='table',
-                        choices=['table', 'json'],
-                        help='Defines the format that will be displayed for the violations')  # nopep8
+    parser.add_argument('-o', '--output', type=str, required=False,
+                        default='table', choices=['table', 'json'],
+                        help='Defines the format that will be displayed \
+                        for the violations')
     return parser
 
 
@@ -83,8 +93,8 @@ def validate_yaml_data_from_file(yaml_filepath: str,
     Raises:
         ValueError: If either argument is `None` or an empty string
         FileNotFoundError: If either argument cannot be found on the file system
-        InvalidSchemaFilenameError: If `schema_filepath` does not have a valid filename
-        that ends with the `.ys` extension.
+        InvalidSchemaFilenameError: If `schema_filepath` does not have
+        a valid filename that ends with the `.ys` extension.
     """
     yaml_data = load_yaml_file(yaml_filepath)
     ruleset_data = load_schema(schema_filepath)
@@ -95,8 +105,8 @@ def validate_yaml_data_from_file(yaml_filepath: str,
 
 class DisplayMethod(Enum):
     """Represents the supported violation display methods"""
-    TABLE = "table"
-    JSON = "json"
+    TABLE = 'table'
+    JSON = 'json'
 
 
 def display_violations(violations: Iterator[Violation],
@@ -117,10 +127,10 @@ def display_violations(violations: Iterator[Violation],
         ValueError: If `violations` or `method` is None
     """
     if violations is None:
-        raise ValueError("violations should not be None")
+        raise ValueError('violations should not be None')
 
     if method is None:
-        raise ValueError("method should not be None")
+        raise ValueError('method should not be None')
 
     if method == DisplayMethod.JSON:
         return JSONOutput.display(violations)
@@ -130,6 +140,7 @@ def display_violations(violations: Iterator[Violation],
 class ViolationOutput(ABC):
     """Base class for displaying violations"""
 
+    @staticmethod
     def display(violations: Iterator[Violation]) -> int:
         """Display the violations to the user
 
@@ -137,8 +148,8 @@ class ViolationOutput(ABC):
             violations (Iterator[Violation]): A collection of violations
 
         Returns:
-            The status code if violations were found. 0 = no violations were found
-            and -1 = violations were found
+            The status code if violations were found. 0 = no
+            violations were found and -1 = violations were found
         """
         pass
 
@@ -146,6 +157,7 @@ class ViolationOutput(ABC):
 class TableOutput(ViolationOutput):
     """Displays violations as a table"""
 
+    @staticmethod
     def display(violations: Iterator[Violation]) -> int:
         """Display the violations to the user as a table
 
@@ -153,55 +165,58 @@ class TableOutput(ViolationOutput):
             violations (Iterator[Violation]): A collection of violations
 
         Returns:
-            The status code if violations were found. 0 = no violations were found
-            and -1 = violations were found
+            The status code if violations were found. 0 = no
+            violations were found and -1 = violations were found
         """
         if violations is None:
-            raise ValueError("violations should not be None")
+            raise ValueError('violations should not be None')
 
         violation_count = len(violations)
-        print("\n{:<4} violation(s) found".format(violation_count))
+        print(f'\n{violation_count:<4} violation(s) found')
 
         has_violations = violation_count != 0
         if not has_violations:
             return SUCCESS
 
-        print('\n{:<30} {:<20} {:<15} {:20}'.format(
-                'Parent Key', 'Key', 'Violation', 'Message'))
-        print('---------------------------------------------------------------------------')  # nopep8
+        parent_title = 'Parent Key'
+        key_title = 'Key'
+        violation_title = 'Violation'
+        message_title = 'Message'
+        print(f'\n{parent_title:<30} {key_title:<20} {violation_title:<15} {message_title:<20}') # pylint: disable=C0301
+
+        print('---------------------------------------------------------------------------')  # nopep8 pylint: disable=C0301
         for violation in violations:
-            print('{:<30} {:<20} {:<15} {:20}'.format(
-                violation.parent,
-                violation.key,
-                violation.violation_type,
-                violation.message))
-        print('---------------------------------------------------------------------------')  # nopep8
+            print(f'{violation.parent:<30} {violation.key:<20} {violation.violation_type:<15} {violation.message:<20}') # pylint: disable=C0301
+        print('---------------------------------------------------------------------------')  # nopep8 pylint: disable=C0301
         return ERR
 
 
 class JSONOutput(ViolationOutput):
     """Displays violations as JSON"""
 
+    @staticmethod
     def display(violations: Iterator[Violation]) -> int:
         """Display the violations to the user as JSON
 
         Args:
-            violations (Iterator[Violation]): A collection of violations
+            violations (Iterator[Violation]): A collection
+            of violations
 
         Returns:
-            The status code if violations were found. 0 = no violations were found
-            and -1 = violations were found
+            The status code if violations were found. 0 = no
+            violations were found and -1 = violations were found
         """
         if violations is None:
-            raise ValueError("violations should not be None")
+            raise ValueError('violations should not be None')
 
         violation_count = len(violations)
         pre_json_data = {
-            'violatons': violations,
-            'violation_count': violation_count
+            'violations': violations,
+            'violations_count': violation_count
         }
 
-        json_data = json.dumps(pre_json_data, cls=ViolationJSONEncoder, indent=4)
+        json_data = json.dumps(pre_json_data,
+                               cls=ViolationJSONEncoder, indent=4)
         print(json_data)
 
         return SUCCESS if violation_count == 0 else ERR
