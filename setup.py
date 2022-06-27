@@ -61,5 +61,5 @@ setuptools.setup(
     entry_points={
         'console_scripts': ['yamlator=yamlator.cmd:main']
     },
-    package_data={'yamlator': ['grammer/grammer.lark']}
+    package_data={'yamlator': ['grammar/grammar.lark']}
 )

@@ -6,15 +6,17 @@ start: instructions*
             | ruleset
             | schema_entry
 
+?values: INT -> integer
+       | FLOAT -> float
+       | string
+
 schema_entry: "schema" "{" rule+ "}"
 
 ruleset: "ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
 
 // Enum constructs
 enum: "enum" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" enum_item+ "}"
-enum_item: /[A-Z0-9_]+/ "=" INT
-         | /[A-Z0-9_]+/ "=" FLOAT
-         | /[A-Z0-9_]+/ "=" ESCAPED_STRING
+enum_item: /[A-Z0-9_]+/ "=" values
 
 // Rule definitions
 ?rule: required_rule
@@ -43,9 +45,11 @@ bool_type: "bool"
 list_type: "list""(" type ")"
 map_type: "map""(" type ")"
 container_type: /[A-Z]{1}[a-zA-Z0-9_]+/
-regex_type: "regex""(" ESCAPED_STRING ")"
+regex_type: "regex""(" string ")"
 
 NEW_LINES: "\n"+
+
+string: ESCAPED_STRING
 
 %import common.SH_COMMENT
 %import common.ESCAPED_STRING
