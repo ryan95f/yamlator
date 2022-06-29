@@ -1,3 +1,11 @@
+"""Test the `main` (entry point) of the command line
+
+Test Cases:
+    * `test_main` tests the entry point with different arguments
+       to validate the correct status code is provided
+"""
+
+
 import io
 import unittest
 
@@ -18,6 +26,7 @@ ValidateArgs = namedtuple('ValidateArgs', ['file', 'ruleset_schema', 'output'])
 
 
 class TestMain(unittest.TestCase):
+    """Test cases for the `main` method of the command line"""
 
     @parameterized.expand([
         ('with_yaml_matching_ruleset', ValidateArgs(
@@ -67,8 +76,11 @@ class TestMain(unittest.TestCase):
         ), ERR)
     ])
     @patch('argparse.ArgumentParser')
-    def test_main(self, name: str, args: ValidateArgs, expected_status_code: int,
-                  mock_args_parser: Mock):
+    def test_main(self, name: str, args: ValidateArgs,
+                  expected_status_code: int, mock_args_parser: Mock):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         mock_parser = MagicMock()
         mock_parser.parse_args.return_value = args
         mock_args_parser.return_value = mock_parser

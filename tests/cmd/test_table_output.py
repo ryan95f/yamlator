@@ -1,3 +1,13 @@
+"""Test cases for the `TableOutput` static class
+
+Test Cases:
+    * `test_displayed_violation_output` tests that the expected status code
+       is returned when valid arguments are provided
+    * `test_json_output_invalid_args` tests that the relevant exception is
+       raised when invalid arguments are provided
+"""
+
+
 import io
 import unittest
 
@@ -12,6 +22,7 @@ from yamlator.violations import ViolationType
 
 
 class TestTableOutput(unittest.TestCase):
+    """Test the `TableOutput` display method"""
 
     @parameterized.expand([
         ('with_no_violations', [], SUCCESS),
@@ -23,6 +34,8 @@ class TestTableOutput(unittest.TestCase):
     def test_displayed_violation_output(self, name: str,
                                         violations: Iterator[ViolationType],
                                         expected_status_code: int):
+        # Unused by test case, however is required by the parameterized library
+        del name
 
         # Suppress the print statements
         with patch('sys.stdout', new=io.StringIO()):
@@ -35,6 +48,9 @@ class TestTableOutput(unittest.TestCase):
     def test_json_output_invalid_args(self, name: str,
                                       violations: Iterator[Violation],
                                       expected_exception: Type[Exception]):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         with self.assertRaises(expected_exception):
             TableOutput.display(violations)
 
