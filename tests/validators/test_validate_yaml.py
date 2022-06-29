@@ -9,7 +9,7 @@ from yamlator.types import EnumItem
 from yamlator.types import YamlatorEnum
 from yamlator.types import YamlatorRuleset
 from yamlator.types import SchemaTypes
-from yamlator.validators import validate_yaml
+from yamlator.validators.core import validate_yaml
 
 
 def create_flat_schema():

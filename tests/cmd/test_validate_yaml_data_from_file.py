@@ -7,7 +7,7 @@ from parameterized import parameterized
 from yamlator.cmd import validate_yaml_data_from_file
 from yamlator.exceptions import InvalidSchemaFilenameError
 
-EMPTY_STR = ""
+EMPTY_STR = ''
 VALID_YAML_DATA_FILE_PATH = './tests/files/example/example.yaml'
 VALID_SCHEMA_FILE_PATH = './tests/files/example/example.ys'
 

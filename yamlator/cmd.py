@@ -12,7 +12,7 @@ from yamlator.utils import load_yaml_file
 from yamlator.utils import load_schema
 from yamlator.parser import SchemaSyntaxError
 from yamlator.parser import parse_schema
-from yamlator.validators import validate_yaml
+from yamlator.validators.core import validate_yaml
 
 from yamlator.exceptions import InvalidSchemaFilenameError
 from yamlator.exceptions import SchemaParseError
