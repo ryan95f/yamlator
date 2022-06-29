@@ -12,7 +12,8 @@ ignore=third_party
 
 # Files or directories matching the regex patterns are skipped. The regex
 # matches against base names, not paths.
-ignore-patterns=
+# Ignore the top level package which executes the package entry point
+ignore-patterns=__main__
 
 # Pickle collected data for later comparisons.
 persistent=no

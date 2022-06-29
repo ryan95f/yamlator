@@ -30,6 +30,7 @@ class TestBuiltInTypeValidator(BaseValidatorTest):
     ])
     def test_build_in_type_validator(self, name: str, rtype: RuleType, data: Data,
                                      expect_violations: bool):
+        del name # Unused by test case. Required to be defined by parameterized 
         validator = BuiltInTypeValidator(self.violations)
         validator.validate(
             key=self.key,

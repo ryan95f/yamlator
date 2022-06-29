@@ -1,5 +1,6 @@
 """Custom exceptions used by Yamlator"""
 
+
 class InvalidSchemaFilenameError(RuntimeError):
     """When the schema filename does not match the expected pattern"""
 

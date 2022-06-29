@@ -31,18 +31,19 @@ class TestMapValidator(BaseValidatorTest):
         ('with_map_rule_none_data', None, RuleType(
             schema_type=SchemaTypes.MAP, sub_type=RuleType(schema_type=SchemaTypes.STR),
         ), 0, 1),
-        ('with_map_rule_str_data', "hello world", RuleType(
+        ('with_map_rule_str_data', 'hello world', RuleType(
             schema_type=SchemaTypes.MAP, sub_type=RuleType(schema_type=SchemaTypes.STR),
         ), 0, 1),
         ('with_map_rule_list_data', [0, 1, 2], RuleType(
             schema_type=SchemaTypes.MAP, sub_type=RuleType(schema_type=SchemaTypes.STR),
         ), 0, 1),
     ])
-    @patch('yamlator.validators.Validator.validate')
+    @patch('yamlator.validators.base_validator.Validator.validate')
     def test_map_validator(self, name: str, data: Data, rtype: RuleType,
                            expected_parent_call_count: int,
                            expected_violation_count: int,
                            mock_parent_validator: Mock):
+        del name
         validator = MapValidator(self.violations)
         validator.validate(
             key=self.key,

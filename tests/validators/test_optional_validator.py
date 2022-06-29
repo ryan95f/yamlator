@@ -18,10 +18,11 @@ class TestOptionalValidator(BaseValidatorTest):
         ('with_optional_and_none_data', False, None, 0),
         ('with_required_and_none_data', True, None, 1),
     ])
-    @patch('yamlator.validators.Validator.validate')
+    @patch('yamlator.validators.base_validator.Validator.validate')
     def test_optional_validator(self, name: str, is_required: bool, data: Data,
                                 next_validator_call_count: int,
                                 mock_parent_validator: Mock):
+        del name # Unused by test case
         validator = OptionalValidator(self.violations)
         validator.validate(
             key=self.key,

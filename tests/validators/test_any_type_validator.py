@@ -25,10 +25,11 @@ class TestAnyTypeValidator(BaseValidatorTest):
             schema_type=SchemaTypes.RULESET, lookup='value'), 1),
         ('is_int_type', 100, RuleType(schema_type=SchemaTypes.INT), 1)
     ])
-    @patch('yamlator.validators.Validator.validate')
+    @patch('yamlator.validators.base_validator.Validator.validate')
     def test_any_type_validator(self, name: str, data: Data, rtype: RuleType,
                                 expected_validator_call_count: int,
                                 mock_parent_validator: Mock):
+        del name
         validator = AnyTypeValidator(self.violations)
         validator.validate(
             key=self.key,

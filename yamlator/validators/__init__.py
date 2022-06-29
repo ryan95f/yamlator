@@ -1,5 +1,6 @@
+"""Yamlator validators package"""
+
 from .any_type_validator import AnyTypeValidator
-from .base_validator import Validator
 from .builtin_type_validator import BuiltInTypeValidator
 from .core import validate_yaml
 from .enum_type_validator import EnumTypeValidator
