@@ -1,3 +1,11 @@
+"""Test cases for the `OptionalValidator`
+
+Test cases:
+    * `test_optional_validator` tests the optional validator with
+       different required and optional flags
+"""
+
+
 import unittest
 
 from .base import BaseValidatorTest
@@ -11,6 +19,7 @@ from yamlator.validators import OptionalValidator
 
 
 class TestOptionalValidator(BaseValidatorTest):
+    """Test cases for the Optional Validator"""
 
     @parameterized.expand([
         ('with_optional_data', False, 'hello world', 1),
@@ -22,7 +31,9 @@ class TestOptionalValidator(BaseValidatorTest):
     def test_optional_validator(self, name: str, is_required: bool, data: Data,
                                 next_validator_call_count: int,
                                 mock_parent_validator: Mock):
-        del name # Unused by test case
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         validator = OptionalValidator(self.violations)
         validator.validate(
             key=self.key,
@@ -31,7 +42,8 @@ class TestOptionalValidator(BaseValidatorTest):
             rtype=self.rtype,
             is_required=is_required)
 
-        self.assertEqual(next_validator_call_count, mock_parent_validator.call_count)
+        self.assertEqual(next_validator_call_count,
+                         mock_parent_validator.call_count)
 
 
 if __name__ == '__main__':
