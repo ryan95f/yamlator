@@ -15,7 +15,7 @@ def create_long_description():
         # with links to the documentation in GitHub
         long_description = long_description.replace(
             './docs/schema_components.md',
-            'https://github.com/ryan95f/yamlator/blob/main/docs/schema_components.md'
+            'https://github.com/ryan95f/yamlator/blob/main/docs/schema_components.md'  # nopep8
         )
 
         long_description = long_description.replace(
@@ -41,7 +41,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/ryan95f/yamlator',
     author='Ryan Flynn',
-    packages=setuptools.find_packages(include=['yamlator', 'yamlator.validators']),
+    packages=setuptools.find_packages(include=['yamlator', 'yamlator.validators']),  # nopep8
     install_requires=[
         'lark==1.0.0',
         'PyYAML==6.0'
