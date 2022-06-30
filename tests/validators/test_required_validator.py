@@ -1,3 +1,12 @@
+"""Test cases for the `RequiredValidator`
+
+
+Test cases:
+    * `test_required_validator` tests the required validator with
+       different required and optional flags
+"""
+
+
 import unittest
 
 from .base import BaseValidatorTest
@@ -8,6 +17,7 @@ from yamlator.validators import RequiredValidator
 
 
 class TestRequiredValidator(BaseValidatorTest):
+    """Test cases for the Required Validator"""
 
     @parameterized.expand([
         ('required_data', 'hello world', True, False),
@@ -17,6 +27,9 @@ class TestRequiredValidator(BaseValidatorTest):
     ])
     def test_required_validator(self, name: str, data: Data, is_required: bool,
                                 expect_violation: bool):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         validator = RequiredValidator(self.violations)
         validator.validate(
             key=self.key,

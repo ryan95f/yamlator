@@ -1,3 +1,6 @@
+"""Contains classes related to handling different violations"""
+
+
 from __future__ import annotations
 import json
 
@@ -16,7 +19,8 @@ class ViolationJSONEncoder(json.JSONEncoder):
 
     def default(self, o: Any) -> Any:
         """Encodes a deque or violation object into a JSON serializable object.
-        If the object cannot be serialized, then the `TypeError` exception is raised
+        If the object cannot be serialized, then the `TypeError`
+        exception is raised
         """
         if isinstance(o, deque):
             return list(o)
@@ -32,16 +36,18 @@ class ViolationJSONEncoder(json.JSONEncoder):
 
 
 class Violation:
-    def __init__(self, key: str, parent: str, message: str, v_type: ViolationType):
+    """Base violation class"""
+
+    def __init__(self, key: str, parent: str, message: str,
+                 v_type: ViolationType):
         """Violation init
 
         Args:
             key     (str):              The key name in the YAML file
             parent  (str):              The parent key in the YAML file
-            message (str):              The message with information regarding
-            the violation
-
-            v_type  (ViolationType):    The violation type. Either `REQUIRED` or `TYPE`
+            message (str):              The message with violation information
+            v_type  (ViolationType):    The violation type.
+            Either `REQUIRED` or `TYPE`
         """
         self.key = key
         self.message = message
@@ -81,7 +87,8 @@ class TypeViolation(Violation):
         Args:
             key     (str):  The key name in the YAML file
             parent  (str):  The parent key in the YAML file
-            message (str):  The message with information regarding the type violation
+            message (str):  The message with information
+            regarding the type violation
         """
         super().__init__(key, parent, message, ViolationType.TYPE)
 
@@ -97,9 +104,10 @@ class BuiltInTypeViolation(TypeViolation):
         Args:
             key             (str):  The key name in the YAML file
             parent          (str):  The parent key in the YAML file
-            expected_type   (type): The expected build in type for the field
+            expected_type   (type): The expected build in type
+            for the field
         """
-        message = f"{key} is expected to be an {expected_type.__name__}"
+        message = f'{key} is expected to be an {expected_type.__name__}'
         super().__init__(key, parent, message)
 
 

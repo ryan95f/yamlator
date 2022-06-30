@@ -1,3 +1,6 @@
+"""Validator for handling regex data types in the Yamlator schema"""
+
+
 from yamlator.types import Data
 from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
@@ -22,13 +25,14 @@ class RegexValidator(Validator):
             rtype       (RuleType): The type assigned to the rule
             is_required     (bool): Is the rule required
         """
-        is_regex_type = (rtype.type == SchemaTypes.REGEX)
+        is_regex_type = (rtype.schema_type == SchemaTypes.REGEX)
         if not is_regex_type:
             super().validate(key, data, parent, rtype, is_required)
             return
 
         if not isinstance(data, str):
-            self._add_type_violation(key, parent, f'{key} should be of type str')
+            self._add_type_violation(key, parent,
+                                     f'{key} should be of type str')
             return
 
         if not rtype.regex.search(data):

@@ -1,3 +1,6 @@
+"""Validator for handling optional rules in the Yamlator schema"""
+
+
 from yamlator.types import Data
 from yamlator.types import RuleType
 from .base_validator import Validator

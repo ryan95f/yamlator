@@ -1,3 +1,6 @@
+"""Validator for handling rulesets in the Yamlator schema"""
+
+
 from collections import deque
 from typing import Iterable
 
@@ -47,7 +50,7 @@ class RulesetValidator(Validator):
             is_required     (bool): Is the rule required
         """
 
-        is_ruleset_rule = (rtype.type == SchemaTypes.RULESET)
+        is_ruleset_rule = (rtype.schema_type == SchemaTypes.RULESET)
         if not is_ruleset_rule:
             super().validate(key, data, parent, rtype, is_required)
             return

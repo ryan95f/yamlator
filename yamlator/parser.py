@@ -1,3 +1,6 @@
+"""Maintains the parser transformers"""
+
+
 from __future__ import annotations
 
 import re
@@ -6,6 +9,7 @@ import os
 from pathlib import Path
 from typing import Iterator
 from lark import Lark
+from lark import v_args
 from lark import Transformer
 from lark import UnexpectedInput
 from lark.exceptions import VisitError
@@ -24,7 +28,7 @@ from yamlator.exceptions import SchemaParseError
 
 
 _package_dir = Path(__file__).parent.absolute()
-_GRAMMER_FILE = os.path.join(_package_dir, 'grammer/grammer.lark')
+_GRAMMAR_FILE = os.path.join(_package_dir, 'grammar/grammar.lark')
 
 _SPEECH_MARKS_REGEX = re.compile(r'\"|\'')
 
@@ -45,16 +49,16 @@ def parse_schema(schema_content: str) -> dict:
         SchemaSyntaxError: Raised when a syntax error is detected in the schema
     """
     if schema_content is None:
-        raise ValueError("schema_content should not be None")
+        raise ValueError('schema_content should not be None')
 
-    lark_parser = Lark.open(_GRAMMER_FILE)
+    lark_parser = Lark.open(_GRAMMAR_FILE)
     transformer = SchemaTransformer()
 
     try:
         tokens = lark_parser.parse(schema_content)
         return transformer.transform(tokens)
     except VisitError as ve:
-        raise SchemaParseError(ve.__context__)
+        raise SchemaParseError(ve) from ve
     except UnexpectedInput as u:
         _handle_syntax_errors(u, lark_parser, schema_content)
 
@@ -64,8 +68,9 @@ class SchemaTransformer(Transformer):
     can be used to validate a YAML file. This class will be used by Lark
     during the parsing process.
 
-    Each method matches to a terminal or rule in the grammer (.lark) file. E.g the
-    method `required_rule` corresponds to the following rule in the grammer:
+    Each method matches to a terminal or rule in the grammar (.lark) file.
+    E.g the method `required_rule` corresponds to the following rule
+    in the grammar:
 
     required_rule: /[a-zA-Z0-9_]+/ type "required"
                  | /[a-zA-Z0-9_]+/ type
@@ -74,15 +79,6 @@ class SchemaTransformer(Transformer):
     # Used to track previously seen enums or rulesets to dynamically
     # determine the type of the rule if a enum or ruleset is used
     seen_constructs = {}
-
-    def __init__(self, visit_tokens: bool = True) -> None:
-        """SchemaTransformer init
-
-        Args:
-            visit_tokens (bool): Should the transformer visit tokens in addition
-            to rules. Setting this to False is slightly faster. Defaults to True
-        """
-        super().__init__(visit_tokens)
 
     def required_rule(self, tokens: Any) -> Rule:
         """Transforms the required rule tokens in a Rule object"""
@@ -126,31 +122,31 @@ class SchemaTransformer(Transformer):
 
     def str_type(self, _: Any) -> RuleType:
         """Transforms a string type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.STR)
+        return RuleType(schema_type=SchemaTypes.STR)
 
     def int_type(self, _: Any) -> RuleType:
         """Transforms a int type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.INT)
+        return RuleType(schema_type=SchemaTypes.INT)
 
     def float_type(self, _: Any) -> RuleType:
         """Transforms a float type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.FLOAT)
+        return RuleType(schema_type=SchemaTypes.FLOAT)
 
     def list_type(self, tokens: Any) -> RuleType:
         """Transforms a list type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.LIST, sub_type=tokens[0])
+        return RuleType(schema_type=SchemaTypes.LIST, sub_type=tokens[0])
 
     def map_type(self, tokens: Any) -> RuleType:
         """Transforms a map type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.MAP, sub_type=tokens[0])
+        return RuleType(schema_type=SchemaTypes.MAP, sub_type=tokens[0])
 
     def any_type(self, _: Any) -> RuleType:
         """Transforms the any type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.ANY)
+        return RuleType(schema_type=SchemaTypes.ANY)
 
     def bool_type(self, _: Any) -> RuleType:
         """Transforms a bool type token into a RuleType object"""
-        return RuleType(type=SchemaTypes.BOOL)
+        return RuleType(schema_type=SchemaTypes.BOOL)
 
     def enum_item(self, tokens: Any) -> EnumItem:
         """Transforms a enum item token into a EnumItem object"""
@@ -173,18 +169,19 @@ class SchemaTransformer(Transformer):
         """Transforms a container type token into a RuleType object
 
         Raises:
-            ConstructNotFoundError: Raised if the enum or ruleset cannot be found
+            ConstructNotFoundError: Raised if the enum or ruleset
+            cannot be found
         """
         name = token[0]
         schema_type = self.seen_constructs.get(name)
         if schema_type is None:
             raise ConstructNotFoundError(name)
-        return RuleType(type=schema_type, lookup=name)
+        return RuleType(schema_type=schema_type, lookup=name)
 
     def regex_type(self, tokens: Any) -> RuleType:
         """Transforms a regex type token into a RuleType object"""
         (regex, ) = tokens
-        return RuleType(type=SchemaTypes.REGEX, regex=regex)
+        return RuleType(schema_type=SchemaTypes.REGEX, regex=regex)
 
     def type(self, tokens: Any) -> Any:
         """Extracts the type tokens and passes them through onto
@@ -199,23 +196,39 @@ class SchemaTransformer(Transformer):
         """
         return YamlatorRuleset('main', rules)
 
-    def INT(self, token: str) -> int:
+    @v_args(inline=True)
+    def integer(self, token: str) -> int:
         """Convers a integer string into a int type"""
         return int(token)
 
-    def FLOAT(self, token: str) -> float:
+    @v_args(inline=True)
+    def float(self, token: str) -> float:
         """Convers a float string into a int type"""
         return float(token)
 
-    def ESCAPED_STRING(self, token: str) -> str:
-        """Transforms the escaped string by removing speech marks from the value"""
+    @v_args(inline=True)
+    def string(self, token: str) -> str:
+        """Transforms the escaped string by removing speech
+        marks from the value
+        """
         return _SPEECH_MARKS_REGEX.sub('', token)
 
 
 class _InstructionHandler:
+    """Base handle for dealing with Yamlator types"""
     _next_handler = None
 
-    def set_next_handler(self, handler: _InstructionHandler) -> _InstructionHandler:
+    def set_next_handler(self,
+                         handler: _InstructionHandler) -> _InstructionHandler:
+        """Set the next handler in the chain
+
+        Args:
+            handler: The next instruction handler
+
+        Returns:
+            The instance of the instruction handler that was
+            passed as an argument
+        """
         self._next_handler = handler
         return handler
 
@@ -225,12 +238,14 @@ class _InstructionHandler:
 
 
 class _EnumInstructionHandler(_InstructionHandler):
+    """Enum type instruction handler"""
+
     def __init__(self, enums: dict):
         super().__init__()
         self._enums = enums
 
     def handle(self, instruction: YamlatorType) -> None:
-        if instruction.type != ContainerTypes.ENUM:
+        if instruction.container_type != ContainerTypes.ENUM:
             super().handle(instruction)
             return
 
@@ -238,12 +253,14 @@ class _EnumInstructionHandler(_InstructionHandler):
 
 
 class _RulesetInstructionHandler(_InstructionHandler):
+    """Ruleset type instruction handler"""
+
     def __init__(self, rulesets: dict):
         super().__init__()
         self._rulesets = rulesets
 
     def handle(self, instruction: YamlatorType) -> None:
-        if instruction.type != ContainerTypes.RULESET:
+        if instruction.container_type != ContainerTypes.RULESET:
             super().handle(instruction)
             return
 
@@ -256,7 +273,7 @@ class SchemaSyntaxError(SyntaxError):
     label = None
 
     def __str__(self) -> str:
-        context, line, column = self.args
+        context, line, column, *_ = self.args
         if self.label is None:
             return f'Error on line {line}, column {column}.\n\n{context}'
         return f'{self.label} at line {line}, column {column}.\n\n{context}'
@@ -277,7 +294,8 @@ class MissingRulesError(SchemaSyntaxError):
     label = 'Missing rules'
 
 
-def _handle_syntax_errors(u: UnexpectedInput, parser: Lark, content: str) -> None:
+def _handle_syntax_errors(u: UnexpectedInput, parser: Lark,
+                          content: str) -> None:
     exc_class = u.match_examples(parser.parse, {
         MalformedRulesetNameError: [
             'ruleset foo',

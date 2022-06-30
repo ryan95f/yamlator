@@ -1,3 +1,12 @@
+"""Test cases for the `AnyTypeValidator`
+
+Test cases:
+    * `test_any_type_validator` tests the validator with a variety
+       of different rules and data to validate that no additional
+       processing is applied
+"""
+
+
 import unittest
 
 from .base import BaseValidatorTest
@@ -13,22 +22,31 @@ from yamlator.validators import AnyTypeValidator
 
 
 class TestAnyTypeValidator(BaseValidatorTest):
+    """Test cases for the Any Type Validator"""
 
     @parameterized.expand([
-        ('is_any_type_with_dict', {'message': 'test'}, RuleType(type=SchemaTypes.ANY), 0),
-        ('is_any_type_with_list', [1, 2, 3, 4], RuleType(type=SchemaTypes.ANY), 0),
-        ('is_any_type_with_none', None, RuleType(type=SchemaTypes.ANY), 0),
-        ('is_any_type_with_str', 100, RuleType(type=SchemaTypes.ANY), 0),
-        ('is_list_type', [0, 1, 2, 3, 4], RuleType(
-            type=SchemaTypes.LIST, sub_type=RuleType(type=SchemaTypes.INT)), 1),
-        ('is_ruleset_type', {'val': 42}, RuleType(
-            type=SchemaTypes.RULESET, lookup='value'), 1),
-        ('is_int_type', 100, RuleType(type=SchemaTypes.INT), 1)
+        ('is_any_type_with_dict', {'message': 'test'},
+            RuleType(schema_type=SchemaTypes.ANY), 0),
+        ('is_any_type_with_list', [1, 2, 3, 4],
+            RuleType(schema_type=SchemaTypes.ANY), 0),
+        ('is_any_type_with_none', None,
+            RuleType(schema_type=SchemaTypes.ANY), 0),
+        ('is_any_type_with_str', 100,
+            RuleType(schema_type=SchemaTypes.ANY), 0),
+        ('is_list_type', [0, 1, 2, 3, 4],
+            RuleType(schema_type=SchemaTypes.LIST,
+                     sub_type=RuleType(schema_type=SchemaTypes.INT)), 1),
+        ('is_ruleset_type', {'val': 42},
+            RuleType(schema_type=SchemaTypes.RULESET, lookup='value'), 1),
+        ('is_int_type', 100, RuleType(schema_type=SchemaTypes.INT), 1)
     ])
-    @patch('yamlator.validators.Validator.validate')
+    @patch('yamlator.validators.base_validator.Validator.validate')
     def test_any_type_validator(self, name: str, data: Data, rtype: RuleType,
                                 expected_validator_call_count: int,
                                 mock_parent_validator: Mock):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         validator = AnyTypeValidator(self.violations)
         validator.validate(
             key=self.key,

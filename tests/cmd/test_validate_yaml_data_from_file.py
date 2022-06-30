@@ -1,3 +1,14 @@
+"""Test cases for the `validate_yaml_data_from_file` function
+
+Test Cases:
+    * `test_validate_yaml_data_from_file_with_invalid_args` tests the validation
+       process with a range of invalid arguments that a user could enter
+       via the CLI
+    * `test_validate_yaml_data_from_file_with_valid_data` with expected
+       valid data
+"""
+
+
 import unittest
 
 from typing import Type
@@ -7,7 +18,7 @@ from parameterized import parameterized
 from yamlator.cmd import validate_yaml_data_from_file
 from yamlator.exceptions import InvalidSchemaFilenameError
 
-EMPTY_STR = ""
+EMPTY_STR = ''
 VALID_YAML_DATA_FILE_PATH = './tests/files/example/example.yaml'
 VALID_SCHEMA_FILE_PATH = './tests/files/example/example.ys'
 
@@ -15,10 +26,18 @@ ValidateArgs = namedtuple('ValidateArgs', ['yaml_filepath', 'schema_filepath'])
 
 
 class TestValidateYamlDataFromFile(unittest.TestCase):
+    """Test the `validate_yaml_data_from_file` function with
+    valid and invalid arguments that would be expected as input
+    when the CLI is used
+    """
+
     @parameterized.expand([
-        ('none_yaml_path', ValidateArgs(None, VALID_SCHEMA_FILE_PATH), ValueError),
-        ('none_schema_path', ValidateArgs(VALID_YAML_DATA_FILE_PATH, None), ValueError),
-        ('none_yaml_and_schema_path', ValidateArgs(None, None), ValueError),
+        ('none_yaml_path',
+            ValidateArgs(None, VALID_SCHEMA_FILE_PATH), ValueError),
+        ('none_schema_path',
+            ValidateArgs(VALID_YAML_DATA_FILE_PATH, None), ValueError),
+        ('none_yaml_and_schema_path',
+            ValidateArgs(None, None), ValueError),
         ('empty_yaml_path_str', ValidateArgs(
             EMPTY_STR, VALID_SCHEMA_FILE_PATH
         ), ValueError),
@@ -45,9 +64,13 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
     ])
     def test_validate_yaml_data_from_file_with_invalid_args(self, name: str,
                                                             args: ValidateArgs,
-                                                            expected_exception: Type[Exception]):  # nopep8
+                                                            expected_exception: Type[Exception]):  # nopep8 pylint: disable=C0301
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         with self.assertRaises(expected_exception):
-            validate_yaml_data_from_file(args.yaml_filepath, args.schema_filepath)
+            validate_yaml_data_from_file(args.yaml_filepath,
+                                         args.schema_filepath)
 
     def test_validate_yaml_data_from_file_with_valid_data(self):
         violations = validate_yaml_data_from_file(

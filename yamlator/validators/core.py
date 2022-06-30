@@ -1,3 +1,7 @@
+"""Provides the core functions and entry point to the
+validator handler chian.
+"""
+
 from collections import deque
 from typing import Iterable
 
@@ -5,16 +9,16 @@ from yamlator.types import Data
 from yamlator.types import Rule
 from yamlator.types import YamlatorRuleset
 
-from .any_type_validator import AnyTypeValidator
-from .base_validator import Validator
-from .builtin_type_validator import BuiltInTypeValidator
-from .enum_type_validator import EnumTypeValidator
-from .list_validator import ListValidator
-from .map_validator import MapValidator
-from .optional_validator import OptionalValidator
-from .regex_validator import RegexValidator
-from .required_validator import RequiredValidator
-from .ruleset_validator import RulesetValidator
+from yamlator.validators import AnyTypeValidator
+from yamlator.validators import BuiltInTypeValidator
+from yamlator.validators import EnumTypeValidator
+from yamlator.validators import ListValidator
+from yamlator.validators import MapValidator
+from yamlator.validators import OptionalValidator
+from yamlator.validators import RegexValidator
+from yamlator.validators import RequiredValidator
+from yamlator.validators import RulesetValidator
+from yamlator.validators.base_validator import Validator
 
 
 def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
@@ -41,7 +45,8 @@ def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
 
     entry_parent = '-'
     violations = deque()
-    entry_point: YamlatorRuleset = instructions.get('main', YamlatorRuleset('main', []))
+    entry_point: YamlatorRuleset = instructions.get('main',
+                                                    YamlatorRuleset('main', []))
 
     validators = _create_validators_chain(
         ruleset_lookups=instructions.get('rules', {}),

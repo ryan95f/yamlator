@@ -1,3 +1,13 @@
+"""Test cases for the `display_violations` function
+
+Test cases:
+    * `test_display_violations` tests that the function will display the
+       results when provided a valid display method
+    * `test_display_violations_invalid_params` tests that the expected
+       exception is raised when invalid parameters are provided.
+"""
+
+
 import io
 import unittest
 
@@ -14,6 +24,8 @@ from yamlator.violations import Violation
 
 
 class TestDisplayViolations(unittest.TestCase):
+    """Test that the display violation function"""
+
     @parameterized.expand([
         ('display_table_with_violations',
             [RequiredViolation('data', '-')], DisplayMethod.TABLE, ERR),
@@ -24,6 +36,9 @@ class TestDisplayViolations(unittest.TestCase):
     ])
     def test_display_violations(self, name, violations: Iterator[Violation],
                                 display_method: str, expected_status_code: int):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         # Suppress the print statements
         with patch('sys.stdout', new=io.StringIO()):
             status_code = display_violations(violations, display_method)
@@ -34,9 +49,12 @@ class TestDisplayViolations(unittest.TestCase):
         ('with_none_display_method', [RequiredViolation('data', '-')], None),
         ('with_violations_and_display_method_none', None, None)
     ])
-    def test_display_violations_invalid_params(self, name,
+    def test_display_violations_invalid_params(self, name: str,
                                                violations: Iterator[Violation],
                                                display_method: str):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         with self.assertRaises(ValueError):
             display_violations(violations, display_method)
 

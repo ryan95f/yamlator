@@ -1,3 +1,14 @@
+"""Test cases for the `ViolationJSONEncoder`
+
+Test Cases:
+    * `test_violation_json_encoder` tests the encoder using a variety
+       of different data structures and types to validate the JSON
+       is successfully generated
+    * `test_violation_json_encoder_raises_type_error` tests the JSON
+       encoder with objects that are not support
+"""
+
+
 import unittest
 
 from typing import Any
@@ -18,14 +29,18 @@ class FakeViolation:
 
 
 class TestViolationJSONEncoder(unittest.TestCase):
+    """Test cases for the ViolationJSONEncoder"""
+
     @parameterized.expand([
         ('encode_deque', deque(['hello', 'world'])),
-        ('encode_type_violation', TypeViolation('data', '-', "Should be a string")),
+        ('encode_type_violation',
+            TypeViolation('data', '-', 'Should be a string')),
         ('encode_required_violation', RequiredViolation('data', '-')),
         ('encode_ruleset_type_violation', RulesetTypeViolation('data', '-')),
-        ('encode_build_in_type_violation', BuiltInTypeViolation('data', '-', int)),
-        ('encode_regex_type_violation', RegexTypeViolation('data', '-',
-                                                           'message', '^roles/')),
+        ('encode_build_in_type_violation',
+            BuiltInTypeViolation('data', '-', int)),
+        ('encode_regex_type_violation',
+            RegexTypeViolation('data', '-', 'message', '^roles/')),
         ('encode_int', 42),
         ('encode_bool', True),
         ('encode_string', 'hello world'),
@@ -34,15 +49,21 @@ class TestViolationJSONEncoder(unittest.TestCase):
         ('encode_none', None)
     ])
     def test_violation_json_encoder(self, name: str, data: Any):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         encoder = ViolationJSONEncoder()
         encoded_json = encoder.encode(data)
         self.assertIsNotNone(encoded_json)
 
     @parameterized.expand([
         ('encode_base_object', object()),
-        ('encode_custom_unsupported_object', FakeViolation("A fake error"))
+        ('encode_custom_unsupported_object', FakeViolation('A fake error'))
     ])
     def test_violation_json_encoder_raises_type_error(self, name, data: Any):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         encoder = ViolationJSONEncoder()
         with self.assertRaises(TypeError):
             encoder.encode(data)

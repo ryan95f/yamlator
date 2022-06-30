@@ -1,3 +1,6 @@
+"""Utility functions to handle loading YAML files and Yamlator schemas"""
+
+
 import yaml
 import re
 
@@ -27,7 +30,7 @@ def load_yaml_file(filename: str) -> dict:
     if len(filename) == 0:
         raise ValueError('filename cannot be an empty string')
 
-    with open(filename, 'r') as f:
+    with open(filename, 'r', encoding='utf-8') as f:
         return yaml.load(f, Loader=yaml.Loader)
 
 
@@ -43,7 +46,7 @@ def load_schema(filename: str) -> str:
     Raises:
         ValueError: If `filename` is None or an empty string
         InvalidSchemaFilenameError: If the filename does not match
-        a file with a `.ys` extention
+        a file with a `.ys` extension
     """
     if filename is None:
         raise ValueError('filename cannot be None')
@@ -56,5 +59,5 @@ def load_schema(filename: str) -> str:
 
     filename = _BACKSLASH_REGEX.sub('/', filename)
 
-    with open(filename) as f:
+    with open(filename, 'r', encoding='utf-8') as f:
         return f.read()

@@ -1,7 +1,10 @@
+"""Validator for the any time data type"""
+
+
 from yamlator.types import Data
 from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
-from .base_validator import Validator
+from yamlator.validators.base_validator import Validator
 
 
 class AnyTypeValidator(Validator):
@@ -19,7 +22,7 @@ class AnyTypeValidator(Validator):
             is_required     (bool): Is the rule required
         """
 
-        is_any_type = (rtype.type == SchemaTypes.ANY)
+        is_any_type = (rtype.schema_type == SchemaTypes.ANY)
         if is_any_type:
             return
 
