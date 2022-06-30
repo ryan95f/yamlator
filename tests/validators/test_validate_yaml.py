@@ -1,3 +1,13 @@
+"""Test cases for the `validate_yaml` function
+
+Test cases:
+    * `test_validator_invalid_parameters` tests the validate yaml function
+       with a range of invalid arguments
+    * `test_validator` tests the validate yaml function with a variety of
+       different schemas and data to verify the validation process
+"""
+
+
 import unittest
 
 from parameterized import parameterized
@@ -39,22 +49,21 @@ def create_complex_schema():
             schema_type=SchemaTypes.LIST,
             sub_type=RuleType(
                 schema_type=SchemaTypes.LIST,
-                sub_type=RuleType(schema_type=SchemaTypes.INT))
-        ), False),
-        Rule('personList', RuleType(
-            schema_type=SchemaTypes.LIST,
-            sub_type=RuleType(schema_type=SchemaTypes.RULESET, lookup='person')
-        ), False),
-        Rule('person', RuleType(schema_type=SchemaTypes.RULESET, lookup='person'), False),
-        Rule('my_map', RuleType(
-            schema_type=SchemaTypes.MAP,
-            sub_type=RuleType(schema_type=SchemaTypes.STR)
-        ), False),
-        Rule('my_any_list', RuleType(
-            schema_type=SchemaTypes.LIST,
-            sub_type=RuleType(schema_type=SchemaTypes.ANY)
-        ), False),
-        Rule('status', RuleType(schema_type=SchemaTypes.ENUM, lookup='Status'), False),
+                sub_type=RuleType(schema_type=SchemaTypes.INT))), False),
+        Rule('personList',
+             RuleType(schema_type=SchemaTypes.LIST,
+                      sub_type=RuleType(schema_type=SchemaTypes.RULESET,
+                                        lookup='person')), False),
+        Rule('person',
+             RuleType(schema_type=SchemaTypes.RULESET, lookup='person'), False),
+        Rule('my_map',
+             RuleType(schema_type=SchemaTypes.MAP,
+                      sub_type=RuleType(schema_type=SchemaTypes.STR)), False),
+        Rule('my_any_list',
+             RuleType(schema_type=SchemaTypes.LIST,
+                      sub_type=RuleType(schema_type=SchemaTypes.ANY)), False),
+        Rule('status',
+             RuleType(schema_type=SchemaTypes.ENUM, lookup='Status'), False),
     ])
 
     return {
@@ -69,6 +78,7 @@ COMPLEX_RULESET = create_complex_schema()
 
 
 class TestWrangleData(unittest.TestCase):
+    """Test cases for the validate_yaml function"""
 
     @parameterized.expand([
         ('none_data', None, FLAT_RULESET),
@@ -77,6 +87,9 @@ class TestWrangleData(unittest.TestCase):
     ])
     def test_validator_invalid_parameters(self, name: str, data: Data,
                                           instructions: dict):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         with self.assertRaises(ValueError):
             validate_yaml(data, instructions)
 
@@ -164,6 +177,9 @@ class TestWrangleData(unittest.TestCase):
         }, 1),
     ])
     def test_validator(self, name, ruleset, data, expected_violations_count):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         violations = validate_yaml(data, ruleset)
         self.assertEqual(expected_violations_count, len(violations))
 
