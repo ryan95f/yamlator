@@ -1,4 +1,4 @@
-"""Test cases for `validate_yaml_data_from_file` function
+"""Test cases for the `validate_yaml_data_from_file` function
 
 Test Cases:
     * `test_validate_yaml_data_from_file_with_invalid_args` tests the validation
@@ -28,7 +28,7 @@ ValidateArgs = namedtuple('ValidateArgs', ['yaml_filepath', 'schema_filepath'])
 class TestValidateYamlDataFromFile(unittest.TestCase):
     """Test the `validate_yaml_data_from_file` function with
     valid and invalid arguments that would be expected as input
-    when a the CLI is used
+    when the CLI is used
     """
 
     @parameterized.expand([

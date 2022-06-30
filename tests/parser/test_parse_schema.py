@@ -28,7 +28,7 @@ from yamlator.parser import SchemaSyntaxError
 
 
 class TestParseSchema(unittest.TestCase):
-    """Tests the parse_schema function"""
+    """Tests the parse schema function"""
 
     def setUp(self):
         self.valid_schema_file = './tests/files/example/example.ys'

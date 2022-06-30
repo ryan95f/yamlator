@@ -2,7 +2,7 @@
 
 Test cases:
     * `test_regex_validator` tests the validator with a variety of rule types
-      with regex and non-regex types to validate that violations are raised
+      with regex and non-regex types to validate violations are being raised
 """
 
 

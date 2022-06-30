@@ -1,4 +1,4 @@
-"""Test cases for the SchemaTransformer
+"""Test cases for the `SchemaTransformer`
 
 Test Cases:
     * `test_required_rule` tests the transformation of a required rule token
@@ -64,7 +64,7 @@ Token = namedtuple('Token', ['value'])
 
 
 class TestSchemaTransformer(unittest.TestCase):
-    """Tests the SchemaTransformer"""
+    """Tests the Schema Transformer"""
 
     def setUp(self):
         self.transformer = SchemaTransformer()
