@@ -23,12 +23,13 @@ class TestBuiltInTypeValidator(BaseValidatorTest):
 
     @parameterized.expand([
         ('int_type_match', RuleType(schema_type=SchemaTypes.INT), 1, False),
-        ('list_type_match', RuleType(schema_type=SchemaTypes.LIST,
-                sub_type=RuleType(schema_type=SchemaTypes.INT)
-        ), [0, 1, 2], False),
+        ('list_type_match',
+            RuleType(schema_type=SchemaTypes.LIST,
+                     sub_type=RuleType(schema_type=SchemaTypes.INT)),
+            [0, 1, 2], False),
         ('ruleset_type_match',
-            RuleType(schema_type=SchemaTypes.RULESET,
-            lookup='msg'), {'message': 'hello'}, False),
+            RuleType(schema_type=SchemaTypes.RULESET, lookup='msg'),
+            {'message': 'hello'}, False),
         ('float_type_match',
             RuleType(schema_type=SchemaTypes.FLOAT), 3.14, False),
         ('int_type_mismatch',
