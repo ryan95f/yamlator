@@ -1,6 +1,20 @@
-from typing import Type
+"""Test cases for the `parse_schema` function
+
+Test cases:
+    * `test_parse_with_none_text` tests the parse function when the
+       content is `None`
+    * `test_parse_with_empty_text` tests the parse function when the
+       schema is an empty string
+    * `test_parse_with_valid_content` tests the parse function with
+       valid content
+    * `test_parse_syntax_errors` tests the parse function with a range
+       of different syntax errors using multiple test files
+"""
+
+
 import unittest
 
+from typing import Type
 from parameterized import parameterized
 
 from yamlator.utils import load_schema
@@ -14,6 +28,8 @@ from yamlator.parser import SchemaSyntaxError
 
 
 class TestParseSchema(unittest.TestCase):
+    """Tests the parse_schema function"""
+
     def setUp(self):
         self.valid_schema_file = './tests/files/example/example.ys'
         self.invalid_schema_file = './tests/files/example/example.yaml'
@@ -69,6 +85,9 @@ class TestParseSchema(unittest.TestCase):
     ])
     def test_parse_syntax_errors(self, name: str, schema_file_path: str,
                                  exception_type: Type[Exception]):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         schema_content = load_yaml_file(schema_file_path)
         with self.assertRaises(exception_type):
             parse_schema(str(schema_content))

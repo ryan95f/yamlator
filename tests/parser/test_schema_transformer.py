@@ -1,3 +1,53 @@
+"""Test cases for the SchemaTransformer
+
+Test Cases:
+    * `test_required_rule` tests the transformation of a required rule token
+       into a rule object with required set to `true`
+    * `test_optional_rule` tests the transformation of a optional rule token
+       into a rule object with required set to `false`
+    * `test_ruleset` tests that given a set of rule tokens, a ruleset is
+       generated that contains all the specified rules
+    * `test_start` tests that all the rulesets and enums are sorted into
+       the correct container type, which can then be used by the Yamlator
+       validation chain
+    * `test_str_type` tests transforming a string token into a Yamlator
+       string rule type
+    * `test_int_type` tests transforming a int token into a Yamlator
+       int rule type
+    * `test_float_type` tests transforming a float token into a Yamlator
+       float rule type
+    * `test_list_type` tests transforming a list token into a Yamlator
+       list rule type
+    * `test_map_type` tests transforming a map token into a Yamlator
+       map rule type
+    * `test_any_type` tests transforming a any token into a Yamlator
+       any rule type
+    * `test_bool_type` tests transforming a bool token into a Yamlator
+       bool rule type
+    * `test_enum_item` tests transforming enum item tokens into a Yamlator
+       enum item
+    * `test_enum` tests that given a set of enum items a enum container
+       type is created
+    * `test_container_type` tests transforming a container Type
+       (ruleset / enum) type into the relevant rule type
+    * `test_container_type_construct_does_not_exist` tests transforming a
+       container type when the name of the given container is not found
+    * `test_regex_type` tests transforming regex tokens into a Yamlator
+       regex type
+    * `test_type` tests the type transformer returns the token it was
+       passed so the other transformer can successfully transform it
+    * `test_schema_entry` tests that given a set of rule tokens within
+       a schema block, a schema block is generated that contains all
+       the specified rules
+    * `test_int_transform` tests transforming a int into an actual
+       integer value
+    * `test_float_transform` tests transforming a float into an actual
+       float value
+    * `test_escaped_string_transform` tests that a string is escaped
+       and any speech marks are removed
+"""
+
+
 import re
 import unittest
 
@@ -14,6 +64,8 @@ Token = namedtuple('Token', ['value'])
 
 
 class TestSchemaTransformer(unittest.TestCase):
+    """Tests the SchemaTransformer"""
+
     def setUp(self):
         self.transformer = SchemaTransformer()
         self.name_token = Token('message')
@@ -128,7 +180,7 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(len(enum_items), len(enum.items))
 
     def test_container_type(self):
-        token = Token("Employee")
+        token = Token('Employee')
         self.transformer.seen_constructs = {'Employee': SchemaTypes.RULESET}
         rule = self.transformer.container_type(token)
         self.assertEqual(rule.schema_type, SchemaTypes.RULESET)
@@ -148,8 +200,8 @@ class TestSchemaTransformer(unittest.TestCase):
             self.transformer.container_type(token)
 
     def test_regex_type(self):
-        token = "test{1}"
-        expected_regex_str = re.compile("test{1}")
+        token = 'test{1}'
+        expected_regex_str = re.compile('test{1}')
 
         rule_type = self.transformer.regex_type((token, ))
         self.assertEqual(expected_regex_str, rule_type.regex)
@@ -169,21 +221,25 @@ class TestSchemaTransformer(unittest.TestCase):
 
     def test_int_transform(self):
         expected_value = 42
-        actual_value = self.transformer.integer("42")
+        actual_value = self.transformer.integer('42')
         self.assertEqual(expected_value, actual_value)
 
     def test_float_transform(self):
         expected_value = 3.142
-        actual_value = self.transformer.float("3.142")
+        actual_value = self.transformer.float('3.142')
         self.assertEqual(expected_value, actual_value)
 
     @parameterized.expand([
-        ('string_with_double_speech_marks', '\"hello\"', 'hello'),
+        ('string_with_double_speech_marks', '\'hello\'', 'hello'),
         ('string_with_single_speech_marks', '\'hello\'', 'hello'),
         ('string_without_speech_marks', 'hello', 'hello'),
         ('empty_string', '', '')
     ])
-    def test_escaped_string_transform(self, name: str, string_token: str, expected: str):
+    def test_escaped_string_transform(self, name: str, string_token: str,
+                                      expected: str):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         actual = self.transformer.string(string_token)
         self.assertEqual(expected, actual)
 
