@@ -1,3 +1,12 @@
+"""Test cases for the `ListValidator`
+
+Test cases:
+    * `test_list_validator` tests validating lists with a variety
+       of different types of lists, including nested lists and
+       different rule types
+"""
+
+
 import unittest
 
 from .base import BaseValidatorTest
@@ -12,42 +21,55 @@ from yamlator.types import SchemaTypes
 
 
 class TestListValidator(BaseValidatorTest):
+    """Test cases for the List Validator"""
+
     def setUp(self):
         super().setUp()
         self.mock_ruleset_validator = MagicMock()
         self.mock_ruleset_validator.validate.return_value = None
 
     @parameterized.expand([
-        ('with_str_type', RuleType(schema_type=SchemaTypes.STR), 'hello', 0, 0),
-        ('with_int_type', RuleType(schema_type=SchemaTypes.INT), 42, 0, 0),
-        ('with_map_type', RuleType(schema_type=SchemaTypes.MAP), {'value': 42}, 0, 0),
-        ('with_regex_type', RuleType(
-            schema_type=SchemaTypes.REGEX, regex='value'), "value", 0, 0),
-        ('with_str_type_none_data', RuleType(schema_type=SchemaTypes.STR), None, 0, 0),
-        ('with_list_type', RuleType(
-            schema_type=SchemaTypes.LIST,
-            sub_type=RuleType(schema_type=SchemaTypes.INT)), [0, 1, 2, 3], 0, 0),
-        ('with_ruleset_list_type', RuleType(
-            schema_type=SchemaTypes.LIST, sub_type=RuleType(
-                schema_type=SchemaTypes.RULESET, lookup='message'
-            )
-        ), [{'msg': 'hello'}, {'msg': 'world'}], 2, 0),
-        ('with_nested_list', RuleType(
-            schema_type=SchemaTypes.LIST, sub_type=RuleType(
-                schema_type=SchemaTypes.LIST, sub_type=RuleType(
-                    schema_type=SchemaTypes.INT)
-                )
-        ), [[0, 1, 2], [3, 4, 5]], 0, 0),
-        ('with_list_type_none_data', RuleType(
-            schema_type=SchemaTypes.LIST,
-            sub_type=RuleType(schema_type=SchemaTypes.INT)), None, 0, 1),
-        ('with_list_type_str', RuleType(
-            schema_type=SchemaTypes.LIST,
-            sub_type=RuleType(schema_type=SchemaTypes.INT)), "hello world", 0, 1),
+        ('with_str_type',
+            RuleType(schema_type=SchemaTypes.STR), 'hello', 0, 0),
+        ('with_int_type',
+            RuleType(schema_type=SchemaTypes.INT), 42, 0, 0),
+        ('with_map_type',
+            RuleType(schema_type=SchemaTypes.MAP), {'value': 42}, 0, 0),
+        ('with_regex_type',
+            RuleType(schema_type=SchemaTypes.REGEX, regex='value'),
+            'value', 0, 0),
+        ('with_str_type_none_data',
+            RuleType(schema_type=SchemaTypes.STR), None, 0, 0),
+        ('with_list_type',
+            RuleType(schema_type=SchemaTypes.LIST,
+                     sub_type=RuleType(schema_type=SchemaTypes.INT)),
+            [0, 1, 2, 3], 0, 0),
+        ('with_ruleset_list_type',
+            RuleType(schema_type=SchemaTypes.LIST,
+                     sub_type=RuleType(schema_type=SchemaTypes.RULESET,
+                                       lookup='message')),
+            [{'msg': 'hello'}, {'msg': 'world'}], 2, 0),
+        ('with_nested_list',
+            RuleType(schema_type=SchemaTypes.LIST,
+                     sub_type=RuleType(schema_type=SchemaTypes.LIST,
+                                       sub_type=RuleType(
+                                                schema_type=SchemaTypes.INT))),
+            [[0, 1, 2], [3, 4, 5]], 0, 0),
+        ('with_list_type_none_data',
+            RuleType(schema_type=SchemaTypes.LIST,
+                     sub_type=RuleType(schema_type=SchemaTypes.INT)),
+            None, 0, 1),
+        ('with_list_type_str',
+            RuleType(schema_type=SchemaTypes.LIST,
+                     sub_type=RuleType(schema_type=SchemaTypes.INT)),
+            'hello world', 0, 1),
     ])
     def test_list_validator(self, name: str, rtype: RuleType, data: Any,
                             ruleset_validate_call_count: int,
                             expected_violation_count: int):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
         validator = ListValidator(self.violations)
         validator.set_ruleset_validator(self.mock_ruleset_validator)
 
