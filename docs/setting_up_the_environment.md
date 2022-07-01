@@ -52,8 +52,22 @@ coverage report -m
 
 ## Coding Standards
 
-This project adopts the [PEP 8](https://www.python.org/dev/peps/pep-0008/) coding standard. To run the `pycodestyle` linter, use:
+This project uses the [PEP 8](https://www.python.org/dev/peps/pep-0008/) coding standard. To run the `pycodestyle` linter, use:
 
 ```bash
 pycodestyle .
+```
+
+This project also uses `pylint` to run static code analysis checks using the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html) configuration.
+
+To run the check over the Yamlator source code:
+
+```bash
+pylint yamlator/
+```
+
+Then to apply this check to the test cases:
+
+```bash
+pylint tests/
 ```
