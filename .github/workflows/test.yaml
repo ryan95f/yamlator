@@ -19,9 +19,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements-dev.txt
-    - name: Lint with pycodestyle
-      run: |
-        pycodestyle .
     - name: Run Unit Tests
       run: |
         python -m unittest
@@ -38,14 +35,17 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements-dev.txt
-    - name: Pylint Package source
+    - name: Lint with pycodestyle
+      run: |
+        pycodestyle .
+    - name: Pylint Yamlator source
       run: |
         pylint yamlator/
-    - name: Pylint Test source
+    - name: Pylint Tests
       run: |
         pylint tests/
   code-coverage:
-    needs: validate-python-versions
+    needs: static-analysis
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
