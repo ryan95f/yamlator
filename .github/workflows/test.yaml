@@ -25,6 +25,25 @@ jobs:
     - name: Run Unit Tests
       run: |
         python -m unittest
+  static-analysis:
+    needs: validate-python-versions
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-dev.txt
+    - name: Pylint Package source
+      run: |
+        pylint yamlator/
+    - name: Pylint Test source
+      run: |
+        pylint tests/
   code-coverage:
     needs: validate-python-versions
     runs-on: ubuntu-latest
