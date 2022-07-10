@@ -1,4 +1,4 @@
-"""Validator for handling Enum constructs in the Yamlator schema"""
+"""Validator for handling Enum types"""
 
 from collections import deque
 
