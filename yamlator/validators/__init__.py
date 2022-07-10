@@ -1,11 +1,24 @@
-"""Yamlator validators package"""
+"""Shortcuts for accessing the Validators"""
 
-from .any_type_validator import AnyTypeValidator
-from .builtin_type_validator import BuiltInTypeValidator
-from .enum_type_validator import EnumTypeValidator
-from .list_validator import ListValidator
-from .map_validator import MapValidator
-from .optional_validator import OptionalValidator
-from .regex_validator import RegexValidator
-from .required_validator import RequiredValidator
-from .ruleset_validator import RulesetValidator
+from yamlator.validators.any_type_validator import AnyTypeValidator
+from yamlator.validators.builtin_type_validator import BuiltInTypeValidator
+from yamlator.validators.enum_type_validator import EnumTypeValidator
+from yamlator.validators.list_validator import ListValidator
+from yamlator.validators.map_validator import MapValidator
+from yamlator.validators.optional_validator import OptionalValidator
+from yamlator.validators.regex_validator import RegexValidator
+from yamlator.validators.required_validator import RequiredValidator
+from yamlator.validators.ruleset_validator import RulesetValidator
+
+
+__all__ = [
+    'AnyTypeValidator',
+    'BuiltInTypeValidator',
+    'EnumTypeValidator',
+    'ListValidator',
+    'MapValidator',
+    'OptionalValidator',
+    'RegexValidator',
+    'RequiredValidator',
+    'RulesetValidator'
+]

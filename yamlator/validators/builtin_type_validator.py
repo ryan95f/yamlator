@@ -1,4 +1,4 @@
-"""Built in type validator"""
+"""Validator for handling the builtin types"""
 
 
 from collections import deque
@@ -13,14 +13,14 @@ _SchemaTypeDecoder = namedtuple('SchemaTypeDecoder', ['type', 'friendly_name'])
 
 
 class BuiltInTypeValidator(Validator):
-    """Validator to handle the build in types. e.g `int`, `list` & `str`"""
+    """Validator to handle the builtin types. e.g `int`, `list` & `str`"""
 
     def __init__(self, violations: deque) -> None:
         """BuiltInTypeValidator init
 
         Args:
             violations (deque): Contains violations that have been detected
-            whilst processing the data
+                whilst processing the data
         """
         super().__init__(violations)
         self._built_in_lookups = {
@@ -39,11 +39,12 @@ class BuiltInTypeValidator(Validator):
         to the list of violations
 
         Args:
-            key              (str): The key to the data
-            data            (Data): The data to validate
-            parent           (str): The parent key of the data
-            rtype       (RuleType): The type assigned to the rule
-            is_required     (bool): Is the rule required
+            key (str): The key to the data
+            data (Data): The data to validate
+            parent (str): The parent key of the data
+            rtype (RuleType): The type assigned to the rule that will be
+                applied to the data
+            is_required (bool, optional): Indicates if the rule is required
         """
         buildin_type = self._built_in_lookups.get(rtype.schema_type)
         is_not_build_in_type = (buildin_type is None)
