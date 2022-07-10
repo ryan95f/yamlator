@@ -1,24 +1,24 @@
-"""Validator for handling lists in the Yamlator schema"""
+"""Validator for handling lists types"""
 
 
 from yamlator.types import Data
 from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
-from .base_validator import Validator
+from yamlator.validators.base_validator import Validator
 
 
 class ListValidator(Validator):
-    """Validtor for handling list types"""
+    """Validator for handling list types"""
 
-    ruleset_validator: Validator = None
+    _ruleset_validator: Validator = None
 
     def set_ruleset_validator(self, validator: Validator) -> None:
-        """Set a validator for when nested rulesets are within the list
+        """Set a validator for when nested rulesets within the list
 
         Args:
             validator (Validator): The validator to handle rulesets
         """
-        self.ruleset_validator = validator
+        self._ruleset_validator = validator
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
@@ -26,11 +26,12 @@ class ListValidator(Validator):
         nested lists are detected in the rule
 
         Args:
-            key              (str): The key to the data
-            data            (Data): The data to validate
-            parent           (str): The parent key of the data
-            rtype       (RuleType): The type assigned to the rule
-            is_required     (bool): Is the rule required
+            key (str): The key to the data
+            data (Data): The data to validate
+            parent (str): The parent key of the data
+            rtype (RuleType): The type assigned to the rule that will be
+                applied to the data
+            is_required (bool, optional): Indicates if the rule is required
         """
         is_list_data = isinstance(data, list)
         is_list_rule = (rtype.schema_type == SchemaTypes.LIST)
@@ -40,8 +41,8 @@ class ListValidator(Validator):
             return
 
         if not is_list_data:
-            self._add_type_violation(key, parent,
-                                     f'{key} should be of type list')
+            message = f'{key} should be of type list'
+            self._add_type_violation(key, parent, message)
             return
 
         for idx, item in enumerate(data):
@@ -66,11 +67,11 @@ class ListValidator(Validator):
 
     def _run_ruleset_validator(self, key: str, parent: str, data: Data,
                                rtype: RuleType) -> None:
-        has_ruleset_validator = (self.ruleset_validator is not None)
+        has_ruleset_validator = (self._ruleset_validator is not None)
         is_ruleset_rule = (rtype.schema_type == SchemaTypes.RULESET)
 
         if has_ruleset_validator and is_ruleset_rule:
-            self.ruleset_validator.validate(
+            self._ruleset_validator.validate(
                 key=key,
                 parent=parent,
                 data=data,
