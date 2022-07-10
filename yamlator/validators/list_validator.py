@@ -13,7 +13,7 @@ class ListValidator(Validator):
     _ruleset_validator: Validator = None
 
     def set_ruleset_validator(self, validator: Validator) -> None:
-        """Set a validator for when nested rulesets within the list
+        """Set a validator for handling nested rulesets in the list
 
         Args:
             validator (Validator): The validator to handle rulesets

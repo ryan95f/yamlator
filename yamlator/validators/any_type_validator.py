@@ -1,4 +1,4 @@
-"""Validator for the any data type"""
+"""Validator for handling the any data type"""
 
 
 from yamlator.types import Data
