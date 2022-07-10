@@ -1,4 +1,4 @@
-"""Validator for handling maps in the Yamlator schema"""
+"""Validator for handling map types"""
 
 
 from yamlator.types import Data
@@ -15,11 +15,12 @@ class MapValidator(Validator):
         """Validate the data contained within in a map
 
         Args:
-            key              (str): The key to the data
-            data            (Data): The data to validate
-            parent           (str): The parent key of the data
-            rtype       (RuleType): The type assigned to the rule
-            is_required     (bool): Is the rule required
+            key (str): The key to the data
+            data (Data): The data to validate
+            parent (str): The parent key of the data
+            rtype (RuleType): The type assigned to the rule that will be
+                applied to the data
+            is_required (bool, optional): Indicates if the rule is required
         """
         is_map_rule = (rtype.schema_type == SchemaTypes.MAP)
         is_map_data = isinstance(data, dict)
@@ -29,8 +30,8 @@ class MapValidator(Validator):
             return
 
         if not is_map_data:
-            self._add_type_violation(key, parent,
-                                     f'{key} should be of type map')
+            message = f'{key} should be of type map'
+            self._add_type_violation(key, parent, message)
             return
 
         for child_key, value in data.items():
