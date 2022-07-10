@@ -1,4 +1,4 @@
-"""Base validator"""
+"""Base Yamlator validator"""
 
 from __future__ import annotations
 from collections import deque
@@ -9,7 +9,7 @@ from yamlator.violations import TypeViolation
 
 
 class Validator:
-    """Base class for validating a rule against the data"""
+    """Base Validator handler"""
 
     _next_validator = None
 
@@ -18,7 +18,7 @@ class Validator:
 
         Args:
             violations (deque): Contains violations that have been detected
-            whilst processing the data
+                whilst processing the data
         """
         self._violations = violations
 
@@ -29,7 +29,7 @@ class Validator:
             validator (Validator): The next validator in the chain
 
         Returns:
-            The object that was provided in the `validator` parameter
+            Validator: The object that was provided in the `validator` parameter
         """
         self._next_validator = validator
         return validator
@@ -39,11 +39,12 @@ class Validator:
         """Validate the data against the next validator in the chain
 
         Args:
-            key              (str): The key to the data
-            data            (Data): The data to validate
-            parent           (str): The parent key of the data
-            rtype       (RuleType): The type assigned to the rule
-            is_required     (bool): Is the rule required
+            key (str): The key to the data
+            data (Data): The data to validate
+            parent (str): The parent key of the data
+            rtype (RuleType): The type assigned to the rule that will be
+                applied to the data
+            is_required (bool, optional): Indicates if the rule is required
         """
 
         if self._next_validator is not None:

@@ -1,4 +1,4 @@
-"""Validator for handling regex data types in the Yamlator schema"""
+"""Validator for handling regex data types"""
 
 
 from yamlator.types import Data
@@ -13,17 +13,18 @@ class RegexValidator(Validator):
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
-        """Validate a regex rule type against some string data. If the data
-        is a string type, then a `TypeViolation` is added to the violation list.
-        If the string does not match the regex rule, then a `RegexTypeViolation`
-        is added to the violation list.
+        """Validate a regex rule type against a string. If the data
+        is not a string type, then a `TypeViolation` is added to
+        the violation list. If the string does not match the regex
+        rule, then a `RegexTypeViolation` is added to the violation list
 
         Args:
-            key              (str): The key to the data
-            data            (Data): The data to validate
-            parent           (str): The parent key of the data
-            rtype       (RuleType): The type assigned to the rule
-            is_required     (bool): Is the rule required
+            key (str): The key to the data
+            data (Data): The data to validate
+            parent (str): The parent key of the data
+            rtype (RuleType): The type assigned to the rule that will be
+                applied to the data
+            is_required (bool, optional): Indicates if the rule is required
         """
         is_regex_type = (rtype.schema_type == SchemaTypes.REGEX)
         if not is_regex_type:
@@ -31,8 +32,8 @@ class RegexValidator(Validator):
             return
 
         if not isinstance(data, str):
-            self._add_type_violation(key, parent,
-                                     f'{key} should be of type str')
+            message = f'{key} should be of type str'
+            self._add_type_violation(key, parent, message)
             return
 
         if not rtype.regex.search(data):

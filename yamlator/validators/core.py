@@ -5,7 +5,6 @@ validator handler chian.
 from collections import deque
 from typing import Iterable
 
-from yamlator.types import Data
 from yamlator.types import Rule
 from yamlator.types import YamlatorRuleset
 
@@ -21,21 +20,21 @@ from yamlator.validators import RulesetValidator
 from yamlator.validators.base_validator import Validator
 
 
-def validate_yaml(yaml_data: Data, instructions: dict) -> deque:
+def validate_yaml(yaml_data: dict, instructions: dict) -> deque:
     """Validate YAML data by comparing the data against a set of instructions.
     Any violations will be collected and returned in a `deque`
 
     Args:
-        yaml_data (dict | list | int | float | str): The yaml data to validate
-
-        instructions                         (dict): The instructions containing
-        enums and rulesets that will be validated
+        yaml_data (dict): The YAML data to validate. Assumes the YAML
+            contains a root key
+        instructions (dict): Contains the enums and rulesets that will be
+            used to validate the YAML data
 
     Returns:
-        A deque with the violations that were detected in the data.
+        deque: The violations that were detected in the data.
 
     Raises:
-        ValueError if the parameters `yaml_data` or `instructions` are `None`.
+        ValueError: When the parameters `yaml_data` or `instructions` are `None`
     """
     if yaml_data is None:
         raise ValueError('yaml_data should not be None')
