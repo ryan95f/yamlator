@@ -69,7 +69,7 @@ The first argument for the CLI is always the path to the YAML file.
 | Flag | Alias | Description | Is Required |
 |:-----|:------|:------------|:------------|
 | `--schema` | `-s` | The schema that will be used to validate the YAML file | True |
-| `--output` | `-o` | Defines the violations format that will be displayed. Supported values are `table` or `json`. Defaults to `table` if not specified. | False |
+| `--output` | `-o` | Defines the violations format that will be displayed. Supported values are `table`, `yaml` or `json`. Defaults to `table` if not specified. | False |
 
 To see the help options for the CLI, run `yamlator -h` or `yamlator --help`
 

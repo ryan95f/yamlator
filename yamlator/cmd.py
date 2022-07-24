@@ -3,10 +3,12 @@
 
 import argparse
 import json
+import yaml
 
 from abc import ABC
 from typing import Iterator
 from enum import Enum
+from collections import deque
 
 from yamlator.utils import load_yaml_file
 from yamlator.utils import load_schema
@@ -17,7 +19,13 @@ from yamlator.validators.core import validate_yaml
 from yamlator.exceptions import InvalidSchemaFilenameError
 from yamlator.exceptions import SchemaParseError
 from yamlator.violations import Violation
+from yamlator.violations import RequiredViolation
+from yamlator.violations import TypeViolation
+from yamlator.violations import BuiltInTypeViolation
+from yamlator.violations import RulesetTypeViolation
+from yamlator.violations import RegexTypeViolation
 from yamlator.violations import ViolationJSONEncoder
+
 
 SUCCESS = 0
 ERR = -1
@@ -72,7 +80,7 @@ def _create_args_parser():
                         validate the YAML file')
 
     parser.add_argument('-o', '--output', type=str, required=False,
-                        default='table', choices=['table', 'json'],
+                        default='table', choices=['table', 'json', 'yaml'],
                         help='Defines the format that will be displayed \
                         for the violations')
     return parser
@@ -107,6 +115,7 @@ class DisplayMethod(Enum):
     """Represents the supported violation display methods"""
     TABLE = 'table'
     JSON = 'json'
+    YAML = 'yaml'
 
 
 def display_violations(violations: Iterator[Violation],
@@ -132,9 +141,14 @@ def display_violations(violations: Iterator[Violation],
     if method is None:
         raise ValueError('method should not be None')
 
-    if method == DisplayMethod.JSON:
-        return JSONOutput.display(violations)
-    return TableOutput.display(violations)
+    strategies = {
+        DisplayMethod.JSON: JSONOutput,
+        DisplayMethod.TABLE: TableOutput,
+        DisplayMethod.YAML: YAMLOutput,
+    }
+
+    display_option = strategies.get(method, TableOutput)
+    return display_option.display(violations)
 
 
 class ViolationOutput(ABC):
@@ -220,3 +234,58 @@ class JSONOutput(ViolationOutput):
         print(json_data)
 
         return SUCCESS if violation_count == 0 else ERR
+
+
+class YAMLOutput(ViolationOutput):
+    """Display violations as YAML"""
+
+    @staticmethod
+    def display(violations: Iterator[Violation]) -> int:
+        """Display the violations to the user as YAML
+
+        Args:
+            violations (Iterator[Violation]): A collection
+            of violations
+
+        Returns:
+            The status code if violations were found. 0 = no
+            violations were found and -1 = violations were found
+        """
+
+        if violations is None:
+            raise ValueError('violations should not be None')
+
+        YAMLOutput._set_up_dumper()
+
+        violation_count = len(violations)
+        data = {
+            'violations': violations,
+            'violationCount': violation_count
+        }
+
+        yaml_str = yaml.dump(data)
+        print(yaml_str)
+        return SUCCESS if violation_count == 0 else ERR
+
+    @staticmethod
+    def _set_up_dumper() -> None:
+        yaml.add_representer(deque, deque_dumper)
+        yaml.add_representer(RequiredViolation, violation_dumper)
+        yaml.add_representer(TypeViolation, violation_dumper)
+        yaml.add_representer(BuiltInTypeViolation, violation_dumper)
+        yaml.add_representer(RulesetTypeViolation, violation_dumper)
+        yaml.add_representer(RegexTypeViolation, violation_dumper)
+
+
+def deque_dumper(dumper: yaml.Dumper, data: deque) -> yaml.SequenceNode:
+    return dumper.represent_list(data)
+
+
+def violation_dumper(dumper: yaml.Dumper, data: Violation) -> yaml.SequenceNode:
+    data_dict = {
+        'key': data.key,
+        'parent': data.parent,
+        'message': data.message,
+        'violationType': data.violation_type
+    }
+    return dumper.represent_dict(data_dict)
