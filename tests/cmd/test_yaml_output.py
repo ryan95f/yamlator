@@ -17,6 +17,9 @@ from parameterized import parameterized
 
 from yamlator.cmd import YAMLOutput
 from yamlator.cmd import ERR, SUCCESS
+from yamlator.violations import BuiltInTypeViolation
+from yamlator.violations import RegexTypeViolation
+from yamlator.violations import RulesetTypeViolation
 from yamlator.violations import RequiredViolation
 from yamlator.violations import TypeViolation
 from yamlator.violations import Violation
@@ -29,7 +32,15 @@ class TestYAMLOutput(unittest.TestCase):
         ('with_no_violations', deque(), SUCCESS),
         ('with_violations', deque([
             RequiredViolation(key='message', parent='-'),
-            TypeViolation(key='number', parent='-', message='Invalid number')
+            TypeViolation(key='number', parent='-', message='Invalid number'),
+            BuiltInTypeViolation(key='name',
+                                 parent='-',
+                                 expected_type=str),
+            RulesetTypeViolation(key='address', parent='-'),
+            RegexTypeViolation(key='data',
+                               parent='-',
+                               data='1st January 2022',
+                               regex_str=r'([0-3][0-9]\/){2}2022')
         ]), ERR)
     ])
     def test_json_output(self,
