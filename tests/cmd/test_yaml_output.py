@@ -1,9 +1,9 @@
 """Test cases for the `YAMLOutput` static class
 
 Test Cases:
-    * `test_json_output` tests that the expected status code is returned
+    * `test_yaml_output` tests that the expected status code is returned
        when valid arguments are provided
-    * `test_json_output_invalid_args` tests that the relevant exception is
+    * `test_yaml_output_invalid_args` tests that the relevant exception is
        raised when invalid arguments are provided
 """
 
@@ -43,7 +43,7 @@ class TestYAMLOutput(unittest.TestCase):
                                regex_str=r'([0-3][0-9]\/){2}2022')
         ]), ERR)
     ])
-    def test_json_output(self,
+    def test_yaml_output(self,
                          name: str,
                          violations: Iterator[Violation],
                          expected_status_code: str):
