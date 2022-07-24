@@ -280,6 +280,7 @@ class YAMLOutput(ViolationOutput):
 def deque_dumper(dumper: yaml.Dumper, data: deque) -> yaml.SequenceNode:
     return dumper.represent_list(data)
 
+
 def violation_dumper(dumper: yaml.Dumper, data: Violation) -> yaml.SequenceNode:
     data_dict = {
         'key': data.key,
