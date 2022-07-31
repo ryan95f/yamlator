@@ -182,6 +182,9 @@ class TableOutput(ViolationOutput):
         Returns:
             The status code if violations were found. 0 = no
             violations were found and -1 = violations were found
+        
+        Raises:
+            ValueError: If the violations list is None
         """
         if violations is None:
             raise ValueError('violations should not be None')
@@ -220,6 +223,9 @@ class JSONOutput(ViolationOutput):
         Returns:
             The status code if violations were found. 0 = no
             violations were found and -1 = violations were found
+        
+        Raises:
+            ValueError: If the violations list is None
         """
         if violations is None:
             raise ValueError('violations should not be None')
@@ -251,6 +257,9 @@ class YAMLOutput(ViolationOutput):
         Returns:
             The status code if violations were found. 0 = no
             violations were found and -1 = violations were found
+
+        Raises:
+            ValueError: If the violations list is None
         """
 
         if violations is None:
@@ -270,23 +279,24 @@ class YAMLOutput(ViolationOutput):
 
     @staticmethod
     def _set_up_dumper() -> None:
-        yaml.add_representer(deque, deque_dumper)
-        yaml.add_representer(RequiredViolation, violation_dumper)
-        yaml.add_representer(TypeViolation, violation_dumper)
-        yaml.add_representer(BuiltInTypeViolation, violation_dumper)
-        yaml.add_representer(RulesetTypeViolation, violation_dumper)
-        yaml.add_representer(RegexTypeViolation, violation_dumper)
+        yaml.add_representer(deque, YAMLOutput._deque_dumper)
+        yaml.add_representer(RequiredViolation, YAMLOutput._violation_dumper)
+        yaml.add_representer(TypeViolation, YAMLOutput._violation_dumper)
+        yaml.add_representer(BuiltInTypeViolation, YAMLOutput._violation_dumper)
+        yaml.add_representer(RulesetTypeViolation, YAMLOutput._violation_dumper)
+        yaml.add_representer(RegexTypeViolation, YAMLOutput._violation_dumper)
 
+    @staticmethod
+    def _deque_dumper(dumper: yaml.Dumper, data: deque) -> yaml.SequenceNode:
+        return dumper.represent_list(data)
 
-def deque_dumper(dumper: yaml.Dumper, data: deque) -> yaml.SequenceNode:
-    return dumper.represent_list(data)
-
-
-def violation_dumper(dumper: yaml.Dumper, data: Violation) -> yaml.SequenceNode:
-    data_dict = {
-        'key': data.key,
-        'parent': data.parent,
-        'message': data.message,
-        'violationType': data.violation_type
-    }
-    return dumper.represent_dict(data_dict)
+    @staticmethod
+    def _violation_dumper(dumper: yaml.Dumper,
+                          data: Violation) -> yaml.SequenceNode:
+        data_dict = {
+            'key': data.key,
+            'parent': data.parent,
+            'message': data.message,
+            'violationType': data.violation_type
+        }
+        return dumper.represent_dict(data_dict)
