@@ -15,9 +15,9 @@ from typing import Iterator
 from unittest.mock import patch
 from parameterized import parameterized
 
-from yamlator.cmd import SuccessCode
 from yamlator.cmd import display_violations
 from yamlator.cmd import DisplayMethod
+from yamlator.cmd.outputs import SuccessCode
 from yamlator.violations import RequiredViolation
 from yamlator.violations import Violation
 

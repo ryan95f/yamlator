@@ -15,8 +15,8 @@ from typing import Iterator, Type
 from unittest.mock import patch
 from parameterized import parameterized
 
-from yamlator.cmd import SuccessCode
-from yamlator.cmd import TableOutput
+from yamlator.cmd.outputs import SuccessCode
+from yamlator.cmd.outputs import TableOutput
 from yamlator.violations import RequiredViolation
 from yamlator.violations import Violation
 from yamlator.violations import TypeViolation

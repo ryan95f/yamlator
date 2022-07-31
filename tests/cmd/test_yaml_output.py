@@ -16,8 +16,8 @@ from typing import Type
 from typing import Iterator
 from parameterized import parameterized
 
-from yamlator.cmd import YAMLOutput
-from yamlator.cmd import SuccessCode
+from yamlator.cmd.outputs import YAMLOutput
+from yamlator.cmd.outputs import SuccessCode
 from yamlator.violations import BuiltInTypeViolation
 from yamlator.violations import RegexTypeViolation
 from yamlator.violations import RulesetTypeViolation

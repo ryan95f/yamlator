@@ -16,8 +16,8 @@ from unittest.mock import Mock
 from unittest.mock import patch
 
 from yamlator.cmd import main
-from yamlator.cmd import SuccessCode
 from yamlator.cmd import DisplayMethod
+from yamlator.cmd.outputs import SuccessCode
 
 HELLO_YAML_FILE_PATH = './tests/files/example/example.yaml'
 HELLO_RULESET_FILE_PATH = './tests/files/example/example.ys'
