@@ -1,3 +1,4 @@
+"""Display output class for generating a table"""
 from typing import Iterator
 
 from yamlator.violations import Violation
@@ -18,7 +19,7 @@ class TableOutput(ViolationOutput):
         Returns:
             The status code if violations were found. 0 = no
             violations were found and -1 = violations were found
-        
+
         Raises:
             ValueError: If the violations list is None
         """

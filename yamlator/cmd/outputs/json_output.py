@@ -1,3 +1,4 @@
+"""Display output class for generating JSON"""
 import json
 from typing import Iterator
 

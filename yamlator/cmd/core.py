@@ -1,9 +1,8 @@
 """Handles the command line utility functions and entry point"""
 import argparse
 
-from typing import Iterator
 from enum import Enum
-
+from typing import Iterator
 
 from yamlator.utils import load_yaml_file
 from yamlator.utils import load_schema

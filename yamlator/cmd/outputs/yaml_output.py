@@ -1,3 +1,4 @@
+"""Display output class for generating YAML"""
 import yaml
 
 from collections import deque

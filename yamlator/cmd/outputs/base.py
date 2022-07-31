@@ -1,3 +1,7 @@
+"""Maintains the base class for defining an output option and
+the SuccessCode Enum
+"""
+
 from abc import ABC
 from typing import Iterator
 from enum import IntEnum
