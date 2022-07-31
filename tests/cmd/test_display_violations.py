@@ -19,7 +19,26 @@ from yamlator.cmd import display_violations
 from yamlator.cmd import DisplayMethod
 from yamlator.cmd.outputs import SuccessCode
 from yamlator.violations import RequiredViolation
+from yamlator.violations import TypeViolation
+from yamlator.violations import BuiltInTypeViolation
+from yamlator.violations import RulesetTypeViolation
+from yamlator.violations import RegexTypeViolation
 from yamlator.violations import Violation
+
+
+EMPTY_VIOLATION_LIST = []
+VIOLATION_LIST = [
+    RequiredViolation(key='message', parent='-'),
+    TypeViolation(key='number', parent='-', message='Invalid number'),
+    BuiltInTypeViolation(key='name',
+                         parent='-',
+                         expected_type=str),
+    RulesetTypeViolation(key='address', parent='-'),
+    RegexTypeViolation(key='data',
+                       parent='-',
+                       data='1st January 2022',
+                       regex_str=r'([0-3][0-9]\/){2}2022')
+]
 
 
 class TestDisplayViolations(unittest.TestCase):
@@ -27,19 +46,28 @@ class TestDisplayViolations(unittest.TestCase):
 
     @parameterized.expand([
         ('display_table_with_violations',
-            [RequiredViolation('data', '-')],
+            VIOLATION_LIST,
             DisplayMethod.TABLE,
             SuccessCode.ERR),
         ('display_table_without_violations',
-            [],
+            EMPTY_VIOLATION_LIST,
             DisplayMethod.TABLE,
             SuccessCode.SUCCESS),
         ('display_json_with_violations',
-            [RequiredViolation('data', '-')],
+            VIOLATION_LIST,
             DisplayMethod.JSON,
             SuccessCode.ERR),
         ('display_json_without_violations',
-            [], DisplayMethod.JSON,
+            EMPTY_VIOLATION_LIST,
+            DisplayMethod.JSON,
+            SuccessCode.SUCCESS),
+        ('display_yaml_with_violations',
+            VIOLATION_LIST,
+            DisplayMethod.YAML,
+            SuccessCode.ERR),
+        ('display_yaml_without_violations',
+            EMPTY_VIOLATION_LIST,
+            DisplayMethod.YAML,
             SuccessCode.SUCCESS),
     ])
     def test_display_violations(self, name, violations: Iterator[Violation],
