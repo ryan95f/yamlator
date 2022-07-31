@@ -15,7 +15,8 @@ from typing import Iterator, Type
 from unittest.mock import patch
 from parameterized import parameterized
 
-from yamlator.cmd import ERR, SUCCESS, JSONOutput
+from yamlator.cmd import SuccessCode
+from yamlator.cmd import JSONOutput
 from yamlator.violations import RequiredViolation
 from yamlator.violations import TypeViolation
 from yamlator.violations import Violation
@@ -25,11 +26,11 @@ class TestJSONOutput(unittest.TestCase):
     """Test the JSONOutput display method"""
 
     @parameterized.expand([
-        ('with_no_violations', [], SUCCESS),
+        ('with_no_violations', [], SuccessCode.SUCCESS),
         ('with_violations', [
             RequiredViolation(key='message', parent='-'),
             TypeViolation(key='number', parent='-', message='Invalid number')
-        ], ERR)
+        ], SuccessCode.ERR)
     ])
     def test_json_output(self, name: str,
                          violations: Iterator[Violation],

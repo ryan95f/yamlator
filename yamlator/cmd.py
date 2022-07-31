@@ -7,7 +7,7 @@ import yaml
 
 from abc import ABC
 from typing import Iterator
-from enum import Enum
+from enum import Enum, IntEnum
 from collections import deque
 
 from yamlator.utils import load_yaml_file
@@ -27,12 +27,13 @@ from yamlator.violations import RegexTypeViolation
 from yamlator.violations import ViolationJSONEncoder
 
 
-SUCCESS = 0
-ERR = -1
+class SuccessCode(IntEnum):
+    SUCCESS = 0
+    ERR = -1
 
 
 def main() -> int:
-    """Entry point into the Yamler CLI
+    """Entry point into the Yamlator CLI
 
     Returns:
         A status code where 0 = success and -1 = error
@@ -48,19 +49,19 @@ def main() -> int:
         )
     except SchemaParseError as ex:
         print(ex)
-        return ERR
+        return SuccessCode.ERR
     except SchemaSyntaxError as ex:
         print(ex)
-        return ERR
+        return SuccessCode.ERR
     except FileNotFoundError as ex:
         print(ex)
-        return ERR
+        return SuccessCode.ERR
     except InvalidSchemaFilenameError as ex:
         print(ex)
-        return ERR
+        return SuccessCode.ERR
     except ValueError as ex:
         print(ex)
-        return ERR
+        return SuccessCode.ERR
 
     display_method = DisplayMethod[args.output.upper()]
     return display_violations(violations, display_method)
@@ -190,7 +191,7 @@ class TableOutput(ViolationOutput):
 
         has_violations = violation_count != 0
         if not has_violations:
-            return SUCCESS
+            return SuccessCode.SUCCESS
 
         parent_title = 'Parent Key'
         key_title = 'Key'
@@ -202,7 +203,7 @@ class TableOutput(ViolationOutput):
         for violation in violations:
             print(f'{violation.parent:<30} {violation.key:<20} {violation.violation_type:<15} {violation.message:<20}')  # nopep8 pylint: disable=C0301
         print('---------------------------------------------------------------------------')  # nopep8 pylint: disable=C0301
-        return ERR
+        return SuccessCode.ERR
 
 
 class JSONOutput(ViolationOutput):
@@ -233,7 +234,7 @@ class JSONOutput(ViolationOutput):
                                cls=ViolationJSONEncoder, indent=4)
         print(json_data)
 
-        return SUCCESS if violation_count == 0 else ERR
+        return SuccessCode.SUCCESS if violation_count == 0 else SuccessCode.ERR
 
 
 class YAMLOutput(ViolationOutput):
@@ -265,7 +266,7 @@ class YAMLOutput(ViolationOutput):
 
         yaml_str = yaml.dump(data)
         print(yaml_str)
-        return SUCCESS if violation_count == 0 else ERR
+        return SuccessCode.SUCCESS if violation_count == 0 else SuccessCode.ERR
 
     @staticmethod
     def _set_up_dumper() -> None:

@@ -15,8 +15,7 @@ from typing import Iterator
 from unittest.mock import patch
 from parameterized import parameterized
 
-from yamlator.cmd import ERR
-from yamlator.cmd import SUCCESS
+from yamlator.cmd import SuccessCode
 from yamlator.cmd import display_violations
 from yamlator.cmd import DisplayMethod
 from yamlator.violations import RequiredViolation
@@ -28,11 +27,20 @@ class TestDisplayViolations(unittest.TestCase):
 
     @parameterized.expand([
         ('display_table_with_violations',
-            [RequiredViolation('data', '-')], DisplayMethod.TABLE, ERR),
-        ('display_table_without_violations', [], DisplayMethod.TABLE, SUCCESS),
+            [RequiredViolation('data', '-')],
+            DisplayMethod.TABLE,
+            SuccessCode.ERR),
+        ('display_table_without_violations',
+            [],
+            DisplayMethod.TABLE,
+            SuccessCode.SUCCESS),
         ('display_json_with_violations',
-            [RequiredViolation('data', '-')], DisplayMethod.JSON, ERR),
-        ('display_json_without_violations', [], DisplayMethod.JSON, SUCCESS),
+            [RequiredViolation('data', '-')],
+            DisplayMethod.JSON,
+            SuccessCode.ERR),
+        ('display_json_without_violations',
+            [], DisplayMethod.JSON,
+            SuccessCode.SUCCESS),
     ])
     def test_display_violations(self, name, violations: Iterator[Violation],
                                 display_method: str, expected_status_code: int):

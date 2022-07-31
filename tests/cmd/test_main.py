@@ -11,11 +11,12 @@ import unittest
 
 from collections import namedtuple
 from parameterized import parameterized
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
 
-from yamlator.cmd import ERR
-from yamlator.cmd import SUCCESS
 from yamlator.cmd import main
+from yamlator.cmd import SuccessCode
 from yamlator.cmd import DisplayMethod
 
 HELLO_YAML_FILE_PATH = './tests/files/example/example.yaml'
@@ -33,47 +34,47 @@ class TestMain(unittest.TestCase):
             HELLO_YAML_FILE_PATH,
             HELLO_RULESET_FILE_PATH,
             DisplayMethod.TABLE.value
-        ), SUCCESS),
+        ), SuccessCode.SUCCESS),
         ('with_yaml_containing_ruleset_violations', ValidateArgs(
             INVALID_HELLO_YAML_FILE_PATH,
             HELLO_RULESET_FILE_PATH,
             DisplayMethod.TABLE.value
-        ), ERR),
+        ), SuccessCode.ERR),
         ('with_ruleset_file_not_found', ValidateArgs(
             HELLO_YAML_FILE_PATH,
             '/test/files/not_found.ys',
             DisplayMethod.TABLE.value
-        ), ERR),
+        ), SuccessCode.ERR),
         ('with_yaml_data_not_found', ValidateArgs(
             './tests/files/not_found.yaml',
             HELLO_RULESET_FILE_PATH,
             DisplayMethod.TABLE.value
-        ), ERR),
+        ), SuccessCode.ERR),
         ('with_empty_yaml_file_path', ValidateArgs(
             '',
             HELLO_RULESET_FILE_PATH,
             DisplayMethod.TABLE.value
-        ), ERR),
+        ), SuccessCode.ERR),
         ('with_empty_ruleset_path', ValidateArgs(
             HELLO_YAML_FILE_PATH,
             '',
             DisplayMethod.TABLE.value
-        ), ERR),
+        ), SuccessCode.ERR),
         ('with_invalid_ruleset_extension', ValidateArgs(
             HELLO_YAML_FILE_PATH,
             './tests/files/hello.ruleset',
             DisplayMethod.TABLE.value
-        ), ERR),
+        ), SuccessCode.ERR),
         ('with_syntax_errors', ValidateArgs(
             HELLO_YAML_FILE_PATH,
             './tests/files/invalid_files/invalid_enum_name.ys',
             DisplayMethod.TABLE.value
-        ), ERR),
+        ), SuccessCode.ERR),
         ('with_ruleset_not_defined', ValidateArgs(
             HELLO_YAML_FILE_PATH,
             './tests/files/invalid_files/missing_defined_ruleset.ys',
             DisplayMethod.TABLE.value
-        ), ERR)
+        ), SuccessCode.ERR)
     ])
     @patch('argparse.ArgumentParser')
     def test_main(self, name: str, args: ValidateArgs,
