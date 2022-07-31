@@ -15,8 +15,10 @@ from typing import Iterator, Type
 from unittest.mock import patch
 from parameterized import parameterized
 
-from yamlator.cmd import ERR, SUCCESS, TableOutput
-from yamlator.violations import RequiredViolation, Violation
+from yamlator.cmd.outputs import SuccessCode
+from yamlator.cmd.outputs import TableOutput
+from yamlator.violations import RequiredViolation
+from yamlator.violations import Violation
 from yamlator.violations import TypeViolation
 from yamlator.violations import ViolationType
 
@@ -25,11 +27,11 @@ class TestTableOutput(unittest.TestCase):
     """Test the `TableOutput` display method"""
 
     @parameterized.expand([
-        ('with_no_violations', [], SUCCESS),
+        ('with_no_violations', [], SuccessCode.SUCCESS),
         ('with_violations', [
             RequiredViolation(key='message', parent='-'),
             TypeViolation(key='number', parent='-', message='Invalid number')
-        ], ERR)
+        ], SuccessCode.ERR)
     ])
     def test_displayed_violation_output(self, name: str,
                                         violations: Iterator[ViolationType],

@@ -12,11 +12,12 @@ import unittest
 
 from collections import deque
 from unittest.mock import patch
-from typing import Iterator, Type
+from typing import Type
+from typing import Iterator
 from parameterized import parameterized
 
-from yamlator.cmd import YAMLOutput
-from yamlator.cmd import ERR, SUCCESS
+from yamlator.cmd.outputs import YAMLOutput
+from yamlator.cmd.outputs import SuccessCode
 from yamlator.violations import BuiltInTypeViolation
 from yamlator.violations import RegexTypeViolation
 from yamlator.violations import RulesetTypeViolation
@@ -29,7 +30,7 @@ class TestYAMLOutput(unittest.TestCase):
     """Test the YAMLOutput display method"""
 
     @parameterized.expand([
-        ('with_no_violations', deque(), SUCCESS),
+        ('with_no_violations', deque(), SuccessCode.SUCCESS),
         ('with_violations', deque([
             RequiredViolation(key='message', parent='-'),
             TypeViolation(key='number', parent='-', message='Invalid number'),
@@ -41,7 +42,7 @@ class TestYAMLOutput(unittest.TestCase):
                                parent='-',
                                data='1st January 2022',
                                regex_str=r'([0-3][0-9]\/){2}2022')
-        ]), ERR)
+        ]), SuccessCode.ERR)
     ])
     def test_yaml_output(self,
                          name: str,
