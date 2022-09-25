@@ -16,7 +16,7 @@
 
 * Updated urls in the `README.md` and `setup.py` to reflect the username change
 
-## v0.1.2 (TBC)
+## v0.1.2 (25th September 2022)
 
 * Added `Pylint` to the `test` workflow pipeline
 * Added a new `CodeQL` workflow pipeline
