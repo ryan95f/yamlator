@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 
 from enum import Enum, auto
-from typing import Union
+from typing import Union, Iterator
 from collections import namedtuple
 
 Rule = namedtuple('Rule', ['name', 'rtype', 'is_required'])
@@ -107,8 +107,12 @@ class YamlatorRuleset(YamlatorType):
             rules   (list): A list of rules for the ruleset
         """
         super().__init__(name, ContainerTypes.RULESET)
-        self.rules = rules
+        self._rules = rules
         self.is_strict = is_strict
+
+    @property
+    def rules(self) -> Iterator[Rule]:
+        return self._rules
 
 
 class YamlatorEnum(YamlatorType):

@@ -12,6 +12,7 @@ from typing import Any
 class ViolationType(Enum):
     REQUIRED = 'required'
     TYPE = 'type'
+    STRICT = 'strict'
 
 
 class ViolationJSONEncoder(json.JSONEncoder):
@@ -141,8 +142,7 @@ class RegexTypeViolation(TypeViolation):
         super().__init__(key, parent, message)
 
 
-class StrictRulesetViolation(TypeViolation):
-    def __init__(self, key: str, parent: str, additional_fields: list[str]):
-        fields = ",".join(additional_fields)
-        message = f"strict ruleset violation. Additional fields found: {fields}"
-        super().__init__(key, parent, message)
+class StrictRulesetViolation(Violation):
+    def __init__(self, key: str, parent: str, field: str, ruleset_name: str):
+        message = f"{field} is not expected in ruleset {ruleset_name}"
+        super().__init__(key, parent, message, ViolationType.STRICT)
