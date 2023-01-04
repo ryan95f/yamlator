@@ -97,6 +97,12 @@ class SchemaTransformer(Transformer):
         self.seen_constructs[name] = SchemaTypes.RULESET
         return YamlatorRuleset(name, rules)
 
+    def strict_ruleset(self, tokens: Any) -> YamlatorRuleset:
+        name = tokens[0].value
+        rules = tokens[1:]
+        self.seen_constructs[name] = SchemaTypes.RULESET
+        return YamlatorRuleset(name, rules, is_strict=True)
+
     def start(self, instructions: Iterator[YamlatorType]) -> dict:
         """Transforms the instructions into a dict that sorts the rulesets,
         enums and entry point to validate YAML data"""

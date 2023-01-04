@@ -139,3 +139,10 @@ class RegexTypeViolation(TypeViolation):
         """
         message = f'{data} does not match regex "{regex_str}"'
         super().__init__(key, parent, message)
+
+
+class StrictRulesetViolation(TypeViolation):
+    def __init__(self, key: str, parent: str, additional_fields: list[str]):
+        fields = ",".join(additional_fields)
+        message = f"strict ruleset violation. Additional fields found: {fields}"
+        super().__init__(key, parent, message)

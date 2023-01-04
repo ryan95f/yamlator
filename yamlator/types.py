@@ -99,7 +99,7 @@ class YamlatorRuleset(YamlatorType):
     rules of `RuleType` which will validated against
     """
 
-    def __init__(self, name: str, rules: list):
+    def __init__(self, name: str, rules: list, is_strict: bool = False):
         """YamlatorRuleset init
 
         Args:
@@ -108,6 +108,7 @@ class YamlatorRuleset(YamlatorType):
         """
         super().__init__(name, ContainerTypes.RULESET)
         self.rules = rules
+        self.is_strict = is_strict
 
 
 class YamlatorEnum(YamlatorType):

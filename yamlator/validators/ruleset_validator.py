@@ -10,6 +10,7 @@ from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
 from yamlator.types import YamlatorRuleset
 from yamlator.violations import RulesetTypeViolation
+from yamlator.violations import StrictRulesetViolation
 from .base_validator import Validator
 
 
@@ -74,9 +75,14 @@ class RulesetValidator(Validator):
             self._violations.append(violation)
             return
 
-        ruleset_rules = self._retrieve_next_ruleset(rtype.lookup)
+        next_ruleset = self._retrieve_next_ruleset(rtype.lookup)
 
-        for ruleset_rule in ruleset_rules:
+        extra_fields = self._violates_strict_ruleset(next_ruleset, data)
+        if extra_fields:
+            violation = StrictRulesetViolation(key, parent, extra_fields)
+            self._violations.append(violation)
+
+        for ruleset_rule in next_ruleset.rules:
             sub_data = data.get(ruleset_rule.name, None)
 
             if self._ruleset_validator is not None:
@@ -88,7 +94,16 @@ class RulesetValidator(Validator):
                     is_required=ruleset_rule.is_required
                 )
 
-    def _retrieve_next_ruleset(self, ruleset_name: str) -> Iterable[Rule]:
+    def _retrieve_next_ruleset(self, ruleset_name: str) -> YamlatorRuleset:
         default_missing_ruleset = YamlatorRuleset(ruleset_name, [])
         ruleset = self._instructions.get(ruleset_name, default_missing_ruleset)
-        return ruleset.rules
+        return ruleset
+
+    def _violates_strict_ruleset(self, ruleset: YamlatorRuleset,
+                                 data: dict) -> dict:
+        if not ruleset.is_strict:
+            return {}
+
+        rule_names = set([rule.name for rule in ruleset.rules])
+        data_names = set(data.keys())
+        return data_names - rule_names
