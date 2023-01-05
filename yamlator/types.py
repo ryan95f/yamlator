@@ -103,16 +103,23 @@ class YamlatorRuleset(YamlatorType):
         """YamlatorRuleset init
 
         Args:
-            name     (str): The name of the ruleset
-            rules   (list): A list of rules for the ruleset
+            name       (str): The name of the ruleset
+            rules     (list): A list of rules for the ruleset
+            is_strict (bool): Sets the ruleset to be in strict mode.
+            When used with the validators, it will check to ensure any
+            extra fields are raised as a violation
         """
         super().__init__(name, ContainerTypes.RULESET)
         self._rules = rules
-        self.is_strict = is_strict
+        self._is_strict = is_strict
 
     @property
     def rules(self) -> Iterator[Rule]:
         return self._rules
+
+    @property
+    def is_strict(self) -> bool:
+        return self._is_strict
 
 
 class YamlatorEnum(YamlatorType):

@@ -73,7 +73,7 @@ class RulesetValidator(Validator):
             self._violations.append(violation)
             return
 
-        ruleset = self._retrieve_next_ruleset(rtype.lookup)
+        ruleset = self._retrieve_ruleset(rtype.lookup)
 
         self._handle_strict_violations(key, parent, ruleset, data)
 
@@ -89,7 +89,7 @@ class RulesetValidator(Validator):
                     is_required=ruleset_rule.is_required
                 )
 
-    def _retrieve_next_ruleset(self, ruleset_name: str) -> YamlatorRuleset:
+    def _retrieve_ruleset(self, ruleset_name: str) -> YamlatorRuleset:
         default_missing_ruleset = YamlatorRuleset(ruleset_name, [])
         ruleset = self._instructions.get(ruleset_name, default_missing_ruleset)
         return ruleset
@@ -99,8 +99,12 @@ class RulesetValidator(Validator):
         if not ruleset.is_strict:
             return
 
-        rule_fields = set([rule.name for rule in ruleset.rules])
+        rule_fields = {rule.name for rule in ruleset.rules}
         data_fields = set(data.keys())
+
+        # Find the differance between the data and
+        # the ruleset fields to determine the additional
+        # fields that have been added to the YAML file
         extra_fields = data_fields - rule_fields
 
         for field in extra_fields:

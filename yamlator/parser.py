@@ -98,6 +98,9 @@ class SchemaTransformer(Transformer):
         return YamlatorRuleset(name, rules)
 
     def strict_ruleset(self, tokens: Any) -> YamlatorRuleset:
+        """Transforms the ruleset tokens into a YamlatorRuleset object
+        and marks the ruleset as being in strict mode
+        """
         name = tokens[0].value
         rules = tokens[1:]
         self.seen_constructs[name] = SchemaTypes.RULESET

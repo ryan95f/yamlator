@@ -56,7 +56,7 @@ class TestRuleSetValidator(BaseValidatorTest):
             [0, 1, 2], 1),
         ('ruleset_with_str_data',
             RuleType(schema_type=SchemaTypes.RULESET, lookup='not_real'),
-            'hello world', 1),
+            'hello world', 1)
     ])
     def test_ruleset_validator(self, name: str, rtype: RuleType, data: Data,
                                expected_violation_count: int):

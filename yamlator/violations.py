@@ -143,6 +143,16 @@ class RegexTypeViolation(TypeViolation):
 
 
 class StrictRulesetViolation(Violation):
+    """Violation for when ruleset in strict mode has additional fields"""
+
     def __init__(self, key: str, parent: str, field: str, ruleset_name: str):
+        """StrictRulesetViolation init
+
+        Args:
+            key          (str):  The key name in the YAML file
+            parent       (str):  The parent key in the YAML file
+            field        (str):  The name of the additional field in the ruleset
+            ruleset_name (str):  The name of the ruleset
+        """
         message = f"{field} is not expected in ruleset {ruleset_name}"
         super().__init__(key, parent, message, ViolationType.STRICT)

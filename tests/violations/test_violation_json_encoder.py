@@ -16,11 +16,13 @@ from collections import deque
 from parameterized import parameterized
 from dataclasses import dataclass
 
-from yamlator.violations import BuiltInTypeViolation, RegexTypeViolation
+from yamlator.violations import BuiltInTypeViolation
+from yamlator.violations import RegexTypeViolation
 from yamlator.violations import RequiredViolation
 from yamlator.violations import RulesetTypeViolation
 from yamlator.violations import TypeViolation
 from yamlator.violations import ViolationJSONEncoder
+from yamlator.violations import StrictRulesetViolation
 
 
 @dataclass
@@ -46,7 +48,9 @@ class TestViolationJSONEncoder(unittest.TestCase):
         ('encode_string', 'hello world'),
         ('encode_dict', {'message': 'Hello World', 'number': 43}),
         ('encode_list', [0, 1, 2, 3, 4]),
-        ('encode_none', None)
+        ('encode_none', None),
+        ('encode_strict_ruleset_violation',
+            StrictRulesetViolation('data', '-', 'message', 'details'))
     ])
     def test_violation_json_encoder(self, name: str, data: Any):
         # Unused by test case, however is required by the parameterized library

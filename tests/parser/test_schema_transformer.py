@@ -98,6 +98,16 @@ class TestSchemaTransformer(unittest.TestCase):
 
         self.assertEqual(name.value, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
+        self.assertFalse(ruleset.is_strict)
+
+    def test_strict_ruleset(self):
+        name = Token('person')
+        tokens = (name, *self.ruleset_rules)
+        ruleset = self.transformer.strict_ruleset(tokens)
+
+        self.assertEqual(name.value, ruleset.name)
+        self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
+        self.assertTrue(ruleset.is_strict)
 
     def test_start(self):
         # This will be zero since main is removed from the dict
