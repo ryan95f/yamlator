@@ -25,6 +25,7 @@ class TestRuleSetValidator(BaseValidatorTest):
     def setUp(self):
         super().setUp()
         self.instructions = self._create_flat_ruleset()
+        self.strict_instructions = self._create_strict_ruleset()
 
     def _create_flat_ruleset(self):
         message_ruleset = YamlatorRuleset('message', [
@@ -32,9 +33,18 @@ class TestRuleSetValidator(BaseValidatorTest):
             Rule('number', RuleType(schema_type=SchemaTypes.INT), False)
         ])
         return {
-            'rules': {
-                'message': message_ruleset
-            }
+            'message': message_ruleset
+        }
+
+    def _create_strict_ruleset(self):
+        person_ruleset = YamlatorRuleset('person', [
+            Rule('firstName', RuleType(schema_type=SchemaTypes.STR), True),
+            Rule('lastName', RuleType(schema_type=SchemaTypes.STR), True),
+            Rule('age', RuleType(schema_type=SchemaTypes.INT), False),
+        ], is_strict=True)
+
+        return {
+            'person': person_ruleset
         }
 
     @parameterized.expand([
@@ -44,10 +54,10 @@ class TestRuleSetValidator(BaseValidatorTest):
             RuleType(schema_type=SchemaTypes.RULESET), 'hello world', 1),
         ('valid_ruleset',
             RuleType(schema_type=SchemaTypes.RULESET, lookup='message'),
-            {'msg': {'message': 'hello', 'number': 1}}, 0),
+            {'message': 'hello', 'number': 1}, 0),
         ('ruleset_with_no_rules',
             RuleType(schema_type=SchemaTypes.RULESET, lookup='not_real'),
-            {'msg': {'message': 'hello', 'number': 1}}, 0),
+            {'message': 'hello', 'number': 1}, 0),
         ('ruleset_with_none_data',
             RuleType(schema_type=SchemaTypes.RULESET, lookup='not_real'),
             None, 1),
@@ -64,6 +74,36 @@ class TestRuleSetValidator(BaseValidatorTest):
         del name
 
         validator = RulesetValidator(self.violations, self.instructions)
+        validator.validate(
+            key=self.key,
+            data=data,
+            parent=self.parent,
+            rtype=rtype)
+
+        actual_violation_count = len(self.violations)
+        self.assertEqual(expected_violation_count, actual_violation_count)
+
+    @parameterized.expand([
+        ('with_all_fields',
+            RuleType(schema_type=SchemaTypes.RULESET, lookup='person'),
+            {'firstName': 'foo', 'lastName': 'bar', 'age': 42}, 0),
+        ('with_additional_fields',
+            RuleType(schema_type=SchemaTypes.RULESET, lookup='person'),
+            {
+                'firstName': 'foo',
+                'lastName': 'bar',
+                'age': 42,
+                'message': 'fake',
+                'name': 'foo bar'
+            }, 2)
+    ])
+    def test_strict_ruleset_valiation(self, name: str, rtype: RuleType,
+                                      data: Data,
+                                      expected_violation_count: int):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
+        validator = RulesetValidator(self.violations, self.strict_instructions)
         validator.validate(
             key=self.key,
             data=data,

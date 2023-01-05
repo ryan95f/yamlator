@@ -111,15 +111,11 @@ class YamlatorRuleset(YamlatorType):
         """
         super().__init__(name, ContainerTypes.RULESET)
         self._rules = rules
-        self._is_strict = is_strict
+        self.is_strict = is_strict
 
     @property
     def rules(self) -> Iterator[Rule]:
         return self._rules
-
-    @property
-    def is_strict(self) -> bool:
-        return self._is_strict
 
 
 class YamlatorEnum(YamlatorType):

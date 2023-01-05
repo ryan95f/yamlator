@@ -74,7 +74,6 @@ class RulesetValidator(Validator):
             return
 
         ruleset = self._retrieve_ruleset(rtype.lookup)
-
         self._handle_strict_violations(key, parent, ruleset, data)
 
         for ruleset_rule in ruleset.rules:
