@@ -3,6 +3,8 @@
 Test cases:
     * `test_ruleset_validator` tests the validation of rulesets with
        different possible ways a valid and invalid ruleset can be defined
+    * `test_strict_ruleset_validation` tests the strict ruleset validation
+       with different possible scenarios when using additional fields
 """
 
 
@@ -95,11 +97,17 @@ class TestRuleSetValidator(BaseValidatorTest):
                 'age': 42,
                 'message': 'fake',
                 'name': 'foo bar'
-            }, 2)
+            }, 2),
+        ('with_only_additional_fields',
+            RuleType(schema_type=SchemaTypes.RULESET, lookup='person'),
+            {'message': 'fake', 'name': 'foo bar'}, 2),
+        ('with_empty_data',
+            RuleType(schema_type=SchemaTypes.RULESET, lookup='person'),
+            {}, 0)
     ])
-    def test_strict_ruleset_valiation(self, name: str, rtype: RuleType,
-                                      data: Data,
-                                      expected_violation_count: int):
+    def test_strict_ruleset_validation(self, name: str, rtype: RuleType,
+                                       data: Data,
+                                       expected_violation_count: int):
         # Unused by test case, however is required by the parameterized library
         del name
 
