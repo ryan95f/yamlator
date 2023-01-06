@@ -154,5 +154,5 @@ class StrictRulesetViolation(Violation):
             field        (str):  The name of the additional field in the ruleset
             ruleset_name (str):  The name of the ruleset
         """
-        message = f"{field} is not expected in ruleset {ruleset_name}"
+        message = f'{field} is not expected in ruleset {ruleset_name}'
         super().__init__(key, parent, message, ViolationType.STRICT)
