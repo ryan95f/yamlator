@@ -142,7 +142,18 @@ class RegexTypeViolation(TypeViolation):
         super().__init__(key, parent, message)
 
 
-class StrictRulesetViolation(Violation):
+class StrictViolation(Violation):
+    def __init__(self, key: str, parent: str, message: str):
+        super().__init__(key, parent, message, ViolationType.STRICT)
+
+
+class StrictEntryPointViolation(StrictViolation):
+    def __init__(self, key: str, parent: str, field: str):
+        message = f'{field} is not expected in entry point schema'
+        super().__init__(key, parent, message)
+
+
+class StrictRulesetViolation(StrictViolation):
     """Violation for when ruleset in strict mode has additional fields"""
 
     def __init__(self, key: str, parent: str, field: str, ruleset_name: str):
@@ -155,4 +166,4 @@ class StrictRulesetViolation(Violation):
             ruleset_name (str):  The name of the ruleset
         """
         message = f'{field} is not expected in ruleset {ruleset_name}'
-        super().__init__(key, parent, message, ViolationType.STRICT)
+        super().__init__(key, parent, message)
