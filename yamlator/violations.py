@@ -143,18 +143,42 @@ class RegexTypeViolation(TypeViolation):
 
 
 class StrictViolation(Violation):
+    """Violation for when a type violates strict mode"""
+
     def __init__(self, key: str, parent: str, message: str):
+        """StrictViolation init
+
+        Args:
+            key          (str):  The key name in the YAML file
+            parent       (str):  The parent key in the YAML file
+            message      (str):  The message with information
+                regarding the type violation
+        """
         super().__init__(key, parent, message, ViolationType.STRICT)
 
 
 class StrictEntryPointViolation(StrictViolation):
+    """Violation for when the entry point (schema) is in strict mode
+    and has additional fields
+    """
+
     def __init__(self, key: str, parent: str, field: str):
+        """StrictEntryPointViolation init
+
+        Args:
+            key          (str):  The key name in the YAML file
+            parent       (str):  The parent key in the YAML file
+            field        (str):  The name of the additional field
+                in the entry point
+        """
         message = f'{field} is not expected in entry point schema'
         super().__init__(key, parent, message)
 
 
 class StrictRulesetViolation(StrictViolation):
-    """Violation for when ruleset in strict mode has additional fields"""
+    """Violation for when a ruleset is in strict mode and has
+    additional fields
+    """
 
     def __init__(self, key: str, parent: str, field: str, ruleset_name: str):
         """StrictRulesetViolation init
