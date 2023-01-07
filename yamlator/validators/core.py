@@ -18,6 +18,7 @@ from yamlator.validators import RegexValidator
 from yamlator.validators import RequiredValidator
 from yamlator.validators import RulesetValidator
 from yamlator.validators.base_validator import Validator
+from yamlator.violations import StrictRulesetViolation
 
 
 def validate_yaml(yaml_data: dict, instructions: dict) -> deque:
@@ -54,6 +55,10 @@ def validate_yaml(yaml_data: dict, instructions: dict) -> deque:
     )
 
     entry_point_rules: Iterable[Rule] = entry_point.rules
+
+    if entry_point.is_strict:
+        _validate_entry_point_strict_mode(yaml_data, entry_point_rules, violations)
+
     for rule in entry_point_rules:
         sub_data = yaml_data.get(rule.name, None)
 
@@ -96,3 +101,13 @@ def _create_validators_chain(ruleset_lookups: dict,
     any_type_validator.set_next_validator(regex_validator)
     regex_validator.set_next_validator(type_validator)
     return root
+
+
+def _validate_entry_point_strict_mode(data: dict, rules: Iterable[Rule], violations: deque) -> None:
+    rule_fields = {rule.name for rule in rules}
+    data_fields = set(data.keys())
+    extra_fields = data_fields - rule_fields
+
+    for field in extra_fields:
+        violation = StrictRulesetViolation(key='-', parent='-', field=field, ruleset_name='entry')
+        violations.append(violation)

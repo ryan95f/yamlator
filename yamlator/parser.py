@@ -205,6 +205,9 @@ class SchemaTransformer(Transformer):
         """
         return YamlatorRuleset('main', rules)
 
+    def strict_schema_entry(self, rules: list) -> YamlatorRuleset:
+        return YamlatorRuleset('main', rules, is_strict=True)
+
     @v_args(inline=True)
     def integer(self, token: str) -> int:
         """Convers a integer string into a int type"""

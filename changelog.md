@@ -23,3 +23,9 @@
 * Added `YAML` as a display option using the CLI
 * Updated docstrings in the `validators` package
 * Updated `cmd.py` to be a sub package in `yamlator` to improve code readability
+
+## v0.2.0 (TBC)
+
+* Added `strict` keyword to rulesets to enable strict mode, which will raise a strict violation for every field not defined in the ruleset
+* Updated GitHub workloads to use the latest actions
+* Fixed bug with rule definitions where field names with similar character patterns to types would create two separate rules
