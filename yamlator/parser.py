@@ -82,12 +82,12 @@ class SchemaTransformer(Transformer):
 
     def required_rule(self, tokens: Any) -> Rule:
         """Transforms the required rule tokens in a Rule object"""
-        (name, rtype) = tokens
+        (name, rtype) = tokens[0:2]
         return Rule(name.value, rtype, True)
 
     def optional_rule(self, tokens: Any) -> Rule:
         """Transforms the optional rule tokens in a Rule object"""
-        (name, rtype) = tokens
+        (name, rtype) = tokens[0:2]
         return Rule(name.value, rtype, False)
 
     def ruleset(self, tokens: Any) -> YamlatorRuleset:
