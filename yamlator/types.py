@@ -4,8 +4,10 @@
 from __future__ import annotations
 import re
 
-from enum import Enum, auto
-from typing import Union, Iterator
+from enum import Enum
+from enum import auto
+from typing import Union
+from typing import Iterator
 from collections import namedtuple
 
 Rule = namedtuple('Rule', ['name', 'rtype', 'is_required'])

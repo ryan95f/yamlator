@@ -28,6 +28,6 @@
 
 * Added `strict` keyword to rulesets to enable strict mode, which will raise a strict violation for every field not defined in the ruleset
 * Added `strict` keyword to schema to enable strict mode, which will raise a strict violation for every field not defined in the schema block
-* Added new example [strict_mode](./example/strict_mode/) to the examples directory
+* Added new example [strict_mode](./example/strict_mode/) to the `example` directory
 * Updated GitHub workloads to use the latest actions
 * Fixed bug with rule definitions where field names with similar character patterns to types would create two separate rules

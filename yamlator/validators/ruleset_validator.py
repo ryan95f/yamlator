@@ -101,7 +101,7 @@ class RulesetValidator(Validator):
         rule_fields = {rule.name for rule in ruleset.rules}
         data_fields = set(data.keys())
 
-        # Find the differance between the data and
+        # Find the difference between the data and
         # the ruleset fields to determine the additional
         # fields that have been added to the YAML file
         extra_fields = data_fields - rule_fields
