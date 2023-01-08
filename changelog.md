@@ -24,7 +24,7 @@
 * Updated docstrings in the `validators` package
 * Updated `cmd.py` to be a sub package in `yamlator` to improve code readability
 
-## v0.2.0 (TBC)
+## v0.2.0 (8th January 2023)
 
 * Added `strict` keyword to rulesets to enable strict mode, which will raise a strict violation for every field not defined in the ruleset
 * Added `strict` keyword to schema to enable strict mode, which will raise a strict violation for every field not defined in the schema block
