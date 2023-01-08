@@ -20,7 +20,6 @@ from parameterized import parameterized
 from yamlator.utils import load_schema
 from yamlator.parser import parse_schema
 from yamlator.utils import load_yaml_file
-from yamlator.exceptions import SchemaParseError
 from yamlator.parser import MalformedEnumNameError
 from yamlator.parser import MalformedRulesetNameError
 from yamlator.parser import MissingRulesError
@@ -75,7 +74,7 @@ class TestParseSchema(unittest.TestCase):
         (
             'with_ruleset_not_defined',
             './tests/files/invalid_files/missing_defined_ruleset.ys',
-            SchemaParseError
+            SchemaSyntaxError
         ),
         (
             'with_invalid_schema_syntax',

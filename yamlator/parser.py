@@ -82,12 +82,12 @@ class SchemaTransformer(Transformer):
 
     def required_rule(self, tokens: Any) -> Rule:
         """Transforms the required rule tokens in a Rule object"""
-        (name, rtype) = tokens
+        (name, rtype) = tokens[0:2]
         return Rule(name.value, rtype, True)
 
     def optional_rule(self, tokens: Any) -> Rule:
         """Transforms the optional rule tokens in a Rule object"""
-        (name, rtype) = tokens
+        (name, rtype) = tokens[0:2]
         return Rule(name.value, rtype, False)
 
     def ruleset(self, tokens: Any) -> YamlatorRuleset:
@@ -96,6 +96,15 @@ class SchemaTransformer(Transformer):
         rules = tokens[1:]
         self.seen_constructs[name] = SchemaTypes.RULESET
         return YamlatorRuleset(name, rules)
+
+    def strict_ruleset(self, tokens: Any) -> YamlatorRuleset:
+        """Transforms the ruleset tokens into a YamlatorRuleset object
+        and marks the ruleset as being in strict mode
+        """
+        name = tokens[0].value
+        rules = tokens[1:]
+        self.seen_constructs[name] = SchemaTypes.RULESET
+        return YamlatorRuleset(name, rules, is_strict=True)
 
     def start(self, instructions: Iterator[YamlatorType]) -> dict:
         """Transforms the instructions into a dict that sorts the rulesets,
@@ -195,6 +204,9 @@ class SchemaTransformer(Transformer):
         main that will act as the entry point for validaiting the YAML data
         """
         return YamlatorRuleset('main', rules)
+
+    def strict_schema_entry(self, rules: list) -> YamlatorRuleset:
+        return YamlatorRuleset('main', rules, is_strict=True)
 
     @v_args(inline=True)
     def integer(self, token: str) -> int:

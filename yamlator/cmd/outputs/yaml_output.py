@@ -13,6 +13,8 @@ from yamlator.violations import TypeViolation
 from yamlator.violations import BuiltInTypeViolation
 from yamlator.violations import RulesetTypeViolation
 from yamlator.violations import RegexTypeViolation
+from yamlator.violations import StrictRulesetViolation
+from yamlator.violations import StrictEntryPointViolation
 
 
 class YAMLOutput(ViolationOutput):
@@ -57,6 +59,10 @@ class YAMLOutput(ViolationOutput):
         yaml.add_representer(BuiltInTypeViolation, YAMLOutput._violation_dumper)
         yaml.add_representer(RulesetTypeViolation, YAMLOutput._violation_dumper)
         yaml.add_representer(RegexTypeViolation, YAMLOutput._violation_dumper)
+        yaml.add_representer(StrictRulesetViolation,
+                             YAMLOutput._violation_dumper)
+        yaml.add_representer(StrictEntryPointViolation,
+                             YAMLOutput._violation_dumper)
 
     @staticmethod
     def _deque_dumper(dumper: yaml.Dumper, data: deque) -> yaml.SequenceNode:

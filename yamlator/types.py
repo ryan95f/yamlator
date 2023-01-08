@@ -4,8 +4,10 @@
 from __future__ import annotations
 import re
 
-from enum import Enum, auto
+from enum import Enum
+from enum import auto
 from typing import Union
+from typing import Iterator
 from collections import namedtuple
 
 Rule = namedtuple('Rule', ['name', 'rtype', 'is_required'])
@@ -99,15 +101,23 @@ class YamlatorRuleset(YamlatorType):
     rules of `RuleType` which will validated against
     """
 
-    def __init__(self, name: str, rules: list):
+    def __init__(self, name: str, rules: list, is_strict: bool = False):
         """YamlatorRuleset init
 
         Args:
-            name     (str): The name of the ruleset
-            rules   (list): A list of rules for the ruleset
+            name       (str): The name of the ruleset
+            rules     (list): A list of rules for the ruleset
+            is_strict (bool): Sets the ruleset to be in strict mode.
+            When used with the validators, it will check to ensure any
+            extra fields are raised as a violation
         """
         super().__init__(name, ContainerTypes.RULESET)
-        self.rules = rules
+        self._rules = rules
+        self.is_strict = is_strict
+
+    @property
+    def rules(self) -> Iterator[Rule]:
+        return self._rules
 
 
 class YamlatorEnum(YamlatorType):

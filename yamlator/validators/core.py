@@ -3,9 +3,6 @@ validator handler chian.
 """
 
 from collections import deque
-from typing import Iterable
-
-from yamlator.types import Rule
 from yamlator.types import YamlatorRuleset
 
 from yamlator.validators import AnyTypeValidator
@@ -17,6 +14,7 @@ from yamlator.validators import OptionalValidator
 from yamlator.validators import RegexValidator
 from yamlator.validators import RequiredValidator
 from yamlator.validators import RulesetValidator
+from yamlator.validators import EntryPointValidator
 from yamlator.validators.base_validator import Validator
 
 
@@ -42,37 +40,23 @@ def validate_yaml(yaml_data: dict, instructions: dict) -> deque:
     if instructions is None:
         raise ValueError('instructions should not be None')
 
-    entry_parent = '-'
+    default_key = '-'
     violations = deque()
-    entry_point: YamlatorRuleset = instructions.get('main',
-                                                    YamlatorRuleset('main', []))
 
-    validators = _create_validators_chain(
-        ruleset_lookups=instructions.get('rules', {}),
-        enum_looksups=instructions.get('enums', {}),
-        violations=violations
-    )
-
-    entry_point_rules: Iterable[Rule] = entry_point.rules
-    for rule in entry_point_rules:
-        sub_data = yaml_data.get(rule.name, None)
-
-        validators.validate(
-            key=rule.name,
-            data=sub_data,
-            parent=entry_parent,
-            rtype=rule.rtype,
-            is_required=rule.is_required
-        )
+    validators = _create_validators_chain(instructions, violations)
+    validators.validate(default_key, yaml_data, default_key, None)
 
     return violations
 
 
-def _create_validators_chain(ruleset_lookups: dict,
-                             enum_looksups: dict,
+def _create_validators_chain(instructions: dict,
                              violations: deque) -> Validator:
+    ruleset_lookups = instructions.get('rules', {})
+    enum_looksups = instructions.get('enums', {})
+    entry_point = instructions.get('main', YamlatorRuleset('main', []))
 
-    root = OptionalValidator(violations)
+    root = EntryPointValidator(violations, entry_point)
+    optional_validator = OptionalValidator(violations)
     any_type_validator = AnyTypeValidator(violations)
     required_validator = RequiredValidator(violations)
     map_validator = MapValidator(violations)
@@ -82,11 +66,12 @@ def _create_validators_chain(ruleset_lookups: dict,
     type_validator = BuiltInTypeValidator(violations)
     regex_validator = RegexValidator(violations)
 
-    root.set_next_validator(required_validator)
+    root.set_next_validator(optional_validator)
+    optional_validator.set_next_validator(required_validator)
     required_validator.set_next_validator(map_validator)
     map_validator.set_next_validator(ruleset_validator)
 
-    ruleset_validator.set_next_ruleset_validator(root)
+    ruleset_validator.set_next_ruleset_validator(optional_validator)
     ruleset_validator.set_next_validator(list_validator)
 
     list_validator.set_ruleset_validator(ruleset_validator)

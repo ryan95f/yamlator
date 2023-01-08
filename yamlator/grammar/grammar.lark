@@ -4,15 +4,19 @@ start: instructions*
 // Collection constructs
 ?instructions: enum
             | ruleset
+            | strict_ruleset
             | schema_entry
+            | strict_schema_entry
 
 ?values: INT -> integer
        | FLOAT -> float
        | string
 
 schema_entry: "schema" "{" rule+ "}"
+strict_schema_entry: "strict schema" "{" rule+ "}"
 
 ruleset: "ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
+strict_ruleset: "strict ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
 
 // Enum constructs
 enum: "enum" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" enum_item+ "}"
@@ -22,9 +26,9 @@ enum_item: /[A-Z0-9_]+/ "=" values
 ?rule: required_rule
      | optional_rule
 
-required_rule: /[a-zA-Z0-9_]+/ type "required"
-             | /[a-zA-Z0-9_]+/ type
-optional_rule: /[a-zA-Z0-9_]+/ type "optional"
+required_rule: /[a-zA-Z0-9_]+/ type "required" NEW_LINES
+             | /[a-zA-Z0-9_]+/ type NEW_LINES
+optional_rule: /[a-zA-Z0-9_]+/ type "optional" NEW_LINES
 
 // Data types for rules
 type: int_type

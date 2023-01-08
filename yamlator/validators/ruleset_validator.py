@@ -2,14 +2,13 @@
 
 
 from collections import deque
-from typing import Iterable
 
 from yamlator.types import Data
-from yamlator.types import Rule
 from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
 from yamlator.types import YamlatorRuleset
 from yamlator.violations import RulesetTypeViolation
+from yamlator.violations import StrictRulesetViolation
 from .base_validator import Validator
 
 
@@ -74,9 +73,10 @@ class RulesetValidator(Validator):
             self._violations.append(violation)
             return
 
-        ruleset_rules = self._retrieve_next_ruleset(rtype.lookup)
+        ruleset = self._retrieve_ruleset(rtype.lookup)
+        self._handle_strict_violations(key, parent, ruleset, data)
 
-        for ruleset_rule in ruleset_rules:
+        for ruleset_rule in ruleset.rules:
             sub_data = data.get(ruleset_rule.name, None)
 
             if self._ruleset_validator is not None:
@@ -88,7 +88,24 @@ class RulesetValidator(Validator):
                     is_required=ruleset_rule.is_required
                 )
 
-    def _retrieve_next_ruleset(self, ruleset_name: str) -> Iterable[Rule]:
+    def _retrieve_ruleset(self, ruleset_name: str) -> YamlatorRuleset:
         default_missing_ruleset = YamlatorRuleset(ruleset_name, [])
         ruleset = self._instructions.get(ruleset_name, default_missing_ruleset)
-        return ruleset.rules
+        return ruleset
+
+    def _handle_strict_violations(self, key: str, parent: str,
+                                  ruleset: YamlatorRuleset, data: dict):
+        if not ruleset.is_strict:
+            return
+
+        rule_fields = {rule.name for rule in ruleset.rules}
+        data_fields = set(data.keys())
+
+        # Find the difference between the data and
+        # the ruleset fields to determine the additional
+        # fields that have been added to the YAML file
+        extra_fields = data_fields - rule_fields
+
+        for field in extra_fields:
+            violation = StrictRulesetViolation(key, parent, field, ruleset.name)
+            self._violations.append(violation)
