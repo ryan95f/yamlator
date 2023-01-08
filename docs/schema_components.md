@@ -4,6 +4,9 @@ Below are the various components that can be used to construct a schema with Yam
 
 * [Schema](#schema)
 * [Rulesets](#rulesets)
+* [Strict Mode](#strict-mode)
+  * [Schema](#schema---strict-mode)
+  * [Ruleset](#ruleset---strict-mode)
 * [Rules](#rules)
 * [Enums](#enums)
 * [RuleTypes](#rule-types)
@@ -64,6 +67,58 @@ ruleset Project {
     labels map(str) optional
 }
 ```
+
+## Strict Mode
+
+A schema and ruleset block can be set into strict mode to raise violation errors when fields in the YAML file are not defined in the schema/ruleset block. For every field that is not expected in the block a strict violation is raised.
+
+To use strict mode, the ruleset or schema block should be prefixed with the `strict` keyword.
+
+__NOTE__: Strict mode does not cascade down to other rulesets when defined against a schema or ruleset. Strict mode must be defined on each block that requires it.
+
+### Schema - Strict Mode
+
+For example, given the following schema block:
+
+```text
+strict schema {
+    message str
+    number int optional
+}
+```
+
+Then given the following YAML data:
+
+```yaml
+message: Hello World
+number: 42
+firstName: foo
+lastName: bar
+```
+
+The fields `firstName` and `lastName` will have strict mode violations raised since it does not match the schema block.
+
+### Ruleset - Strict Mode
+
+For example, given the following ruleset:
+
+```text
+strict ruleset Person {
+    firstName str
+    lastName str
+}
+```
+
+Then the following YAML data:
+
+```yaml
+firstName: Foo
+lastName: Bar
+fullName: Foo Bar
+age: 42
+```
+
+The fields `fullName` and `age` will have strict mode violations raised since it does not match the fields specified in the ruleset block.
 
 ## Enums
 
