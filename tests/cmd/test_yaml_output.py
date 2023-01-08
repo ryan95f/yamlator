@@ -25,6 +25,7 @@ from yamlator.violations import RequiredViolation
 from yamlator.violations import TypeViolation
 from yamlator.violations import Violation
 from yamlator.violations import StrictRulesetViolation
+from yamlator.violations import StrictEntryPointViolation
 
 
 class TestYAMLOutput(unittest.TestCase):
@@ -43,6 +44,9 @@ class TestYAMLOutput(unittest.TestCase):
                                    parent='-',
                                    field='message',
                                    ruleset_name='details'),
+            StrictEntryPointViolation(key='SCHEMA',
+                                      parent='-',
+                                      field='name'),
             RegexTypeViolation(key='data',
                                parent='-',
                                data='1st January 2022',
