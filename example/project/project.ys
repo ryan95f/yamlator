@@ -10,7 +10,7 @@ ruleset Details {
     labels map(str)
 }
 
-strict ruleset Project {
+ruleset Project {
     version str
     projectId str
     displayName str

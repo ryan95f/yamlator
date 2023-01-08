@@ -1,8 +1,5 @@
 project:
   version: v1
-  owner: me
-  project: foo
-  foo: bar
   projectId: my-test-project
   displayName: my-test-project
   iam_permission:

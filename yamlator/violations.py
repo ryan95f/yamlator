@@ -171,7 +171,7 @@ class StrictEntryPointViolation(StrictViolation):
             field        (str):  The name of the additional field
                 in the entry point
         """
-        message = f'{field} is not expected in entry point schema'
+        message = f'{field} is not expected in the schema block'
         super().__init__(key, parent, message)
 
 
