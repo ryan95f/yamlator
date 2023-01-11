@@ -157,6 +157,9 @@ class SchemaTransformer(Transformer):
         """Transforms a bool type token into a RuleType object"""
         return RuleType(schema_type=SchemaTypes.BOOL)
 
+    def union_type(self, tokens: Any) -> RuleType:
+        return RuleType(schema_type=SchemaTypes.UNION, sub_type=tokens)
+
     def enum_item(self, tokens: Any) -> EnumItem:
         """Transforms a enum item token into a EnumItem object"""
         name, value = tokens

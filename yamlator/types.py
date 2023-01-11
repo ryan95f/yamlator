@@ -29,6 +29,7 @@ class SchemaTypes(Enum):
     ANY = auto()
     REGEX = auto()
     BOOL = auto()
+    UNION = auto()
 
 
 class RuleType:

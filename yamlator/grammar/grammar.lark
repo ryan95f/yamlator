@@ -40,6 +40,7 @@ type: int_type
      | container_type
      | regex_type
      | bool_type
+     | union_type
 
 str_type: "str"
 int_type: "int"
@@ -50,6 +51,7 @@ list_type: "list""(" type ")"
 map_type: "map""(" type ")"
 container_type: /[A-Z]{1}[a-zA-Z0-9_]+/
 regex_type: "regex""(" string ")"
+union_type: "union""(" [type ("," type)*] ")"
 
 NEW_LINES: "\n"+
 
