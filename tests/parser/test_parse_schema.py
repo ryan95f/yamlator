@@ -30,8 +30,8 @@ class TestParseSchema(unittest.TestCase):
     """Tests the parse schema function"""
 
     def setUp(self):
-        self.valid_schema_file = './tests/files/example/example.ys'
-        self.invalid_schema_file = './tests/files/example/example.yaml'
+        self.valid_schema_file = './tests/files/valid/valid.ys'
+        self.invalid_schema_file = './tests/files/valid/valid.yaml'
 
     def test_parse_with_none_text(self):
         with self.assertRaises(ValueError):
@@ -78,7 +78,7 @@ class TestParseSchema(unittest.TestCase):
         ),
         (
             'with_invalid_schema_syntax',
-            './tests/files/example/example.yaml',
+            './tests/files/valid/valid.yaml',
             SchemaSyntaxError
         )
     ])

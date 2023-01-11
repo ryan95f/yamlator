@@ -19,8 +19,8 @@ from yamlator.cmd import validate_yaml_data_from_file
 from yamlator.exceptions import InvalidSchemaFilenameError
 
 EMPTY_STR = ''
-VALID_YAML_DATA_FILE_PATH = './tests/files/example/example.yaml'
-VALID_SCHEMA_FILE_PATH = './tests/files/example/example.ys'
+VALID_YAML_DATA_FILE_PATH = './tests/files/valid/valid.yaml'
+VALID_SCHEMA_FILE_PATH = './tests/files/valid/valid.ys'
 
 ValidateArgs = namedtuple('ValidateArgs', ['yaml_filepath', 'schema_filepath'])
 
