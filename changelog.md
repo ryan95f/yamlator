@@ -32,7 +32,7 @@
 * Updated GitHub workloads to use the latest actions
 * Fixed bug with rule definitions where field names with similar character patterns to types would create two separate rules
 
-## v0.2.1 (TBC)
+## v0.2.1 (11th January 2023)
 
 * Fixed bug that prevented dashes from being used in a rule name
 * Upgraded the Ubuntu version and action on the publish workflow
