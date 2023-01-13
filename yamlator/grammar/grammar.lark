@@ -26,9 +26,12 @@ enum_item: /[A-Z0-9_]+/ "=" values
 ?rule: required_rule
      | optional_rule
 
-required_rule: /[a-zA-Z0-9_-]+/ type "required" NEW_LINES
-             | /[a-zA-Z0-9_-]+/ type NEW_LINES
-optional_rule: /[a-zA-Z0-9_-]+/ type "optional" NEW_LINES
+rule_name: /[\S]+/
+         | /\"[\S ]+\"/
+
+required_rule: rule_name type "required" NEW_LINES
+             | rule_name type NEW_LINES
+optional_rule: rule_name type "optional" NEW_LINES
 
 // Data types for rules
 type: int_type

@@ -11,6 +11,7 @@ from typing import Iterator
 from lark import Lark
 from lark import v_args
 from lark import Transformer
+from lark import Token
 from lark import UnexpectedInput
 from lark.exceptions import VisitError
 from typing import Any
@@ -79,6 +80,12 @@ class SchemaTransformer(Transformer):
     # Used to track previously seen enums or rulesets to dynamically
     # determine the type of the rule if a enum or ruleset is used
     seen_constructs = {}
+
+    def rule_name(self, tokens: Any):
+        token = tokens[0]
+        name = token.value.strip()
+        name = _SPEECH_MARKS_REGEX.sub('', name)
+        return Token(value=name, type_=token.type)
 
     def required_rule(self, tokens: Any) -> Rule:
         """Transforms the required rule tokens in a Rule object"""

@@ -20,8 +20,20 @@ ruleset Person {
     department Employee_department
 }
 
+# Testing different field options
+ruleset FieldOptions {
+    under_scores str
+    required-under_scores str required
+    required_under-scores str optional
+    "hello world" str optional
+    ரஷ str required
+    ரஷ3 str
+    !!test[] str optional
+}
+
 schema {
     message str
     number int
     person Person optional
+    options FieldOptions optional
 }
