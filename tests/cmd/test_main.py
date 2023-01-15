@@ -19,9 +19,9 @@ from yamlator.cmd import main
 from yamlator.cmd import DisplayMethod
 from yamlator.cmd.outputs import SuccessCode
 
-HELLO_YAML_FILE_PATH = './tests/files/example/example.yaml'
-HELLO_RULESET_FILE_PATH = './tests/files/example/example.ys'
-INVALID_HELLO_YAML_FILE_PATH = './tests/files/example/invalid_example.yaml'
+HELLO_YAML_FILE_PATH = './tests/files/valid/valid.yaml'
+HELLO_RULESET_FILE_PATH = './tests/files/valid/valid.ys'
+INVALID_HELLO_YAML_FILE_PATH = './tests/files/valid/invalid.yaml'
 
 ValidateArgs = namedtuple('ValidateArgs', ['file', 'ruleset_schema', 'output'])
 

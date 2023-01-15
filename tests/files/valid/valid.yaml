@@ -1,7 +1,8 @@
 message: hello world
 number: 42
 person:
-  name: Test Tester
+  first_name: Test
+  last-name: Tester
   age: 42
   isEmployed: true
   department: lead

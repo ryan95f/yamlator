@@ -31,3 +31,8 @@
 * Added new example [strict_mode](./example/strict_mode/) to the `example` directory
 * Updated GitHub workloads to use the latest actions
 * Fixed bug with rule definitions where field names with similar character patterns to types would create two separate rules
+
+## v0.2.1 (15th January 2023)
+
+* Improved the Yamlator grammar to allow rule names to accept options including symbols, unicode, spaces and dashes. Any YAML key that contains spaces, must be enclosed in double quotes
+* Upgraded the Ubuntu version on the publish workflow

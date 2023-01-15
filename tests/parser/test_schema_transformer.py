@@ -53,8 +53,8 @@ Test Cases:
 
 import re
 import unittest
+import lark
 
-from collections import namedtuple
 from parameterized import parameterized
 from yamlator.exceptions import ConstructNotFoundError
 
@@ -63,22 +63,33 @@ from yamlator.types import EnumItem, Rule, RuleType
 from yamlator.types import YamlatorEnum, YamlatorRuleset, SchemaTypes
 
 
-Token = namedtuple('Token', ['value'])
-
-
 class TestSchemaTransformer(unittest.TestCase):
     """Tests the Schema Transformer"""
 
     def setUp(self):
         self.transformer = SchemaTransformer()
-        self.name_token = Token('message')
-        self.status_code_token = Token('StatusCode')
+        self.name_token = lark.Token(type_='NAME', value='message')
+        self.status_code_token = lark.Token(type_='STATUS', value='StatusCode')
 
         self.str_rtype = RuleType(schema_type=SchemaTypes.STR)
         self.ruleset_rules = [
             Rule('name', RuleType(schema_type=SchemaTypes.STR), True),
             Rule('age', RuleType(schema_type=SchemaTypes.INT), True),
         ]
+
+    @parameterized.expand([
+        ('without_quotes', 'ruleName', 'ruleName'),
+        ('with_double_quotes', '\"ruleName\"', 'ruleName'),
+        ('with_single_quotes', '\'ruleName\'', 'ruleName'),
+        ('with_spaces', 'rule name', 'rule name'),
+        ('with_padding_spaces', '    rule name    ', 'rule name'),
+    ])
+    def test_rule_name(self, name: str, rule_name: str, expected: str):
+        # Unused by test case, however is required by the parameterized library
+        del name
+        token = lark.Token('TOKEN', value=rule_name)
+        processed_token = self.transformer.rule_name([token])
+        self.assertEqual(expected, processed_token.value)
 
     def test_required_rule(self):
         tokens = (self.name_token, self.str_rtype)
@@ -95,7 +106,7 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertFalse(optional_rule.is_required)
 
     def test_ruleset(self):
-        name = Token('person')
+        name = lark.Token(type_='TOKEN', value='person')
         tokens = (name, *self.ruleset_rules)
         ruleset = self.transformer.ruleset(tokens)
 
@@ -104,7 +115,7 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertFalse(ruleset.is_strict)
 
     def test_strict_ruleset(self):
-        name = Token('person')
+        name = lark.Token(type_='TOKEN', value='person')
         tokens = (name, *self.ruleset_rules)
         ruleset = self.transformer.strict_ruleset(tokens)
 
@@ -193,9 +204,9 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(len(enum_items), len(enum.items))
 
     def test_container_type(self):
-        token = Token('Employee')
+        token = lark.Token(type_='TOKEN', value='Employee')
         self.transformer.seen_constructs = {'Employee': SchemaTypes.RULESET}
-        rule = self.transformer.container_type(token)
+        rule = self.transformer.container_type([token])
         self.assertEqual(rule.schema_type, SchemaTypes.RULESET)
 
     @parameterized.expand([
@@ -207,7 +218,7 @@ class TestSchemaTransformer(unittest.TestCase):
     ])
     def test_container_type_construct_does_not_exist(self, name: str,
                                                      seen_constructs: dict):
-        token = Token(name)
+        token = lark.Token(type_='TOKEN', value=name)
         self.transformer.seen_constructs = seen_constructs
         with self.assertRaises(ConstructNotFoundError):
             self.transformer.container_type(token)

@@ -1,0 +1,39 @@
+# Test the use of underscores
+enum Employee_department {
+    MANAGER = "manager"
+    LEAD = "lead"
+}
+
+ruleset PersonAddress {
+    houseNumber int
+    street str
+    city str
+    post_code str
+}
+
+ruleset Person {
+    first_name str  # Make sure underscores are parsed correctly
+    last-name str   # Make sure dashes are parsed correctly 
+    age int
+    address PersonAddress optional
+    isEmployed bool
+    department Employee_department
+}
+
+# Testing different field options
+ruleset FieldOptions {
+    under_scores str
+    required-under_scores str required
+    required_under-scores str optional
+    "hello world" str optional
+    ரஷ str required
+    ரஷ3 str
+    !!test[] str optional
+}
+
+schema {
+    message str
+    number int
+    person Person optional
+    options FieldOptions optional
+}

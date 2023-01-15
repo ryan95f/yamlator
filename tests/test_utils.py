@@ -37,7 +37,7 @@ class TestLoadYamlFile(unittest.TestCase):
             load_yaml_file(filename)
 
     @parameterized.expand([
-        ('yaml_file', 'tests/files/example/example.yaml')
+        ('yaml_file', 'tests/files/valid/valid.yaml')
     ])
     def test_load_yaml_file(self, name: str, filename: str):
         # Unused by test case, however is required by the parameterized library
@@ -65,8 +65,8 @@ class TestLoadSchema(unittest.TestCase):
             load_schema(filename)
 
     @parameterized.expand([
-        ('with_unix_style_path', 'tests/files/example/example.ys'),
-        ('with_windows_style_path', 'tests\\files\\example\\example.ys')
+        ('with_unix_style_path', 'tests/files/valid/valid.ys'),
+        ('with_windows_style_path', 'tests\\files\\valid\\valid.ys')
     ])
     def test_successfully_load_schema(self, name, filename):
         # Unused by test case, however is required by the parameterized library
