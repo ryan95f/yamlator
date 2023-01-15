@@ -187,6 +187,20 @@ ruleset <ruleset-name> {
 
 Required rules validate that the key is present in the YAML data. If the required data is missing then a required violation is raised. If the rule is optional, then a violation is not raised when it is missing from the YAML data.
 
+Rule names support dashes, underscores and all unicode characters. If the field name in YAML contains spaces, e.g `my awesome field`, then the rule name will need to be enclosed in double quotes. For example, given the following YAML data:
+
+```yaml
+my awesome field: 42
+```
+
+The corresponding rule name in a ruleset:
+
+```text
+ruleset <ruleset-name> {
+    "my awesome field" int
+}
+```
+
 ## Rule Types
 
 For each rule, a type can be specified to validate the expected data type is present.
