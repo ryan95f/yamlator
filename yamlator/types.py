@@ -29,6 +29,7 @@ class SchemaTypes(Enum):
     ANY = auto()
     REGEX = auto()
     BOOL = auto()
+    UNION = auto()
 
 
 class RuleType:
@@ -70,6 +71,13 @@ class RuleType:
         return repr_template.format(self.__class__.__name__,
                                     self.schema_type,
                                     self.sub_type)
+
+
+class UnionRuleType(RuleType):
+    def __init__(self, schema_type: SchemaTypes,
+                 sub_types: list[RuleType]) -> None:
+        super().__init__(schema_type, None, None, None)
+        self.sub_types = sub_types
 
 
 class ContainerTypes(Enum):

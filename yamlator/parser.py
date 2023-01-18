@@ -21,7 +21,7 @@ from yamlator.types import ContainerTypes
 from yamlator.types import YamlatorRuleset
 from yamlator.types import YamlatorEnum
 from yamlator.types import YamlatorType
-from yamlator.types import RuleType
+from yamlator.types import RuleType, UnionRuleType
 from yamlator.types import EnumItem
 from yamlator.types import SchemaTypes
 from yamlator.exceptions import ConstructNotFoundError
@@ -199,6 +199,9 @@ class SchemaTransformer(Transformer):
         """Transforms a regex type token into a RuleType object"""
         (regex, ) = tokens
         return RuleType(schema_type=SchemaTypes.REGEX, regex=regex)
+
+    def union_type(self, tokens: list[Token]):
+        return UnionRuleType(schema_type=SchemaTypes.UNION, sub_types=tokens)
 
     def type(self, tokens: list[Token]) -> Any:
         """Extracts the type tokens and passes them through onto

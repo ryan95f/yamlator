@@ -15,6 +15,7 @@ from yamlator.validators import RegexValidator
 from yamlator.validators import RequiredValidator
 from yamlator.validators import RulesetValidator
 from yamlator.validators import EntryPointValidator
+from yamlator.validators import UnionValidator
 from yamlator.validators.base_validator import Validator
 
 
@@ -65,6 +66,7 @@ def _create_validators_chain(instructions: dict,
     enum_validator = EnumTypeValidator(violations, enum_looksups)
     type_validator = BuiltInTypeValidator(violations)
     regex_validator = RegexValidator(violations)
+    union_validator = UnionValidator(violations)
 
     root.set_next_validator(optional_validator)
     optional_validator.set_next_validator(required_validator)
@@ -80,4 +82,11 @@ def _create_validators_chain(instructions: dict,
     enum_validator.set_next_validator(any_type_validator)
     any_type_validator.set_next_validator(regex_validator)
     regex_validator.set_next_validator(type_validator)
+
+    type_validator.set_next_validator(union_validator)
+
+    union_validator.set_list_validator(list_validator)
+    union_validator.set_ruleset_validator(ruleset_validator)
+    union_validator.set_regex_validator(regex_validator)
+
     return root
