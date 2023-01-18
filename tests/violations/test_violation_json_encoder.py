@@ -14,7 +14,6 @@ import unittest
 from typing import Any
 from collections import deque
 from parameterized import parameterized
-from dataclasses import dataclass
 
 from yamlator.violations import BuiltInTypeViolation
 from yamlator.violations import RegexTypeViolation
@@ -26,9 +25,9 @@ from yamlator.violations import StrictRulesetViolation
 from yamlator.violations import StrictEntryPointViolation
 
 
-@dataclass
 class FakeViolation:
-    msg: str
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
 
 
 class TestViolationJSONEncoder(unittest.TestCase):

@@ -1,6 +1,5 @@
 """Base Yamlator validator"""
 
-from __future__ import annotations
 from collections import deque
 
 from yamlator.types import Data
@@ -22,7 +21,7 @@ class Validator:
         """
         self._violations = violations
 
-    def set_next_validator(self, validator: Validator) -> Validator:
+    def set_next_validator(self, validator: 'Validator') -> 'Validator':
         """Set the next validator in the chain
 
         Args:
