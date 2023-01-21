@@ -1,3 +1,5 @@
+"""Validator for handling the union type"""
+
 from yamlator.types import Data
 from yamlator.types import RuleType
 from yamlator.types import UnionRuleType
@@ -13,6 +15,8 @@ _UnionViolation = namedtuple('UnionViolation', ['count', 'violations'])
 
 
 class UnionValidator(Validator):
+    """Validator for handling the union type"""
+
     _ruleset_validator: Validator = None
     _list_validator: Validator = None
     _regex_validator: Validator = None
@@ -46,7 +50,7 @@ class UnionValidator(Validator):
 
             if union_type.schema_type == SchemaTypes.RULESET:
                 violations = self._handle_ruleset_validation(key, data,
-                                                             parent,union_type,
+                                                             parent, union_type,
                                                              is_required)
                 union_violation = _UnionViolation(len(violations), violations)
                 union_violations.append(union_violation)
@@ -67,7 +71,6 @@ class UnionValidator(Validator):
                 continue
 
             union_violations.append(_UnionViolation(0, []))
-
 
         union_violations.sort(key=lambda x: x[0])
         if union_violations[0].count == 0:
