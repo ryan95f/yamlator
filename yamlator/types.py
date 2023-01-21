@@ -73,7 +73,7 @@ class RuleType:
 
 class UnionRuleType(RuleType):
     def __init__(self, schema_type: SchemaTypes,
-                 sub_types: list[RuleType]) -> None:
+                 sub_types: 'list[RuleType]') -> None:
         super().__init__(schema_type, None, None, None)
         self.sub_types = sub_types
 
