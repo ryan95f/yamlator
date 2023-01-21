@@ -1,5 +1,3 @@
-from collections import Counter
-
 from yamlator.types import Data
 from yamlator.types import RuleType
 from yamlator.types import UnionRuleType
@@ -7,9 +5,11 @@ from yamlator.types import SchemaTypes
 from yamlator.violations import TypeViolation
 from .base_validator import Validator
 
+from collections import Counter
 from collections import namedtuple
 
 _SchemaTypeDecoder = namedtuple('SchemaTypeDecoder', ['type', 'friendly_name'])
+_UnionViolation = namedtuple('UnionViolation', ['count', 'violations'])
 
 
 class UnionValidator(Validator):
@@ -33,55 +33,60 @@ class UnionValidator(Validator):
             super().validate(key, data, parent, rtype, is_required)
             return
 
-        expected_types = []
-        ripped_violations = []
-        flags = []
-
+        union_violations: 'list[_UnionViolation]' = []
         for union_type in rtype.sub_types:
-            
+
             if union_type.schema_type == SchemaTypes.LIST:
-                violations = self._handle_list_validation(key, data, parent, union_type, is_required)
-                flags.append(len(violations))
-                ripped_violations.append(violations)
+                violations = self._handle_list_validation(key, data,
+                                                          parent, union_type,
+                                                          is_required)
+                union_violation = _UnionViolation(len(violations), violations)
+                union_violations.append(union_violation)
                 continue
 
             if union_type.schema_type == SchemaTypes.RULESET:
-                violations = self._handle_ruleset_validation(key, data, parent, union_type, is_required)
-                flags.append(len(violations))
-                ripped_violations.append(violations)
+                violations = self._handle_ruleset_validation(key, data,
+                                                             parent,union_type,
+                                                             is_required)
+                union_violation = _UnionViolation(len(violations), violations)
+                union_violations.append(union_violation)
                 continue
-            
+
             if union_type.schema_type == SchemaTypes.REGEX:
-                violations = self._handle_regex_validation(key, data, parent, union_type, is_required)
-                flags.append(len(violations))
-                ripped_violations.append(violations)
+                violations = self._handle_regex_validation(key, data,
+                                                           parent, union_type,
+                                                           is_required)
+                union_violation = _UnionViolation(len(violations), violations)
+                union_violations.append(union_violation)
                 continue
-            
+
             builtin = self._type_lookups[union_type.schema_type]
             if not isinstance(data, builtin.type):
-                flags.append(1)
-                ripped_violations.append([])
-                expected_types.append(builtin.friendly_name)
+                union_violation = _UnionViolation(1, [])
+                union_violations.append(union_violation)
                 continue
 
-            flags.append(0)
+            union_violations.append(_UnionViolation(0, []))
 
-        flags.sort()
-        if flags[0] == 0:
+
+        union_violations.sort(key=lambda x: x[0])
+        if union_violations[0].count == 0:
             return
 
-        occurrence = Counter(flags)
-        if occurrence[flags[-1]] == 1:
-            self._violations.extend(ripped_violations[-1])
+        occurrence = Counter([uv.count for uv in union_violations])
+        if occurrence[union_violations[-1].count] == 1:
+            self._violations.extend(union_violations[-1].violations)
             return
 
-        e = ", ".join(expected_types)
-        message = f"Expect types {e} defined in the Union"
+        message = 'Expected types in the union do not match'
         violation = TypeViolation(key, parent, message)
         self._violations.append(violation)
 
     def _handle_list_validation(self, key: str, data: Data, parent: str,
                                 rtype: RuleType, is_required: bool) -> list:
+        if self._list_validator is None:
+            return []
+
         violation_count = len(self._violations)
         self._list_validator.validate(key, data, parent, rtype, is_required)
         return self._extract_new_violations(violation_count)
@@ -98,14 +103,17 @@ class UnionValidator(Validator):
 
     def _handle_ruleset_validation(self, key: str, data: Data, parent: str,
                                    rtype: RuleType, is_required: bool) -> list:
+        if self._ruleset_validator is None:
+            return []
+
         violation_count = len(self._violations)
         self._ruleset_validator.validate(key, data, parent, rtype, is_required)
         return self._extract_new_violations(violation_count)
 
     def _handle_regex_validation(self, key: str, data: Data, parent: str,
                                  rtype: RuleType, is_required: bool) -> list:
-        if rtype.schema_type != SchemaTypes.REGEX:
-            return
+        if self._regex_validator is None:
+            return []
 
         violation_count = len(self._violations)
         self._regex_validator.validate(key, data, parent, rtype, is_required)
