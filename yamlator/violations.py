@@ -1,7 +1,6 @@
 """Contains classes related to handling different violations"""
 
 
-from __future__ import annotations
 import json
 
 from collections import deque

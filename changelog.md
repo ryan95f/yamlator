@@ -36,3 +36,8 @@
 
 * Improved the Yamlator grammar to allow rule names to accept options including symbols, unicode, spaces and dashes. Any YAML key that contains spaces, must be enclosed in double quotes
 * Upgraded the Ubuntu version on the publish workflow
+
+## v0.2.2 (18th January 2023)
+
+* Added support for Python 3.6+ by removing the `__future__` and `dataclass` imports from the codebase
+* Downgraded pylint in the developer dependencies to allow for Python 3.6 to run locally

@@ -1,7 +1,5 @@
 """Yamlator Types"""
 
-
-from __future__ import annotations
 import re
 
 from enum import Enum
@@ -38,7 +36,7 @@ class RuleType:
     regex = None
 
     def __init__(self, schema_type: SchemaTypes, lookup: str = None,
-                 sub_type: RuleType = None, regex: str = None) -> None:
+                 sub_type: 'RuleType' = None, regex: str = None) -> None:
         """RuleType init
 
         Args:
