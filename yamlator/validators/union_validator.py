@@ -19,12 +19,6 @@ _MIN_INDEX = 0
 class UnionValidator(Validator):
     """Validator for handling the union type"""
 
-    _ruleset_validator: Validator = None
-    _list_validator: Validator = None
-    _regex_validator: Validator = None
-    _enum_validator: Validator = None
-    _map_validator: Validator = None
-
     _type_lookups = {
         SchemaTypes.INT: _SchemaTypeDecoder(int, 'int'),
         SchemaTypes.STR: _SchemaTypeDecoder(str, 'str'),
@@ -34,8 +28,40 @@ class UnionValidator(Validator):
         SchemaTypes.BOOL: _SchemaTypeDecoder(bool, 'bool'),
     }
 
+    _sub_type_validators = {}
+
+    def set_ruleset_validator(self, validator: Validator) -> None:
+        self._sub_type_validators[SchemaTypes.RULESET] = validator
+
+    def set_list_validator(self, validator: Validator) -> None:
+        self._sub_type_validators[SchemaTypes.LIST] = validator
+
+    def set_regex_validator(self, validator: Validator) -> None:
+        self._sub_type_validators[SchemaTypes.REGEX] = validator
+
+    def set_enum_validator(self, validator: Validator) -> None:
+        self._sub_type_validators[SchemaTypes.ENUM] = validator
+
+    def set_map_validator(self, validator: Validator) -> None:
+        self._sub_type_validators[SchemaTypes.MAP] = validator
+
     def validate(self, key: str, data: Data, parent: str, rtype: UnionRuleType,
                  is_required: bool = False) -> None:
+        """Validate the data against all types defined in the union. If one
+        or more types do not match the union, a single `TypeViolation`
+        is raised
+
+        __Note__: Any sub violations raised during the processing of
+        the union type are removed from the final list
+
+        Args:
+            key (str): The key to the data
+            data (Data): The data to validate
+            parent (str): The parent key of the data
+            rtype (RuleType): The type assigned to the rule that will be
+                applied to the data
+            is_required (bool, optional): Indicates if the rule is required
+        """
 
         is_union_type = (rtype.schema_type == SchemaTypes.UNION)
         if not is_union_type:
@@ -44,57 +70,11 @@ class UnionValidator(Validator):
 
         union_violations = []
         for union_type in rtype.sub_types:
-            if union_type.schema_type == SchemaTypes.LIST:
-                union_violation = self._handle_validation(
-                    self._list_validator,
-                    key,
-                    data,
-                    parent,
-                    union_type,
-                    is_required
-                )
-                union_violations.append(union_violation)
-                continue
 
-            if union_type.schema_type == SchemaTypes.RULESET:
+            validator = self._sub_type_validators.get(union_type.schema_type)
+            if validator is not None:
                 union_violation = self._handle_validation(
-                    self._ruleset_validator,
-                    key,
-                    data,
-                    parent,
-                    union_type,
-                    is_required
-                )
-                union_violations.append(union_violation)
-                continue
-
-            if union_type.schema_type == SchemaTypes.REGEX:
-                union_violation = self._handle_validation(
-                    self._regex_validator,
-                    key,
-                    data,
-                    parent,
-                    union_type,
-                    is_required
-                )
-                union_violations.append(union_violation)
-                continue
-
-            if union_type.schema_type == SchemaTypes.ENUM:
-                union_violation = self._handle_validation(
-                    self._enum_validator,
-                    key,
-                    data,
-                    parent,
-                    union_type,
-                    is_required
-                )
-                union_violations.append(union_violation)
-                continue
-
-            if union_type.schema_type == SchemaTypes.MAP:
-                union_violation = self._handle_validation(
-                    self._map_validator,
+                    validator,
                     key,
                     data,
                     parent,
@@ -142,18 +122,3 @@ class UnionValidator(Validator):
         for _ in range(0, diff):
             self._violations.pop()
         return diff
-
-    def set_ruleset_validator(self, validator: Validator) -> None:
-        self._ruleset_validator = validator
-
-    def set_list_validator(self, validator: Validator) -> None:
-        self._list_validator = validator
-
-    def set_regex_validator(self, validator: Validator) -> None:
-        self._regex_validator = validator
-
-    def set_enum_validator(self, validator: Validator) -> None:
-        self._enum_validator = validator
-
-    def set_map_validator(self, validator: Validator) -> None:
-        self._map_validator = validator
