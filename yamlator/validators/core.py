@@ -88,5 +88,7 @@ def _create_validators_chain(instructions: dict,
     union_validator.set_list_validator(list_validator)
     union_validator.set_ruleset_validator(ruleset_validator)
     union_validator.set_regex_validator(regex_validator)
+    union_validator.set_enum_validator(enum_validator)
+    union_validator.set_map_validator(map_validator)
 
     return root

@@ -69,15 +69,16 @@ class RuleType:
             SchemaTypes.LIST: 'list({})',
             SchemaTypes.MAP: 'map({})',
             SchemaTypes.BOOL: 'bool',
+            SchemaTypes.ANY: 'any'
         }
 
-        t = types[self.schema_type]
+        type_str = types[self.schema_type]
         sub_type = self.sub_type
         while sub_type is not None:
-            y = types[sub_type.schema_type]
-            t = t.format(y)
+            sub_type_str = types[sub_type.schema_type]
+            type_str = type_str.format(sub_type_str)
             sub_type = sub_type.sub_type
-        return t
+        return type_str
 
     def __repr__(self) -> str:
         if self.schema_type == SchemaTypes.RULESET:

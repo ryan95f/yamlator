@@ -22,5 +22,5 @@ ruleset Project {
 
 schema {
     project Project
-    test union(int, str, list(int), list(list(int)))
+    test union(int, str, list(int))
 }

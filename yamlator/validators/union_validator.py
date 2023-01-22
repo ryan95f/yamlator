@@ -10,11 +10,7 @@ from .base_validator import Validator
 from collections import namedtuple
 
 _SchemaTypeDecoder = namedtuple('SchemaTypeDecoder', ['type', 'friendly_name'])
-_UnionViolation = namedtuple('UnionViolation', [
-    'count',
-    'violations',
-    'type_name'
-])
+_UnionViolation = namedtuple('UnionViolation', ['count', 'type_name'])
 
 _NO_VIOLATION_COUNT = 0
 _MIN_INDEX = 0
@@ -36,8 +32,6 @@ class UnionValidator(Validator):
         SchemaTypes.LIST: _SchemaTypeDecoder(list, 'list'),
         SchemaTypes.MAP: _SchemaTypeDecoder(dict, 'map'),
         SchemaTypes.BOOL: _SchemaTypeDecoder(bool, 'bool'),
-        SchemaTypes.REGEX: _SchemaTypeDecoder(str, 'regex'),
-        SchemaTypes.RULESET: _SchemaTypeDecoder(dict, 'ruleset')
     }
 
     def validate(self, key: str, data: Data, parent: str, rtype: UnionRuleType,
@@ -48,7 +42,7 @@ class UnionValidator(Validator):
             super().validate(key, data, parent, rtype, is_required)
             return
 
-        union_violations: 'list[_UnionViolation]' = []
+        union_violations = []
         for union_type in rtype.sub_types:
             if union_type.schema_type == SchemaTypes.LIST:
                 union_violation = self._handle_validation(
@@ -112,11 +106,11 @@ class UnionValidator(Validator):
 
             builtin = self._type_lookups[union_type.schema_type]
             if not isinstance(data, builtin.type):
-                union_violation = _UnionViolation(1, [], builtin.friendly_name)
+                union_violation = _UnionViolation(1, builtin.friendly_name)
                 union_violations.append(union_violation)
                 continue
 
-            union_violation = _UnionViolation(0, [], builtin.friendly_name)
+            union_violation = _UnionViolation(0, builtin.friendly_name)
             union_violations.append(union_violation)
 
         union_violations.sort(key=lambda x: x[0])
@@ -132,22 +126,22 @@ class UnionValidator(Validator):
                            parent: str, rtype: RuleType,
                            is_required: bool) -> _UnionViolation:
         if validator is None:
-            return []
+            return _UnionViolation(0, str(rtype))
 
         violation_count = len(self._violations)
         validator.validate(key, data, parent, rtype, is_required)
-        violations = self._extract_new_violations(violation_count)
-        return _UnionViolation(len(violations), violations, str(rtype))
 
-    def _extract_new_violations(self, violation_count: int) -> list:
-        diff = len(self._violations) - violation_count
-        if diff == 0:
-            return []
+        # Remove the violations from the sub validation process
+        # to not pollute the output with all the different violations
+        # from every type defined in the union
+        removed_violations = self._remove_nested_violations(violation_count)
+        return _UnionViolation(removed_violations, str(rtype))
 
-        ripped_violations = []
+    def _remove_nested_violations(self, initial_count) -> int:
+        diff = len(self._violations) - initial_count
         for _ in range(0, diff):
-            ripped_violations.append(self._violations.pop())
-        return ripped_violations
+            self._violations.pop()
+        return diff
 
     def set_ruleset_validator(self, validator: Validator) -> None:
         self._ruleset_validator = validator
