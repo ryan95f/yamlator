@@ -58,6 +58,27 @@ class RuleType:
         if regex is not None:
             self.regex = re.compile(regex)
 
+    def __str__(self) -> str:
+        types = {
+            SchemaTypes.REGEX: f'Regex({self.regex})',
+            SchemaTypes.RULESET: self.lookup,
+            SchemaTypes.ENUM: self.lookup,
+            SchemaTypes.INT: 'int',
+            SchemaTypes.STR: 'str',
+            SchemaTypes.FLOAT: 'float',
+            SchemaTypes.LIST: 'list({})',
+            SchemaTypes.MAP: 'map({})',
+            SchemaTypes.BOOL: 'bool',
+        }
+
+        t = types[self.schema_type]
+        sub_type = self.sub_type
+        while sub_type is not None:
+            y = types[sub_type.schema_type]
+            t = t.format(y)
+            sub_type = sub_type.sub_type
+        return t
+
     def __repr__(self) -> str:
         if self.schema_type == SchemaTypes.RULESET:
             repr_template = '{}(type=ruleset, lookup={}, sub_type={})'

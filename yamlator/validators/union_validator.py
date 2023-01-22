@@ -7,7 +7,6 @@ from yamlator.types import SchemaTypes
 from yamlator.violations import TypeViolation
 from .base_validator import Validator
 
-from collections import Counter
 from collections import namedtuple
 
 _SchemaTypeDecoder = namedtuple('SchemaTypeDecoder', ['type', 'friendly_name'])
@@ -19,7 +18,6 @@ _UnionViolation = namedtuple('UnionViolation', [
 
 _NO_VIOLATION_COUNT = 0
 _MIN_INDEX = 0
-_MAX_INDEX = -1
 
 
 class UnionValidator(Validator):
@@ -28,6 +26,8 @@ class UnionValidator(Validator):
     _ruleset_validator: Validator = None
     _list_validator: Validator = None
     _regex_validator: Validator = None
+    _enum_validator: Validator = None
+    _map_validator: Validator = None
 
     _type_lookups = {
         SchemaTypes.INT: _SchemaTypeDecoder(int, 'int'),
@@ -50,7 +50,6 @@ class UnionValidator(Validator):
 
         union_violations: 'list[_UnionViolation]' = []
         for union_type in rtype.sub_types:
-
             if union_type.schema_type == SchemaTypes.LIST:
                 union_violation = self._handle_validation(
                     self._list_validator,
@@ -87,6 +86,30 @@ class UnionValidator(Validator):
                 union_violations.append(union_violation)
                 continue
 
+            if union_type.schema_type == SchemaTypes.ENUM:
+                union_violation = self._handle_validation(
+                    self._enum_validator,
+                    key,
+                    data,
+                    parent,
+                    union_type,
+                    is_required
+                )
+                union_violations.append(union_violation)
+                continue
+
+            if union_type.schema_type == SchemaTypes.MAP:
+                union_violation = self._handle_validation(
+                    self._map_validator,
+                    key,
+                    data,
+                    parent,
+                    union_type,
+                    is_required
+                )
+                union_violations.append(union_violation)
+                continue
+
             builtin = self._type_lookups[union_type.schema_type]
             if not isinstance(data, builtin.type):
                 union_violation = _UnionViolation(1, [], builtin.friendly_name)
@@ -98,11 +121,6 @@ class UnionValidator(Validator):
 
         union_violations.sort(key=lambda x: x[0])
         if union_violations[_MIN_INDEX].count == _NO_VIOLATION_COUNT:
-            return
-
-        occurrence = Counter([uv.count for uv in union_violations])
-        if occurrence[union_violations[_MAX_INDEX].count] == 1:
-            self._violations.extend(union_violations[_MAX_INDEX].violations)
             return
 
         expected_types = ', '.join([uv.type_name for uv in union_violations])
@@ -119,8 +137,7 @@ class UnionValidator(Validator):
         violation_count = len(self._violations)
         validator.validate(key, data, parent, rtype, is_required)
         violations = self._extract_new_violations(violation_count)
-        name = self._type_lookups[rtype.schema_type].friendly_name
-        return _UnionViolation(len(violations), violations, name)
+        return _UnionViolation(len(violations), violations, str(rtype))
 
     def _extract_new_violations(self, violation_count: int) -> list:
         diff = len(self._violations) - violation_count
@@ -140,3 +157,9 @@ class UnionValidator(Validator):
 
     def set_regex_validator(self, validator: Validator) -> None:
         self._regex_validator = validator
+
+    def set_enum_validator(self, validator: Validator) -> None:
+        self._enum_validator = validator
+
+    def set_map_validator(self, validator: Validator) -> None:
+        self._map_validator = validator
