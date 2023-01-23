@@ -55,6 +55,7 @@ class TestUnionValidator(BaseValidatorTest):
                               rtype: typing.Union[UnionRuleType, RuleType],
                               data: Data,
                               expected_violation_count: int):
+        # Unused by test case, however is required by the parameterized library
         del name
 
         validator = UnionValidator(self.violations)
@@ -95,6 +96,7 @@ class TestUnionValidator(BaseValidatorTest):
                                                      ],
                                                      data: Data,
                                                      expected_violation_count: int):  # nopep8 pylint: disable=C0301
+        # Unused by test case, however is required by the parameterized library
         del name
 
         validator = UnionValidator(self.violations)

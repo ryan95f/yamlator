@@ -231,6 +231,17 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(expected_regex_str, rule_type.regex)
         self.assertEqual(rule_type.schema_type, SchemaTypes.REGEX)
 
+    def test_union_type(self):
+        tokens = [
+            RuleType(SchemaTypes.INT),
+            RuleType(SchemaTypes.STR),
+            RuleType(SchemaTypes.LIST, sub_type=RuleType(SchemaTypes.INT))
+        ]
+
+        union_type = self.transformer.union_type(tokens)
+        self.assertIsNotNone(union_type)
+        self.assertEqual(SchemaTypes.UNION, union_type.schema_type)
+
     def test_type(self):
         type_token = self.transformer.type((self.name_token, ))
         self.assertEqual(self.name_token, type_token)

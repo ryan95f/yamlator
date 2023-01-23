@@ -197,7 +197,7 @@ class SchemaTransformer(Transformer):
         (regex, ) = tokens
         return RuleType(schema_type=SchemaTypes.REGEX, regex=regex)
 
-    def union_type(self, tokens: 'list[Token]'):
+    def union_type(self, tokens: 'list[RuleType]'):
         return UnionRuleType(sub_types=tokens)
 
     def type(self, tokens: 'list[Token]') -> Any:
