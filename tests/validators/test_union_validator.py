@@ -6,15 +6,24 @@ import typing
 from parameterized import parameterized
 from .base import BaseValidatorTest
 
+from yamlator.types import Data
+from yamlator.types import RuleType
+from yamlator.types import UnionRuleType
+from yamlator.types import SchemaTypes
 from yamlator.violations import TypeViolation
-from yamlator.types import Data, RuleType, UnionRuleType, SchemaTypes
 from yamlator.validators import UnionValidator
 from yamlator.validators.base_validator import Validator
 
 
 class DummyValidator(Validator):
+    """Dummy Validator to test the union validator
+
+    This validator will always return a Type violation
+
+    """
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:
+        # Not used by the DummyValidator
         del data
         del is_required
         del rtype
@@ -49,13 +58,13 @@ class TestUnionValidator(BaseValidatorTest):
         del name
 
         validator = UnionValidator(self.violations)
-        self._set_update_type_validators(validator)
+        self._set_sub_type_validators(validator)
         validator.validate(self.key, data, self.parent, rtype)
 
         actual_violation_count = len(self.violations)
         self.assertEqual(expected_violation_count, actual_violation_count)
 
-    def _set_update_type_validators(self, validator: UnionValidator):
+    def _set_sub_type_validators(self, validator: UnionValidator):
         dummy_validator = DummyValidator(self.violations)
 
         validator.set_enum_validator(dummy_validator)
