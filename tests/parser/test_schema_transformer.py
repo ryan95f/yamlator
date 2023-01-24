@@ -57,6 +57,7 @@ import lark
 
 from parameterized import parameterized
 from yamlator.exceptions import ConstructNotFoundError
+from yamlator.exceptions import NestedUnionError
 
 from yamlator.parser import SchemaTransformer
 from yamlator.types import EnumItem, Rule, RuleType
@@ -241,6 +242,16 @@ class TestSchemaTransformer(unittest.TestCase):
         union_type = self.transformer.union_type(tokens)
         self.assertIsNotNone(union_type)
         self.assertEqual(SchemaTypes.UNION, union_type.schema_type)
+
+    def test_union_type_with_nested_union(self):
+        tokens = [
+            RuleType(SchemaTypes.INT),
+            RuleType(SchemaTypes.STR),
+            RuleType(SchemaTypes.LIST, sub_type=RuleType(SchemaTypes.INT)),
+            RuleType(SchemaTypes.UNION)
+        ]
+        with self.assertRaises(NestedUnionError):
+            self.transformer.union_type(tokens)
 
     def test_type(self):
         type_token = self.transformer.type((self.name_token, ))
