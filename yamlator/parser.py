@@ -21,6 +21,7 @@ from yamlator.types import YamlatorType
 from yamlator.types import RuleType, UnionRuleType
 from yamlator.types import EnumItem
 from yamlator.types import SchemaTypes
+from yamlator.exceptions import NestedUnionError
 from yamlator.exceptions import ConstructNotFoundError
 from yamlator.exceptions import SchemaParseError
 
@@ -56,7 +57,7 @@ def parse_schema(schema_content: str) -> dict:
         tokens = lark_parser.parse(schema_content)
         return transformer.transform(tokens)
     except VisitError as ve:
-        raise SchemaParseError(ve) from ve
+        raise SchemaParseError(ve.orig_exc) from ve
     except UnexpectedInput as u:
         _handle_syntax_errors(u, lark_parser, schema_content)
 
@@ -198,6 +199,16 @@ class SchemaTransformer(Transformer):
         return RuleType(schema_type=SchemaTypes.REGEX, regex=regex)
 
     def union_type(self, tokens: 'list[RuleType]'):
+        """Transforms a union token into a Union RuleType
+
+        Raises:
+            NestedUnionError: Raised if the tokens contains
+            a union RuleType which indicates a nested union
+            within the union
+        """
+        for token in tokens:
+            if token.schema_type == SchemaTypes.UNION:
+                raise NestedUnionError()
         return UnionRuleType(sub_types=tokens)
 
     def type(self, tokens: 'list[Token]') -> Any:

@@ -10,8 +10,8 @@ from yamlator.parser import SchemaSyntaxError
 from yamlator.parser import parse_schema
 from yamlator.validators.core import validate_yaml
 
-from yamlator.exceptions import InvalidSchemaFilenameError
 from yamlator.exceptions import SchemaParseError
+from yamlator.exceptions import InvalidSchemaFilenameError
 from yamlator.violations import Violation
 
 from yamlator.cmd.outputs import SuccessCode
@@ -36,15 +36,15 @@ def main() -> int:
             schema_filepath=args.ruleset_schema
         )
     except SchemaParseError as ex:
-        print(ex)
+        print(f'Error when parsing schema: {ex}')
         return SuccessCode.ERR
     except SchemaSyntaxError as ex:
         print(ex)
         return SuccessCode.ERR
-    except FileNotFoundError as ex:
+    except InvalidSchemaFilenameError as ex:
         print(ex)
         return SuccessCode.ERR
-    except InvalidSchemaFilenameError as ex:
+    except FileNotFoundError as ex:
         print(ex)
         return SuccessCode.ERR
     except ValueError as ex:

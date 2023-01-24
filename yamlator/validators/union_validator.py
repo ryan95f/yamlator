@@ -69,22 +69,22 @@ class UnionValidator(Validator):
             return
 
         union_violations = []
-        for union_type in rtype.sub_types:
+        for sub_rule_type in rtype.sub_types:
 
-            validator = self._sub_type_validators.get(union_type.schema_type)
+            validator = self._sub_type_validators.get(sub_rule_type.schema_type)
             if validator is not None:
-                union_violation = self._handle_validation(
+                union_violation = self._handle_sub_type_validation(
                     validator,
                     key,
                     data,
                     parent,
-                    union_type,
+                    sub_rule_type,
                     is_required
                 )
                 union_violations.append(union_violation)
                 continue
 
-            builtin = self._type_lookups[union_type.schema_type]
+            builtin = self._type_lookups[sub_rule_type.schema_type]
             if not isinstance(data, builtin.type):
                 union_violation = _UnionViolation(1, builtin.friendly_name)
                 union_violations.append(union_violation)
@@ -102,9 +102,9 @@ class UnionValidator(Validator):
         violation = TypeViolation(key, parent, message)
         self._violations.append(violation)
 
-    def _handle_validation(self, validator: Validator, key: str, data: Data,
-                           parent: str, rtype: RuleType,
-                           is_required: bool) -> _UnionViolation:
+    def _handle_sub_type_validation(self, validator: Validator, key: str,
+                                    data: Data, parent: str, rtype: RuleType,
+                                    is_required: bool) -> _UnionViolation:
         if validator is None:
             return _UnionViolation(0, str(rtype))
 
