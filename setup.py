@@ -48,8 +48,8 @@ setuptools.setup(
         'yamlator.cmd.outputs'
     ]),
     install_requires=[
-        'lark==1.0.0',
-        'PyYAML==6.0'
+        'lark>=1.0.0',
+        'PyYAML>=5.4.1'
     ],
     python_requires='>=3.6',
     classifiers=[
