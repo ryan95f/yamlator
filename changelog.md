@@ -41,3 +41,9 @@
 
 * Added support for Python 3.6+ by removing the `__future__` and `dataclass` imports from the codebase
 * Downgraded pylint in the developer dependencies to allow for Python 3.6 to run locally
+
+## v0.3.0 (TBC)
+
+* Added the `union` data type tp the schema to allow a field to allow a key to have more than one specific type
+* Reduced the constraints on the `install_requirements`
+* Minor fixes and improvements to the overall codebase
