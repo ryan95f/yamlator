@@ -19,10 +19,10 @@ from parameterized import parameterized
 
 from yamlator.utils import load_schema
 from yamlator.parser import parse_schema
-from yamlator.utils import load_yaml_file
 from yamlator.parser import MalformedEnumNameError
 from yamlator.parser import MalformedRulesetNameError
 from yamlator.parser import MissingRulesError
+from yamlator.parser import SchemaParseError
 from yamlator.parser import SchemaSyntaxError
 
 
@@ -74,11 +74,16 @@ class TestParseSchema(unittest.TestCase):
         (
             'with_ruleset_not_defined',
             './tests/files/invalid_files/missing_defined_ruleset.ys',
-            SchemaSyntaxError
+            SchemaParseError
         ),
         (
-            'with_invalid_schema_syntax',
-            './tests/files/valid/valid.yaml',
+            'union_with_nested_union',
+            './tests/files/invalid_files/nested_union.ys',
+            SchemaParseError
+        ),
+        (
+            'with_invalid_rule_syntax',
+            './tests/files/invalid_files/invalid_syntax.ys',
             SchemaSyntaxError
         )
     ])
@@ -87,9 +92,9 @@ class TestParseSchema(unittest.TestCase):
         # Unused by test case, however is required by the parameterized library
         del name
 
-        schema_content = load_yaml_file(schema_file_path)
+        schema_content = load_schema(schema_file_path)
         with self.assertRaises(exception_type):
-            parse_schema(str(schema_content))
+            parse_schema(schema_content)
 
 
 if __name__ == '__main__':

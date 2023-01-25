@@ -1,0 +1,9 @@
+
+ruleset Config {
+    kind str
+    version union(str, int, union(int, str))
+}
+
+schema {
+    config Config optional
+}

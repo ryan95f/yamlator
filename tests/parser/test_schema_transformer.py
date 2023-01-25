@@ -34,6 +34,10 @@ Test Cases:
        container type when the name of the given container is not found
     * `test_regex_type` tests transforming regex tokens into a Yamlator
        regex type
+    * `test_union_type` tests transforming a union token into a Union
+       rule type
+    * `test_union_type_with_nested_union` tests that a exception
+       is raised when a union contains a nested union
     * `test_type` tests the type transformer returns the token it was
        passed so the other transformer can successfully transform it
     * `test_schema_entry` tests that given a set of rule tokens within
