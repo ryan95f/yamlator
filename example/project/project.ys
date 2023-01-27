@@ -22,5 +22,4 @@ ruleset Project {
 
 schema {
     project Project
-    test union(int, str, list(int))
 }

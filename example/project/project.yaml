@@ -10,9 +10,3 @@ project:
   labels:
     cost: value
     team: value
-test:
-  - 1
-  - - 1
-    - 2
-  - - 1
-    - "str"

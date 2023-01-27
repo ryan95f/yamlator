@@ -44,6 +44,6 @@
 
 ## v0.3.0 (TBC)
 
-* Added the `union` data type tp the schema to allow a field to allow a key to have more than one specific type
+* Added the `union` data type to the schema to allow a key to be more than one specific type
 * Reduced the constraints on the `install_requirements`
 * Minor fixes and improvements to the overall codebase
