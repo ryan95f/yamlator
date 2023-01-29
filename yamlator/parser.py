@@ -18,7 +18,8 @@ from yamlator.types import ContainerTypes
 from yamlator.types import YamlatorRuleset
 from yamlator.types import YamlatorEnum
 from yamlator.types import YamlatorType
-from yamlator.types import RuleType, UnionRuleType
+from yamlator.types import RuleType
+from yamlator.types import UnionRuleType
 from yamlator.types import EnumItem
 from yamlator.types import SchemaTypes
 from yamlator.exceptions import NestedUnionError
