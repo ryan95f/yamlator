@@ -5,7 +5,7 @@ enum Employee_department {
 }
 
 ruleset PersonAddress {
-    houseNumber int
+    houseNumber union(int, str)
     street str
     city str
     post_code str

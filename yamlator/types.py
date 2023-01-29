@@ -27,6 +27,7 @@ class SchemaTypes(Enum):
     ANY = auto()
     REGEX = auto()
     BOOL = auto()
+    UNION = auto()
 
 
 class RuleType:
@@ -53,9 +54,32 @@ class RuleType:
         self.schema_type = schema_type
         self.lookup = lookup
         self.sub_type = sub_type
+        self._raw_regex = regex
 
         if regex is not None:
             self.regex = re.compile(regex)
+
+    def __str__(self) -> str:
+        types = {
+            SchemaTypes.REGEX: f'Regex({self._raw_regex})',
+            SchemaTypes.RULESET: self.lookup,
+            SchemaTypes.ENUM: self.lookup,
+            SchemaTypes.INT: 'int',
+            SchemaTypes.STR: 'str',
+            SchemaTypes.FLOAT: 'float',
+            SchemaTypes.LIST: 'list({})',
+            SchemaTypes.MAP: 'map({})',
+            SchemaTypes.BOOL: 'bool',
+            SchemaTypes.ANY: 'any'
+        }
+
+        type_str = types[self.schema_type]
+        sub_type = self.sub_type
+        while sub_type is not None:
+            sub_type_str = types[sub_type.schema_type]
+            type_str = type_str.format(sub_type_str)
+            sub_type = sub_type.sub_type
+        return type_str
 
     def __repr__(self) -> str:
         if self.schema_type == SchemaTypes.RULESET:
@@ -68,6 +92,27 @@ class RuleType:
         return repr_template.format(self.__class__.__name__,
                                     self.schema_type,
                                     self.sub_type)
+
+
+class UnionRuleType(RuleType):
+    """Represents a Union data type that is defined in the Yamlator schema"""
+
+    def __init__(self, sub_types: 'list[RuleType]') -> None:
+        """UnionRuleType init
+
+        Args:
+            sub_types (list[RuleType]): A list of rule types that
+            the union will compare
+        """
+        super().__init__(SchemaTypes.UNION)
+        self.sub_types = sub_types
+
+    def __str__(self) -> str:
+        sub_types_strings = [None] * len(self.sub_types)
+        for idx, sub_type in enumerate(self.sub_types):
+            sub_types_strings[idx] = str(sub_type)
+        combined_sub_types_strings = ', '.join(sub_types_strings)
+        return f'union({combined_sub_types_strings})'
 
 
 class ContainerTypes(Enum):

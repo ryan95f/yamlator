@@ -1,0 +1,8 @@
+ruleset Hello {
+    name str required true
+    no_data
+}
+
+schema {
+    hello Hello
+}

@@ -2,7 +2,7 @@
 
 import setuptools
 
-VERSION = '0.2.2'
+VERSION = '0.3.0'
 PACKAGE_NAME = 'yamlator'
 DESCRIPTION = 'Yamlator is a CLI tool that allows a YAML file to be validated using a lightweight schema language'  # nopep8
 
@@ -48,8 +48,8 @@ setuptools.setup(
         'yamlator.cmd.outputs'
     ]),
     install_requires=[
-        'lark==1.0.0',
-        'PyYAML==6.0'
+        'lark>=1.0.0',
+        'PyYAML>=5.4.1'
     ],
     python_requires='>=3.6',
     classifiers=[

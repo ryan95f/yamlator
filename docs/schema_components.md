@@ -15,6 +15,7 @@ Below are the various components that can be used to construct a schema with Yam
   * [Regex Type](#regex-type)
   * [Ruleset Type](#ruleset-type)
   * [Enum Type](#enum-type)
+  * [Union Type](#union-type)
 
 ## Schema
 
@@ -362,7 +363,38 @@ ruleset <ruleset-name> {
 Or in a schema block:
 
 ```text
-Schema {
+schema {
     logLevel LogLevel
+}
+```
+
+### Union Type
+
+The `union` type can be used when a key could be one or more types. For example, a key could be either an `int` or a `float`. The union type supports all available types including lists, rulesets, regex, enums, maps and all the other basic types. When defining a `union`, 2 or more types must be defined for it to be valid.
+
+Nested `unions` are *NOT* supported and will raise a parsing error. Unions can be nested in other data types such as a list, rulesets and maps which can then used within a `union`. However direct nesting of unions is not supported.
+
+__Note__: The union will always return a single violation if one or more data types are not met. It currently does not display the individual violations against each type.
+
+An example of a `union` type:
+
+```yaml
+items:
+    - name: item1
+      price: 10
+    - name: item2
+      price: 15.2
+```
+
+Then the following schema can be defined:
+
+```text
+ruleset Item {
+    name str
+    price union(int, float)
+}
+
+schema {
+    items list(Item)
 }
 ```

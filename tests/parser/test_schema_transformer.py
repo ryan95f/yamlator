@@ -34,6 +34,10 @@ Test Cases:
        container type when the name of the given container is not found
     * `test_regex_type` tests transforming regex tokens into a Yamlator
        regex type
+    * `test_union_type` tests transforming a union token into a Union
+       rule type
+    * `test_union_type_with_nested_union` tests that a exception
+       is raised when a union contains a nested union
     * `test_type` tests the type transformer returns the token it was
        passed so the other transformer can successfully transform it
     * `test_schema_entry` tests that given a set of rule tokens within
@@ -57,6 +61,7 @@ import lark
 
 from parameterized import parameterized
 from yamlator.exceptions import ConstructNotFoundError
+from yamlator.exceptions import NestedUnionError
 
 from yamlator.parser import SchemaTransformer
 from yamlator.types import EnumItem, Rule, RuleType
@@ -230,6 +235,27 @@ class TestSchemaTransformer(unittest.TestCase):
         rule_type = self.transformer.regex_type((token, ))
         self.assertEqual(expected_regex_str, rule_type.regex)
         self.assertEqual(rule_type.schema_type, SchemaTypes.REGEX)
+
+    def test_union_type(self):
+        tokens = [
+            RuleType(SchemaTypes.INT),
+            RuleType(SchemaTypes.STR),
+            RuleType(SchemaTypes.LIST, sub_type=RuleType(SchemaTypes.INT))
+        ]
+
+        union_type = self.transformer.union_type(tokens)
+        self.assertIsNotNone(union_type)
+        self.assertEqual(SchemaTypes.UNION, union_type.schema_type)
+
+    def test_union_type_with_nested_union(self):
+        tokens = [
+            RuleType(SchemaTypes.INT),
+            RuleType(SchemaTypes.STR),
+            RuleType(SchemaTypes.LIST, sub_type=RuleType(SchemaTypes.INT)),
+            RuleType(SchemaTypes.UNION)
+        ]
+        with self.assertRaises(NestedUnionError):
+            self.transformer.union_type(tokens)
 
     def test_type(self):
         type_token = self.transformer.type((self.name_token, ))

@@ -41,3 +41,9 @@
 
 * Added support for Python 3.6+ by removing the `__future__` and `dataclass` imports from the codebase
 * Downgraded pylint in the developer dependencies to allow for Python 3.6 to run locally
+
+## v0.3.0 (29th January 2023)
+
+* Added the `union` data type to the schema to allow a key to be more than one specific type
+* Reduced the constraints on the `install_requirements` in `setup.py`
+* Minor fixes and improvements to the overall codebase
