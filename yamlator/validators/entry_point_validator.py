@@ -24,6 +24,7 @@ class EntryPointValidator(Validator):
             entry_point (YamlatorRuleset): The entry point ruleset
         """
         self._entry_point = entry_point
+        self._flat_validator = None
         super().__init__(violations)
 
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
@@ -44,6 +45,12 @@ class EntryPointValidator(Validator):
         del is_required
 
         rules = self._entry_point.rules
+        if not isinstance(data, dict):
+            rule = rules[0]
+            super().validate(rule.name, data, parent,
+                             rule.rtype, rule.is_required)
+            return
+
         if self._entry_point.is_strict:
             self._handle_strict_mode(data, rules)
 
