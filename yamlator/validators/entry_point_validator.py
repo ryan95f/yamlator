@@ -9,6 +9,7 @@ from yamlator.types import Rule
 from yamlator.types import RuleType
 from yamlator.types import YamlatorRuleset
 from yamlator.violations import StrictEntryPointViolation
+from yamlator.utils import is_no_root_rule
 from .base_validator import Validator
 
 
@@ -45,10 +46,8 @@ class EntryPointValidator(Validator):
         del is_required
 
         rules = self._entry_point.rules
-        if not isinstance(data, dict):
-            rule = rules[0]
-            super().validate(rule.name, data, parent,
-                             rule.rtype, rule.is_required)
+        has_validated = self._handle_keyless_data(data, parent, rules)
+        if has_validated:
             return
 
         if self._entry_point.is_strict:
@@ -59,6 +58,20 @@ class EntryPointValidator(Validator):
 
             super().validate(rule.name, sub_data, parent,
                              rule.rtype, rule.is_required)
+
+    def _handle_keyless_data(self, data: Data, parent: str,
+                             rules: Iterable[Rule]):
+        if len(rules) > 1:
+            return False
+
+        rule: Rule = rules[0]
+        if not is_no_root_rule(rule):
+            return False
+
+        super().validate(rule.name, data, parent,
+                         rule.rtype, rule.is_required)
+        return True
+
 
     def _handle_strict_mode(self, data: dict, rules: Iterable[Rule]):
         rule_fields = {rule.name for rule in rules}

@@ -4,10 +4,17 @@
 import yaml
 import re
 
+from yamlator.types import Rule
 from yamlator.exceptions import InvalidSchemaFilenameError
 
 _YAMLER_SCHEMA_REGEX = re.compile(r'.ys$')
 _BACKSLASH_REGEX = re.compile(r'[\\]{1,2}')
+
+NO_ROOT_KEY_DIRECTIVE = '!!yamlator'
+
+
+def is_no_root_rule(rule: Rule) -> bool:
+    return rule.name == NO_ROOT_KEY_DIRECTIVE 
 
 
 def load_yaml_file(filename: str) -> dict:
