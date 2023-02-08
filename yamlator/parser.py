@@ -97,10 +97,6 @@ class SchemaTransformer(Transformer):
         (name, rtype) = tokens[0:2]
         return Rule(name.value, rtype, False)
 
-    def schema_flat_rule(self, tokens: 'list[Token]') -> Rule:
-        (name, rtype) = tokens[0:2]
-        return Rule(name.value, rtype, True)
-
     def ruleset(self, tokens: 'list[Token]') -> YamlatorRuleset:
         """Transforms the ruleset tokens into a YamlatorRuleset object"""
         name = tokens[0].value

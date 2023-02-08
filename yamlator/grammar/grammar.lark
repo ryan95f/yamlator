@@ -12,16 +12,11 @@ start: instructions*
        | FLOAT -> float
        | string
 
-schema_entry: "schema" "{" schema_flat_rule ~ 1 "}" 
-            |"schema" "{" rule+ "}"
-
+schema_entry: "schema" "{" rule+ "}"
 strict_schema_entry: "strict schema" "{" rule+ "}"
 
 ruleset: "ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
 strict_ruleset: "strict ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
-
-NO_ROOT_KEY_DIRECTIVE: "!!yamlator"
-schema_flat_rule: NO_ROOT_KEY_DIRECTIVE type NEW_LINES
 
 // Enum constructs
 enum: "enum" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" enum_item+ "}"
