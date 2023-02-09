@@ -29,10 +29,6 @@ from yamlator.parser import SchemaSyntaxError
 class TestParseSchema(unittest.TestCase):
     """Tests the parse schema function"""
 
-    def setUp(self):
-        self.valid_schema_file = './tests/files/valid/valid.ys'
-        self.invalid_schema_file = './tests/files/valid/valid.yaml'
-
     def test_parse_with_none_text(self):
         with self.assertRaises(ValueError):
             parse_schema(None)
@@ -41,14 +37,25 @@ class TestParseSchema(unittest.TestCase):
         instructions = parse_schema('')
         self.assertIsNotNone(instructions)
 
-    def test_parse_with_valid_content(self):
-        schema_content = load_schema(self.valid_schema_file)
+    @parameterized.expand([
+        ('with_root_key_schema', './tests/files/valid/valid.ys', 4),
+        ('with_keyless_schema', './tests/files/valid/keyless_directive.ys', 1),
+        ('with_keyless_schema',
+         './tests/files/valid/keyless_and_standard_rules.ys', 2),
+    ])
+    def test_parse_with_valid_content(self, name: str, schema_path: str,
+                                      expected_schema_rule_count: int):
+        # Unused by test case, however is required by the parameterized library
+        del name
+
+        schema_content = load_schema(schema_path)
         instructions = parse_schema(schema_content)
         main = instructions.get('main')
 
         self.assertIsNotNone(instructions)
         self.assertIsNotNone(main)
         self.assertEqual('main', main.name)
+        self.assertEqual(expected_schema_rule_count, len(main.rules))
 
     @parameterized.expand([
         (
