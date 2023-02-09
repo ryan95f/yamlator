@@ -62,8 +62,11 @@ class EntryPointValidator(Validator):
             super().validate(rule.name, sub_data, parent,
                              rule.rtype, rule.is_required)
 
-    def _validate_keyless_data(self, data: Data, parent: str,
-                             rules: Iterable[Rule]):
+    def _validate_keyless_data(self, data: Data,
+                               parent: str,
+                               rules: Iterable[Rule]):
+        # If there is more than 1 rule, that we are not
+        # dealing with a keyless root
         if len(rules) > 1:
             return False
 
@@ -74,7 +77,6 @@ class EntryPointValidator(Validator):
         super().validate(rule.name, data, parent,
                          rule.rtype, rule.is_required)
         return True
-
 
     def _handle_strict_mode(self, data: dict, rules: Iterable[Rule]):
         rule_fields = {rule.name for rule in rules}

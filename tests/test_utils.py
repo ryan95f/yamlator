@@ -83,12 +83,15 @@ class TestLoadSchema(unittest.TestCase):
 
 class TestIsKeylessRule(unittest.TestCase):
     @parameterized.expand([
-        ('with_expected_directive', Rule(KEYLESS_RULE_DIRECTIVE,
-            RuleType(SchemaTypes.INT), False), True),
-        ('with_malformed_directive', Rule('!yamlator',
-            RuleType(SchemaTypes.INT), False), False),
-        ('without_directive', Rule('hello',
-            RuleType(SchemaTypes.INT), False), False)
+        ('with_expected_directive',
+            Rule(KEYLESS_RULE_DIRECTIVE,
+                 RuleType(SchemaTypes.INT), False), True),
+        ('with_malformed_directive',
+            Rule('!yamlator',
+                 RuleType(SchemaTypes.INT), False), False),
+        ('without_directive',
+            Rule('hello',
+                 RuleType(SchemaTypes.INT), False), False)
     ])
     def test_is_keyless_rule(self, name, rule, expected):
         # Unused by test case, however is required by the parameterized library
@@ -100,6 +103,7 @@ class TestIsKeylessRule(unittest.TestCase):
     def test_is_keyless_rule_with_none_rule(self):
         with self.assertRaises(ValueError):
             is_keyless_rule(None)
+
 
 if __name__ == '__main__':
     unittest.main()
