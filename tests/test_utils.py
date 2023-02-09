@@ -82,6 +82,8 @@ class TestLoadSchema(unittest.TestCase):
 
 
 class TestIsKeylessRule(unittest.TestCase):
+    """Test case for the `is_keyless_rule` function"""
+
     @parameterized.expand([
         ('with_expected_directive',
             Rule(KEYLESS_RULE_DIRECTIVE,
