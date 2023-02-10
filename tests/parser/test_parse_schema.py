@@ -2,11 +2,11 @@
 
 Test cases:
     * `test_parse_with_none_text` tests the parse function when the
-       content is `None`
+       content is `None` raises a ValueError
     * `test_parse_with_empty_text` tests the parse function when the
-       schema is an empty string
+       schema is an empty string still returns an object
     * `test_parse_with_valid_content` tests the parse function with
-       valid content
+       valid content returns the expected rule count
     * `test_parse_syntax_errors` tests the parse function with a range
        of different syntax errors using multiple test files
 """

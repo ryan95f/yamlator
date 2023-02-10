@@ -1,4 +1,9 @@
-"""Test case for the Yamlator types module"""
+"""Test case for the Yamlator types module
+
+Test cases:
+    * `test_rule_type_string_representation` tests the string output
+      when different RuleTypes are configured
+"""
 
 import unittest
 

@@ -1,4 +1,4 @@
-"""Test cases for the `OptionalValidator`
+"""Test cases for the OptionalValidator
 
 Test cases:
     * `test_optional_validator` tests the optional validator with

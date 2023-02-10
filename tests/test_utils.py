@@ -1,5 +1,4 @@
-"""Test cases for the Yamlator utilities. This contains tests
-for the `load_yaml_file` and `load_schema` functions
+"""Test cases for the Yamlator utilities
 
 Test cases:
     * `test_yaml_file_invalid_filename` tests loading the YAML file with a range
@@ -8,6 +7,8 @@ Test cases:
     * `test_load_schema_with_invalid_filename` tests loading a Yamlator
        schema with a range of invalid arguments
     * `test_successfully_load_schema` tests loading a valid Yamlator schema
+    * `test_is_keyless_rule` tests that given a different rules it identifies
+       the specific keyless rule `KEYLESS_RULE_DIRECTIVE`
 """
 
 

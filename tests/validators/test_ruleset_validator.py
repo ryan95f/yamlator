@@ -1,4 +1,4 @@
-"""Test cases for the `RulesetValidator`
+"""Test cases for the RulesetValidator
 
 Test cases:
     * `test_ruleset_validator` tests the validation of rulesets with

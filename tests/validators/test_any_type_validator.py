@@ -1,4 +1,4 @@
-"""Test cases for the `AnyTypeValidator`
+"""Test cases for the AnyTypeValidator
 
 Test cases:
     * `test_any_type_validator` tests the validator with a variety
