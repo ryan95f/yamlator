@@ -41,6 +41,7 @@ class EntryPointValidator(Validator):
                 applied to the data
             is_required (bool, optional): Indicates if the rule is required
         """
+        # These are not used by the `EntryPointValidator`
         del key
         del rtype
         del is_required
@@ -74,6 +75,8 @@ class EntryPointValidator(Validator):
         if not is_keyless_rule(rule):
             return False
 
+        # Run the validation here instead since we are dealing
+        # with an object that does not have a root key. E.g a list
         super().validate(rule.name, data, parent,
                          rule.rtype, rule.is_required)
         return True

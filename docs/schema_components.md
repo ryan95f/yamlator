@@ -223,7 +223,7 @@ schema {
 }
 ```
 
-All supported types can be used to perform top level validation including maps, list, union, regex, integers, strings and rulesets.
+All supported types can be used to perform top level validation including maps, lists, unions, regex, integers, strings and rulesets.
 
 __NOTE__: The schema block when performing top level validation will expect exactly __one rule__. If additional rules are added then Yamlator will assume there is an object with multiple keys to validate and will expect a key called `!!yamlator` in the data structure.
 
