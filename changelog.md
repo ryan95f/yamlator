@@ -51,3 +51,4 @@
 ## v0.3.1 (TBC)
 
 * Added top level validation to Yamlator to support data structures that may not be an object or map data structure
+* Minor docstring and structure improvements in the `tests/` module
