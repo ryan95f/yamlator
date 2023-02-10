@@ -1,4 +1,4 @@
-"""Test cases for the `TableOutput` static class
+"""Test cases for the TableOutput static class
 
 Test Cases:
     * `test_displayed_violation_output` tests that the expected status code

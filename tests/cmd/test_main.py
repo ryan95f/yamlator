@@ -1,4 +1,4 @@
-"""Test the `main` (entry point) of the command line
+"""Test the main (entry point) of the command line
 
 Test Cases:
     * `test_main` tests the entry point with different arguments

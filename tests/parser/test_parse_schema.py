@@ -1,4 +1,4 @@
-"""Test cases for the `parse_schema` function
+"""Test cases for the parse_schema function
 
 Test cases:
     * `test_parse_with_none_text` tests the parse function when the

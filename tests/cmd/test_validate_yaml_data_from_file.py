@@ -1,4 +1,4 @@
-"""Test cases for the `validate_yaml_data_from_file` function
+"""Test cases for the validate_yaml_data_from_file function
 
 Test Cases:
     * `test_validate_yaml_data_from_file_with_invalid_args` tests that the

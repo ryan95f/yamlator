@@ -1,4 +1,4 @@
-"""Test cases for the `YAMLOutput` static class
+"""Test cases for the YAMLOutput static class
 
 Test Cases:
     * `test_yaml_output` tests that the expected status code is returned

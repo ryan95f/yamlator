@@ -1,4 +1,4 @@
-"""Test cases for the `JSONOutput` static class
+"""Test cases for the JSONOutput static class
 
 Test Cases:
     * `test_json_output` tests that the expected status code is returned

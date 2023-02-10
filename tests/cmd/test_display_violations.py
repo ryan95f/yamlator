@@ -1,4 +1,4 @@
-"""Test cases for the `display_violations` function
+"""Test cases for the display_violations function
 
 Test cases:
     * `test_display_violations` tests that the function will display the
