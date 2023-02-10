@@ -3,7 +3,7 @@
 Test Cases:
     * `test_displayed_violation_output` tests that the expected status code
        is returned when valid arguments are provided
-    * `test_json_output_invalid_args` tests that the relevant exception is
+    * `test_json_output_invalid_args` tests that the expected exception is
        raised when invalid arguments are provided
 """
 

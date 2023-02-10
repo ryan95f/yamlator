@@ -3,8 +3,8 @@
 Test cases:
     * `test_display_violations` tests that the function will display the
        results when provided a valid display method
-    * `test_display_violations_invalid_params` tests that the expected
-       exception is raised when invalid parameters are provided.
+    * `test_display_violations_invalid_params` tests that a ValueError
+       exception is raised when invalid parameters are provided
 """
 
 
