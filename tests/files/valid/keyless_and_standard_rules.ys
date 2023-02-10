@@ -1,0 +1,16 @@
+enum Status {
+    SUPPORTED = 0
+    DEPRECATED = 1
+}
+
+ruleset App {
+    version int
+    name str
+    dependencies list(str)
+    status Status optional
+}
+
+schema {
+    fileVersion str
+    !!yamlator list(App)
+}
