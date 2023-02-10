@@ -2,8 +2,8 @@
 
 Test cases:
     * `test_list_validator` tests validating lists with a variety
-       of different types of lists, including nested lists and
-       different rule types
+       of different types of lists, including nested lists, flat
+       lists and different rule types
 """
 
 

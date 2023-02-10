@@ -1,9 +1,9 @@
-"""Test cases for the `EntryPointValidator`
+"""Test cases for the EntryPointValidator
 
 Test cases:
     * `test_entry_point_validator` tests the validator when the entry
-       point ruleset is using strict mode to validate if violations
-       are being raised
+       point ruleset is using / not using strict mode to validate if
+       violations are being raised
 """
 
 

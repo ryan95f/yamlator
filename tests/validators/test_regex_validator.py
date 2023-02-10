@@ -1,4 +1,4 @@
-"""Test cases for the `RegexValidator`
+"""Test cases for the RegexValidator
 
 Test cases:
     * `test_regex_validator` tests the validator with a variety of rule types

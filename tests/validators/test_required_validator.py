@@ -1,4 +1,4 @@
-"""Test cases for the `RequiredValidator`
+"""Test cases for the RequiredValidator
 
 
 Test cases:

@@ -1,4 +1,4 @@
-"""Test cases for the `EnumTypeValidator`
+"""Test cases for the EnumTypeValidator
 
 Test cases:
     * `test_enum_type_validator` tests the validator with a variety of

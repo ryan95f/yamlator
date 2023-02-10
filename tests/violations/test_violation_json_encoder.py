@@ -1,9 +1,9 @@
-"""Test cases for the `ViolationJSONEncoder`
+"""Test cases for the ViolationJSONEncoder
 
 Test Cases:
-    * `test_violation_json_encoder` tests the encoder using a variety
-       of different data structures and types to validate the JSON
-       is successfully generated
+    * `test_violation_json_encoder` tests the encoder with different
+       data structures and types to validate the JSON is
+       successfully generated
     * `test_violation_json_encoder_raises_type_error` tests the JSON
        encoder with objects that are not support
 """

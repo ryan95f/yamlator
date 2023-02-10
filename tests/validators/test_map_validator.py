@@ -1,4 +1,4 @@
-"""Test cases for the `MapValidator`
+"""Test cases for the MapValidator
 
 Test cases:
     * `test_map_validator` tests validating maps with a variety

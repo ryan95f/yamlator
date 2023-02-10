@@ -1,4 +1,4 @@
-"""Test cases for the `BuiltInTypeValidator`
+"""Test cases for the BuiltInTypeValidator
 
 Test cases:
     * `test_build_in_type_validator` tests the validator with a variety
