@@ -24,13 +24,13 @@ def validate_yaml(yaml_data: dict, instructions: dict) -> deque:
     Any violations will be collected and returned in a `deque`
 
     Args:
-        yaml_data (dict): The YAML data to validate. Assumes the YAML
-            contains a root key
+        yaml_data    (dict): The YAML data to validate. Assumes the YAML
+        contains a root key
         instructions (dict): Contains the enums and rulesets that will be
-            used to validate the YAML data
+        used to validate the YAML data
 
     Returns:
-        deque: The violations that were detected in the data.
+        The violations that were detected in the data in a deque
 
     Raises:
         ValueError: When the parameters `yaml_data` or `instructions` are `None`
