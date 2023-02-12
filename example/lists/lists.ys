@@ -1,0 +1,13 @@
+ruleset User {
+    username str required
+}
+
+strict ruleset Project {
+    version int required
+    name str required
+    users list(User) optional
+}
+
+strict schema {
+    !!yamlator list(Project)
+}
