@@ -1,25 +1,25 @@
-"""Custom exceptions used by Yamlator"""
+"""Yamlator exceptions"""
 
 
 class InvalidSchemaFilenameError(RuntimeError):
-    """When the schema filename does not match the expected pattern"""
+    """When the schema filename does not match the expected regex pattern"""
 
-    def __init__(self, filename: str) -> None:
+    def __init__(self, filename: str):
         """InvalidSchemaFilenameError init
 
         Args:
             filename (str): The filename that was invalid
         """
-        message = f'{filename} is not a valid ruleset filename'
+        message = f'{filename} is not a valid Yamlator schema filename'
         super().__init__(message)
 
 
 class ConstructNotFoundError(RuntimeError):
-    """Represents a enum or rule not being found during
-    the transformation process
+    """Represents a enum or ruleset not being found during the
+    schema parsing process
     """
 
-    def __init__(self, construct_name: str) -> None:
+    def __init__(self, construct_name: str):
         """ConstructNotFoundError init
 
         Args:
@@ -39,5 +39,6 @@ class NestedUnionError(RuntimeError):
 
     def __init__(self):
         """NestedUnionError init"""
+
         message = 'Unions cannot have a union nested within it'
         super().__init__(message)

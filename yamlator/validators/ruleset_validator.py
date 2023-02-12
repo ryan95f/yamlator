@@ -21,8 +21,8 @@ class RulesetValidator(Validator):
         """RulesetValidator init
 
         Args:
-            violations (deque): contains violations that have been detected
-                whilst processing the data
+            violations (collections.deque): Contains violations that have
+                been detected whilst processing the data
             instructions (dict): A dict containing references to other rulesets
         """
         self._instructions = instructions
@@ -32,7 +32,8 @@ class RulesetValidator(Validator):
         """Set the next validator for handling nested rulesets
 
         Args:
-            validator (Validator): The ruleset validator
+            validator (yamlator.validators.base_validator.Validator): The
+                ruleset validator
         """
         self._ruleset_validator = validator
 
@@ -54,11 +55,11 @@ class RulesetValidator(Validator):
         that all the above data keys and data types are present.
 
         Args:
-            key (str): The key to the data
-            data (Data): The data to validate
+            key (str): The data field name
+            data (yamlator.types.Data): The data to validate
             parent (str): The parent key of the data
-            rtype (RuleType): The type assigned to the rule that will be
-                applied to the data
+            rtype (yamlator.types.RuleType): The type assigned to the
+                rule that will be applied to the data
             is_required (bool, optional): Indicates if the rule is required
         """
 

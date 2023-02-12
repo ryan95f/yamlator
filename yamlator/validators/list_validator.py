@@ -16,7 +16,8 @@ class ListValidator(Validator):
         """Set a validator for handling nested rulesets in the list
 
         Args:
-            validator (Validator): The validator to handle rulesets
+            validator (yamlator.validators.base_validator.Validator): The
+                validator to handle rulesets
         """
         self._ruleset_validator = validator
 
@@ -26,11 +27,11 @@ class ListValidator(Validator):
         nested lists are detected in the rule
 
         Args:
-            key (str): The key to the data
-            data (Data): The data to validate
+            key (str): The data field name
+            data (yamlator.types.Data): The data to validate
             parent (str): The parent key of the data
-            rtype (RuleType): The type assigned to the rule that will be
-                applied to the data
+            rtype (yamlator.types.RuleType): The type assigned to the
+                rule that will be applied to the data
             is_required (bool, optional): Indicates if the rule is required
         """
         is_list_data = isinstance(data, list)

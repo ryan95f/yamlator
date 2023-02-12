@@ -4,6 +4,7 @@
 import yaml
 import re
 
+from typing import Any
 from yamlator.types import Rule
 from yamlator.exceptions import InvalidSchemaFilenameError
 
@@ -27,11 +28,11 @@ def is_keyless_rule(rule: Rule) -> bool:
     as the rule name. For example:
 
     schema {
-        !!yamlator list(int)
+        !!yamlator map(int)
     }
 
     Args:
-        rule (Rule): A Yamlator rule
+        rule (yamlator.types.Rule): A Yamlator rule
 
     Returns:
         True if the name matches the `KEYLESS_RULE_DIRECTIVE`
@@ -45,15 +46,15 @@ def is_keyless_rule(rule: Rule) -> bool:
     return rule.name == KEYLESS_RULE_DIRECTIVE
 
 
-def load_yaml_file(filename: str) -> dict:
-    """Load a YAML file from a the file system and
-    convert it into a dict
+def load_yaml_file(filename: str) -> Any:
+    """Load a YAML file from the file system and convert it
+    into a data structure Python can process
 
     Args:
         filename (str): The path to the YAML file
 
     Returns:
-        The YAML file contents as a dict
+        The YAML file in a data structure that Python can process
 
     Raises:
         ValueError: If the filename parameter is None or an empty string
@@ -80,8 +81,9 @@ def load_schema(filename: str) -> str:
 
     Raises:
         ValueError: If `filename` is None or an empty string
-        InvalidSchemaFilenameError: If the filename does not match
-        a file with a `.ys` extension
+
+        yamlator.exceptions.InvalidSchemaFilenameError: If the filename
+            does not match a file with a `.ys` extension
     """
     if filename is None:
         raise ValueError('filename cannot be None')

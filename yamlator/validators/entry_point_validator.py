@@ -20,9 +20,11 @@ class EntryPointValidator(Validator):
         """EntryPointValidator init
 
         Args:
-            violations (deque): contains violations that have been
+            violations (collections.deque): Contains violations that have been
                 detected whilst processing the data
-            entry_point (YamlatorRuleset): The entry point ruleset
+
+            entry_point (yamlator.types.YamlatorRuleset): The entry
+                point ruleset
         """
         self._entry_point = entry_point
         self._flat_validator = None
@@ -34,11 +36,11 @@ class EntryPointValidator(Validator):
         rule by calling the next validator in the chain
 
         Args:
-            key (str): The key to the data
-            data (Data): The data to validate
+            key (str): The data field name
+            data (yamlator.types.Data): The data to validate
             parent (str): The parent key of the data
-            rtype (RuleType): The type assigned to the rule that will be
-                applied to the data
+            rtype (yamlator.types.RuleType): The type assigned to the
+                rule that will be applied to the data
             is_required (bool, optional): Indicates if the rule is required
         """
         # These are not used by the `EntryPointValidator`
