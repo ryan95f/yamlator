@@ -4,21 +4,57 @@
 import yaml
 import re
 
+from typing import Any
+from yamlator.types import Rule
 from yamlator.exceptions import InvalidSchemaFilenameError
 
 _YAMLER_SCHEMA_REGEX = re.compile(r'.ys$')
 _BACKSLASH_REGEX = re.compile(r'[\\]{1,2}')
 
+KEYLESS_RULE_DIRECTIVE = '!!yamlator'
 
-def load_yaml_file(filename: str) -> dict:
-    """Load a YAML file from a the file system and
-    convert it into a dict
+
+def is_keyless_rule(rule: Rule) -> bool:
+    """Checks if a rule has a name that matches a keyless
+    rule directive. For example, given the following YAML data:
+
+    {
+        "value1": 1,
+        "value2: 2,
+    }
+
+    This object does not have a parent key. In order to denote
+    this in the schema block, !!yamlator directive is defined
+    as the rule name. For example:
+
+    schema {
+        !!yamlator map(int)
+    }
+
+    Args:
+        rule (yamlator.types.Rule): A Yamlator rule
+
+    Returns:
+        True if the name matches the `KEYLESS_RULE_DIRECTIVE`
+        otherwise False
+
+    Raises:
+        ValueError: If the rule type is `None`
+    """
+    if rule is None:
+        raise ValueError('The rule argument should not be None')
+    return rule.name == KEYLESS_RULE_DIRECTIVE
+
+
+def load_yaml_file(filename: str) -> Any:
+    """Load a YAML file from the file system and convert it
+    into a data structure Python can process
 
     Args:
         filename (str): The path to the YAML file
 
     Returns:
-        The YAML file contents as a dict
+        The YAML file in a data structure that Python can process
 
     Raises:
         ValueError: If the filename parameter is None or an empty string
@@ -45,8 +81,9 @@ def load_schema(filename: str) -> str:
 
     Raises:
         ValueError: If `filename` is None or an empty string
-        InvalidSchemaFilenameError: If the filename does not match
-        a file with a `.ys` extension
+
+        yamlator.exceptions.InvalidSchemaFilenameError: If the filename
+            does not match a file with a `.ys` extension
     """
     if filename is None:
         raise ValueError('filename cannot be None')

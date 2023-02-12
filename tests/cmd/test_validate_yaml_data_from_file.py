@@ -1,11 +1,10 @@
-"""Test cases for the `validate_yaml_data_from_file` function
+"""Test cases for the validate_yaml_data_from_file function
 
 Test Cases:
-    * `test_validate_yaml_data_from_file_with_invalid_args` tests the validation
-       process with a range of invalid arguments that a user could enter
-       via the CLI
+    * `test_validate_yaml_data_from_file_with_invalid_args` tests that the
+      expected exception is raised when invalid arguments are provided
     * `test_validate_yaml_data_from_file_with_valid_data` with expected
-       valid data
+       valid data provides the correct amount of violations
 """
 
 
@@ -73,11 +72,16 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
                                          args.schema_filepath)
 
     def test_validate_yaml_data_from_file_with_valid_data(self):
+        expected_violation_count = 0
         violations = validate_yaml_data_from_file(
             yaml_filepath=VALID_YAML_DATA_FILE_PATH,
             schema_filepath=VALID_SCHEMA_FILE_PATH
         )
+        actual_violation_count = len(violations)
+
         self.assertIsNotNone(violations)
+        self.assertEqual(expected_violation_count,
+                         actual_violation_count)
 
 
 if __name__ == '__main__':

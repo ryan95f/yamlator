@@ -1,9 +1,9 @@
-"""Test cases for the `YAMLOutput` static class
+"""Test cases for the YAMLOutput static class
 
 Test Cases:
     * `test_yaml_output` tests that the expected status code is returned
        when valid arguments are provided
-    * `test_yaml_output_invalid_args` tests that the relevant exception is
+    * `test_yaml_output_invalid_args` tests that the expected exception is
        raised when invalid arguments are provided
 """
 

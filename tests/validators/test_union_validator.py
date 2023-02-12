@@ -1,4 +1,11 @@
-"""Test cases for the Union Validator"""
+"""Test cases for the UnionValidator
+
+Test cases:
+    * `test_union_validation` tests the union validation with a dummy
+    validator.
+    * `test_union_validation_without_sub_validators` to validate
+     the validation process is halted when a validator is not provided
+"""
 
 import unittest
 import typing
@@ -19,7 +26,6 @@ class DummyValidator(Validator):
     """Dummy Validator to test the union validator
 
     This validator will always return a Type violation
-
     """
     def validate(self, key: str, data: Data, parent: str, rtype: RuleType,
                  is_required: bool = False) -> None:

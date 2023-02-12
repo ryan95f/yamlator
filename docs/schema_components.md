@@ -8,6 +8,7 @@ Below are the various components that can be used to construct a schema with Yam
   * [Schema](#schema---strict-mode)
   * [Ruleset](#ruleset---strict-mode)
 * [Rules](#rules)
+  * [Top Level Validation without a key](#top-level-validation-without-a-key)
 * [Enums](#enums)
 * [RuleTypes](#rule-types)
   * [Basic Types](#basic-types)
@@ -201,6 +202,30 @@ ruleset <ruleset-name> {
     "my awesome field" int
 }
 ```
+
+### Top level validation without a key
+
+Not all YAML files use objects or maps at the top of the data structure. Lists or other data types might be used at the very top level.
+
+In order for Yamlator to validate data structures like this, a reserved rule name called `!!yamlator` can be used to perform this sort of validation. For example, given the following YAML data:
+
+```yaml
+- 1
+- 2
+- 3
+```
+
+The following YAML schema can be defined to validate the list of integers:
+
+```text
+schema {
+    !!yamlator list(int)
+}
+```
+
+All supported types can be used to perform top level validation including maps, lists, unions, regex, integers, strings and rulesets.
+
+__NOTE__: The schema block when performing top level validation will expect exactly __one rule__. If additional rules are added then Yamlator will assume there is an object with multiple keys to validate and will expect a key called `!!yamlator` in the data structure.
 
 ## Rule Types
 

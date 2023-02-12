@@ -1,20 +1,19 @@
-"""Maintains the base class for defining an output option and
-the SuccessCode Enum
-"""
+"""Maintains the basic building blocks used by the output classes"""
 
-from abc import ABC
+import abc
+import enum
+
 from typing import Iterator
-from enum import IntEnum
 
 from yamlator.violations import Violation
 
 
-class SuccessCode(IntEnum):
+class SuccessCode(enum.IntEnum):
     SUCCESS = 0
     ERR = -1
 
 
-class ViolationOutput(ABC):
+class ViolationOutput(abc.ABC):
     """Base class for displaying violations"""
 
     @staticmethod
@@ -22,7 +21,8 @@ class ViolationOutput(ABC):
         """Display the violations to the user
 
         Args:
-            violations (Iterator[Violation]): A collection of violations
+            violations (Iterator[yamlator.violations.Violation]): A collection
+                of violations
 
         Returns:
             The status code if violations were found. 0 = no

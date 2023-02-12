@@ -1,4 +1,4 @@
-"""Test cases for the `validate_yaml` function
+"""Test cases for the validate_yaml function
 
 Test cases:
     * `test_validator_invalid_parameters` tests the validate yaml function

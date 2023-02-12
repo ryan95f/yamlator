@@ -1,0 +1,11 @@
+- version: 1
+  name: Project 1
+- version: 1
+  projectName: Project 2
+- version: 1
+  name: Project 3
+  description: My awesome third project
+  users:
+    - username: User1
+      role: Developer
+    - username: User2

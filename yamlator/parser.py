@@ -5,13 +5,14 @@ import os
 
 from pathlib import Path
 from typing import Iterator
+from typing import Any
+
 from lark import Lark
 from lark import v_args
 from lark import Transformer
 from lark import Token
 from lark import UnexpectedInput
 from lark.exceptions import VisitError
-from typing import Any
 
 from yamlator.types import Rule
 from yamlator.types import ContainerTypes
@@ -45,8 +46,12 @@ def parse_schema(schema_content: str) -> dict:
 
     Raises:
         ValueError: Raised when `schema_content` is `None`
-        SchemaParseError: Raised when the parsing process is interrupted
-        SchemaSyntaxError: Raised when a syntax error is detected in the schema
+
+        yamlator.exceptions.SchemaParseError: Raised when the parsing
+            process is interrupted
+
+        yamlator.parser.SchemaSyntaxError: Raised when a syntax error
+            is detected in the schema
     """
     if schema_content is None:
         raise ValueError('schema_content should not be None')
@@ -115,7 +120,7 @@ class SchemaTransformer(Transformer):
 
     def start(self, instructions: Iterator[YamlatorType]) -> dict:
         """Transforms the instructions into a dict that sorts the rulesets,
-        enums and entry point to validate YAML data"""
+        enums and entry point to validate the YAML data"""
         root = None
         rules = {}
         enums = {}
@@ -185,8 +190,8 @@ class SchemaTransformer(Transformer):
         """Transforms a container type token into a RuleType object
 
         Raises:
-            ConstructNotFoundError: Raised if the enum or ruleset
-            cannot be found
+            yamlator.exceptions.ConstructNotFoundError: Raised if the
+                enum or ruleset cannot be found
         """
         name = token[0]
         schema_type = self.seen_constructs.get(name)
@@ -203,9 +208,9 @@ class SchemaTransformer(Transformer):
         """Transforms a union token into a Union RuleType
 
         Raises:
-            NestedUnionError: Raised if the tokens contains
-            a union RuleType which indicates a nested union
-            within the union
+            yamlator.exceptions.NestedUnionError: Raised if the tokens
+                contains a union RuleType which indicates a nested
+                union within the union
         """
         for token in tokens:
             if token.schema_type == SchemaTypes.UNION:
@@ -213,7 +218,7 @@ class SchemaTransformer(Transformer):
         return UnionRuleType(sub_types=tokens)
 
     def type(self, tokens: 'list[Token]') -> Any:
-        """Extracts the type tokens and passes them through onto
+        """Extracts the type tokens and passes them onto
         the next stage in the transformer
         """
         (t, ) = tokens
@@ -233,24 +238,25 @@ class SchemaTransformer(Transformer):
 
     @v_args(inline=True)
     def integer(self, token: str) -> int:
-        """Convers a integer string into a int type"""
+        """Converts a integer string into a int type"""
         return int(token)
 
     @v_args(inline=True)
     def float(self, token: str) -> float:
-        """Convers a float string into a int type"""
+        """Converts a float string into a int type"""
         return float(token)
 
     @v_args(inline=True)
     def string(self, token: str) -> str:
-        """Transforms the escaped string by removing speech
-        marks from the value
+        """Transforms the escaped string by removing quotes
+        from the value
         """
         return _QUOTES_REGEX.sub('', token)
 
 
 class _InstructionHandler:
     """Base handle for dealing with Yamlator types"""
+
     _next_handler = None
 
     def set_next_handler(self,
@@ -259,7 +265,8 @@ class _InstructionHandler:
         """Set the next handler in the chain
 
         Args:
-            handler: The next instruction handler
+            handler (yamlator.parser._InstructionHandler): The next
+                instruction handler
 
         Returns:
             The instance of the instruction handler that was

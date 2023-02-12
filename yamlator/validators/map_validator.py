@@ -15,11 +15,11 @@ class MapValidator(Validator):
         """Validate the data contained within in a map
 
         Args:
-            key (str): The key to the data
-            data (Data): The data to validate
+            key (str): The data field name
+            data (yamlator.types.Data): The data to validate
             parent (str): The parent key of the data
-            rtype (RuleType): The type assigned to the rule that will be
-                applied to the data
+            rtype (yamlator.types.RuleType): The type assigned to the
+                rule that will be applied to the data
             is_required (bool, optional): Indicates if the rule is required
         """
         is_map_rule = (rtype.schema_type == SchemaTypes.MAP)

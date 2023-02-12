@@ -1,7 +1,8 @@
 """Handles the command line utility functions and entry point"""
+
+import enum
 import argparse
 
-from enum import Enum
 from typing import Iterator
 
 from yamlator.utils import load_yaml_file
@@ -84,8 +85,9 @@ def validate_yaml_data_from_file(yaml_filepath: str,
         schema_filepath (str): The path to the schema file
 
     Returns:
-        A Iterator collection of `Violation` objects that contains
-        the violations detected in the YAML data against the schema.
+        A Iterator collection of `yamlator.violations.Violation` objects
+        that contains the violations detected in the YAML data against
+        the schema
 
     Raises:
         ValueError: If either argument is `None` or an empty string
@@ -100,7 +102,7 @@ def validate_yaml_data_from_file(yaml_filepath: str,
     return validate_yaml(yaml_data, instructions)
 
 
-class DisplayMethod(Enum):
+class DisplayMethod(enum.Enum):
     """Represents the supported violation display methods"""
     TABLE = 'table'
     JSON = 'json'
@@ -112,10 +114,12 @@ def display_violations(violations: Iterator[Violation],
     """Displays the violations to standard output
 
     Args:
-        violations (Iterator[Violation]): A collection of violations
+        violations (Iterator[yamlator.violations.Violation]): A collection
+            of violations
 
-        method               (DisplayMethod): Defines how the violations will be
-        displayed. By default table will be used specified
+        method (yamlator.core.DisplayMethod, optional): Defines how the
+            violations will be displayed. By default `DisplayMethod.TABLE`
+            will be used
 
     Returns:
         The status code if violations were found. 0 = no violations were found
