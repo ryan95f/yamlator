@@ -48,7 +48,7 @@
 * Reduced the constraints on the `install_requirements` in `setup.py`
 * Minor fixes and improvements to the overall codebase
 
-## v0.3.1 (TBC)
+## v0.3.1 (12th February 2023)
 
 * Added top level validation to Yamlator to support data structures that may not be an object or a map
 * Minor docstring and structure improvements in the `tests/` module
