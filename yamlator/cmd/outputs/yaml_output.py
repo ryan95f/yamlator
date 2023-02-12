@@ -1,4 +1,5 @@
 """Display output class for generating YAML"""
+
 import yaml
 
 from collections import deque
@@ -25,7 +26,7 @@ class YAMLOutput(ViolationOutput):
         """Display the violations to the user as YAML
 
         Args:
-            violations (Iterator[Violation]): A collection
+            violations (Iterator[yamlator.violations.Violation]): A collection
             of violations
 
         Returns:
@@ -33,7 +34,7 @@ class YAMLOutput(ViolationOutput):
             violations were found and -1 = violations were found
 
         Raises:
-            ValueError: If the violations list is None
+            ValueError: If the violation list is None
         """
 
         if violations is None:

@@ -233,7 +233,8 @@ class YamlatorRuleset(YamlatorType):
             will raise a strict mode violation
     """
 
-    def __init__(self, name: str, rules: Iterator[Rule], is_strict: bool = False):
+    def __init__(self, name: str, rules: Iterator[Rule],
+                 is_strict: bool = False):
         """YamlatorRuleset init
 
         Args:

@@ -1,4 +1,5 @@
 """Display output class for generating JSON"""
+
 import json
 from typing import Iterator
 
@@ -16,7 +17,7 @@ class JSONOutput(ViolationOutput):
         """Display the violations to the user as JSON
 
         Args:
-            violations (Iterator[Violation]): A collection
+            violations (Iterator[yamlator.violations.Violation]): A collection
             of violations
 
         Returns:
@@ -24,7 +25,7 @@ class JSONOutput(ViolationOutput):
             violations were found and -1 = violations were found
 
         Raises:
-            ValueError: If the violations list is None
+            ValueError: If the violation list is None
         """
         if violations is None:
             raise ValueError('violations should not be None')

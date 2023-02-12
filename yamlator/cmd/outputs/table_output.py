@@ -1,4 +1,5 @@
 """Display output class for generating a table"""
+
 from typing import Iterator
 
 from yamlator.violations import Violation
@@ -14,14 +15,15 @@ class TableOutput(ViolationOutput):
         """Display the violations to the user as a table
 
         Args:
-            violations (Iterator[Violation]): A collection of violations
+            violations (Iterator[yamlator.violations.Violation]): A collection
+                of violations
 
         Returns:
             The status code if violations were found. 0 = no
             violations were found and -1 = violations were found
 
         Raises:
-            ValueError: If the violations list is None
+            ValueError: If the violation list is None
         """
         if violations is None:
             raise ValueError('violations should not be None')
