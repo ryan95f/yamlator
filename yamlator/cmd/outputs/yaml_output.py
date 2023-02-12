@@ -34,7 +34,7 @@ class YAMLOutput(ViolationOutput):
             violations were found and -1 = violations were found
 
         Raises:
-            ValueError: If the violation list is None
+            ValueError: If the violation list is `None`
         """
 
         if violations is None:

@@ -48,7 +48,7 @@ def is_keyless_rule(rule: Rule) -> bool:
 
 def load_yaml_file(filename: str) -> Any:
     """Load a YAML file from the file system and convert it
-    a data structure Python can process
+    into a data structure Python can process
 
     Args:
         filename (str): The path to the YAML file

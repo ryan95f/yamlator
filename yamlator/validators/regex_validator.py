@@ -15,9 +15,9 @@ class RegexValidator(Validator):
                  is_required: bool = False) -> None:
         """Validate a regex rule type against a string. If the data
         is not a string type, then a `yamlator.violations.TypeViolation`
-        is added to the violation list. If the string does not match the regex
+        is added to the violation deque. If the string does not match the regex
         rule, then a `yamlator.violations.RegexTypeViolation` is added to
-        the violation list
+        the violation deque
 
         Args:
             key (str): The data field name

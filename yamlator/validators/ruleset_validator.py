@@ -21,7 +21,7 @@ class RulesetValidator(Validator):
         """RulesetValidator init
 
         Args:
-            violations (collections.deque): contains violations that have
+            violations (collections.deque): Contains violations that have
                 been detected whilst processing the data
             instructions (dict): A dict containing references to other rulesets
         """

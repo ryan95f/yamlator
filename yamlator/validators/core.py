@@ -30,7 +30,7 @@ def validate_yaml(yaml_data: dict, instructions: dict) -> deque:
         used to validate the YAML data
 
     Returns:
-        The violations that were detected in the data in a deque
+        A deque that contains the violations that were detected in the data
 
     Raises:
         ValueError: When the parameters `yaml_data` or `instructions` are `None`

@@ -265,7 +265,7 @@ class _InstructionHandler:
         """Set the next handler in the chain
 
         Args:
-            handler (.yamlator.parser._InstructionHandler): The next
+            handler (yamlator.parser._InstructionHandler): The next
                 instruction handler
 
         Returns:

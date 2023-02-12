@@ -20,7 +20,7 @@ class EntryPointValidator(Validator):
         """EntryPointValidator init
 
         Args:
-            violations (collections.deque): contains violations that have been
+            violations (collections.deque): Contains violations that have been
                 detected whilst processing the data
 
             entry_point (yamlator.types.YamlatorRuleset): The entry

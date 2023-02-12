@@ -52,7 +52,7 @@ class RuleType:
 
         sub_type (yamlator.types.RuleType): The sub type when a rule it using
             a list or a map data type. For example, given the type list(str),
-            the sub type will be a `RuleType` for the string. For other type
+            the sub type will be a `RuleType` for the string. For other types
             this will be `None`
 
         regex (str): The regular expression string used when the rule type is
@@ -67,7 +67,7 @@ class RuleType:
             schema_type (yamlator.types.SchemaTypes): The field type
 
             lookup (str, optional): Used when `schema_type` is
-                `SchemaTypes.RULESET` or `SchemaTypes.ENUM`.This
+                `SchemaTypes.RULESET` or `SchemaTypes.ENUM`. This
                 specifies the custom type to lookup when validating
                 the data structure
 
@@ -144,8 +144,8 @@ class UnionRuleType(RuleType):
 
     Attributes:
         sub_types (Iterator[yamlator.types.RuleType]): A list of sub types
-            that are considered valid types when validating a the data. For
-            example, given `Union(int, str)`, a rule type will be expected
+            that are considered valid types when validating the data. For
+            example, given `Union(int, str)`, a rule type will be created
             for the `int` and `str`
     """
 
