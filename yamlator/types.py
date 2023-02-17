@@ -6,6 +6,7 @@ import enum
 from typing import Union
 from typing import Iterator
 from collections import namedtuple
+from collections import defaultdict
 
 Rule = namedtuple('Rule', ['name', 'rtype', 'is_required'])
 EnumItem = namedtuple('EnumItem', ['name', 'value'])
@@ -310,7 +311,25 @@ class ImportStatement(YamlatorType):
 
 
 class YamlatorSchema:
-    def __init__(self, enums: dict, rulesets: dict, imports: list):
+    def __init__(self, root, enums: dict, rulesets: dict, imports: list):
+        self.root = root
         self.enums = enums
         self.rulesets = rulesets
-        self.imports = imports
+        self.__shake_imports(imports)
+
+    def __shake_imports(self, imports):
+        import_statements = defaultdict(list)
+        for state in imports:
+            import_statements[state.path].append(state.item)
+        self._imports = import_statements
+
+    @property
+    def imports(self):
+        return self._imports.copy()
+
+    def __str__(self) -> str:
+        return str({
+            'root': self.root,
+            'enums': self.enums,
+            'rulesets': self.rulesets
+        })

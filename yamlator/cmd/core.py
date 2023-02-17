@@ -1,5 +1,5 @@
 """Handles the command line utility functions and entry point"""
-
+import os
 import enum
 import argparse
 
@@ -96,10 +96,14 @@ def validate_yaml_data_from_file(yaml_filepath: str,
         a valid filename that ends with the `.ys` extension.
     """
     yaml_data = load_yaml_file(yaml_filepath)
-    ruleset_data = load_schema(schema_filepath)
+    schema_data = load_schema(schema_filepath)
 
-    instructions = parse_schema(ruleset_data)
-    return validate_yaml(yaml_data, instructions)
+    context = load_schema_path_context(schema_filepath)
+
+    instructions = parse_schema(schema_data)
+    load_child_resources(instructions, context)
+    # return validate_yaml(yaml_data, instructions)
+    return []
 
 
 class DisplayMethod(enum.Enum):
@@ -142,3 +146,22 @@ def display_violations(violations: Iterator[Violation],
 
     display_option = strategies.get(method, TableOutput)
     return display_option.display(violations)
+
+
+def load_schema_path_context(schema_path):
+    context = schema_path.split('\\')[:-1]
+    return os.path.join(*context)
+
+
+def load_child_resources(root_schema, context):
+    import_statements = root_schema.imports
+    for path, items in import_statements.items():
+        full_path = os.path.join(context, path)
+        schema = load_schema(full_path)
+        parsed_schema = parse_schema(schema)
+        rulesets = parsed_schema.rulesets
+
+        for item in items:
+            item = rulesets.get(item)
+            root_schema.rulesets[item.name] = item
+    print(root_schema)

@@ -19,6 +19,7 @@ from yamlator.types import ContainerTypes
 from yamlator.types import YamlatorRuleset
 from yamlator.types import YamlatorEnum
 from yamlator.types import YamlatorType
+from yamlator.types import YamlatorSchema
 from yamlator.types import RuleType
 from yamlator.types import UnionRuleType
 from yamlator.types import EnumItem
@@ -139,12 +140,7 @@ class SchemaTransformer(Transformer):
         if root is not None:
             del rules['main']
 
-        return {
-            'main': root,
-            'rules': rules,
-            'enums': enums,
-            'imports': imports
-        }
+        return YamlatorSchema(root, enums, rules, imports)
 
     def str_type(self, _: 'list[Token]') -> RuleType:
         """Transforms a string type token into a RuleType object"""
@@ -261,7 +257,8 @@ class SchemaTransformer(Transformer):
     def import_statement(self, tokens: 'list[Token]'):
         item = tokens[0]
         path = tokens[1]
-        return ImportStatement(item.value, path.value)
+        path = _QUOTES_REGEX.sub('', path.value)
+        return ImportStatement(item.value, path)
 
 
 class _InstructionHandler:

@@ -16,7 +16,7 @@ start: instructions*
 schema_entry: "schema" "{" rule+ "}"
 strict_schema_entry: "strict schema" "{" rule+ "}"
 
-import_statement: "import" /[A-Z]{1}[a-zA-Z0-9_]+/ "from" /(?:[a-z]+\/)*[a-z]+.ys/
+import_statement: "import" /[A-Z]{1}[a-zA-Z0-9_]+/ "from" /\"(?:[a-z]+\/)*[a-z]+.ys\"/
 
 ruleset: "ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
 strict_ruleset: "strict ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
