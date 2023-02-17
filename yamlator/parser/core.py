@@ -30,7 +30,7 @@ from yamlator.exceptions import ConstructNotFoundError
 from yamlator.exceptions import SchemaParseError
 
 
-_package_dir = Path(__file__).parent.absolute()
+_package_dir = Path(__file__).parent.parent.absolute()
 _GRAMMAR_FILE = os.path.join(_package_dir, 'grammar/grammar.lark')
 
 _QUOTES_REGEX = re.compile(r'\"|\'')
@@ -195,10 +195,12 @@ class SchemaTransformer(Transformer):
                 enum or ruleset cannot be found
         """
         name = token[0]
-        schema_type = self.seen_constructs.get(name)
-        if schema_type is None:
-            raise ConstructNotFoundError(name)
-        return RuleType(schema_type=schema_type, lookup=name)
+        # schema_type = self.seen_constructs.get(name)
+        # if schema_type is None:
+        #     raise ConstructNotFoundError(name)
+
+        # TODO: Make this work for enums as well
+        return RuleType(schema_type=SchemaTypes.RULESET, lookup=name)
 
     def regex_type(self, tokens: 'list[Token]') -> RuleType:
         """Transforms a regex type token into a RuleType object"""
