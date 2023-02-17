@@ -15,7 +15,7 @@ Data = Union[dict, list, int, float, str]
 
 
 class SchemaTypes(enum.Enum):
-    """Represents the support types that can be defined in a schema"""
+    """Represents the supported types that can be defined in a schema"""
 
     STR = enum.auto()
     INT = enum.auto()
@@ -175,6 +175,7 @@ class ContainerTypes(enum.Enum):
     """Enum of custom types used by Yamlator"""
     RULESET = 0
     ENUM = 1
+    IMPORT = 2
 
 
 class YamlatorType:
@@ -298,3 +299,18 @@ class YamlatorEnum(YamlatorType):
     @property
     def items(self) -> dict:
         return self._items.copy()
+
+
+class ImportStatement(YamlatorType):
+    def __init__(self, item: str, path: str):
+        name = f'({item}){path}'
+        super().__init__(name, ContainerTypes.IMPORT)
+        self.item = item
+        self.path = path
+
+
+class YamlatorSchema:
+    def __init__(self, enums: dict, rulesets: dict, imports: list):
+        self.enums = enums
+        self.rulesets = rulesets
+        self.imports = imports

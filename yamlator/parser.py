@@ -23,6 +23,7 @@ from yamlator.types import RuleType
 from yamlator.types import UnionRuleType
 from yamlator.types import EnumItem
 from yamlator.types import SchemaTypes
+from yamlator.types import ImportStatement
 from yamlator.exceptions import NestedUnionError
 from yamlator.exceptions import ConstructNotFoundError
 from yamlator.exceptions import SchemaParseError
@@ -124,9 +125,12 @@ class SchemaTransformer(Transformer):
         root = None
         rules = {}
         enums = {}
+        imports = []
 
+        enum_handler = _EnumInstructionHandler(enums)
         handler_chain = _RulesetInstructionHandler(rules)
-        handler_chain.set_next_handler(_EnumInstructionHandler(enums))
+        handler_chain.set_next_handler(enum_handler)
+        enum_handler.set_next_handler(_ImportInstructionHandler(imports))
 
         for instruction in instructions:
             handler_chain.handle(instruction)
@@ -138,7 +142,8 @@ class SchemaTransformer(Transformer):
         return {
             'main': root,
             'rules': rules,
-            'enums': enums
+            'enums': enums,
+            'imports': imports
         }
 
     def str_type(self, _: 'list[Token]') -> RuleType:
@@ -253,6 +258,11 @@ class SchemaTransformer(Transformer):
         """
         return _QUOTES_REGEX.sub('', token)
 
+    def import_statement(self, tokens: 'list[Token]'):
+        item = tokens[0]
+        path = tokens[1]
+        return ImportStatement(item.value, path.value)
+
 
 class _InstructionHandler:
     """Base handle for dealing with Yamlator types"""
@@ -308,6 +318,19 @@ class _RulesetInstructionHandler(_InstructionHandler):
             return
 
         self._rulesets[instruction.name] = instruction
+
+
+class _ImportInstructionHandler(_InstructionHandler):
+    def __init__(self, imports: list):
+        super().__init__()
+        self.imports = imports
+
+    def handle(self, instruction: YamlatorType) -> None:
+        if instruction.container_type != ContainerTypes.IMPORT:
+            super().handle(instruction)
+            return
+
+        self.imports.append(instruction)
 
 
 class SchemaSyntaxError(SyntaxError):

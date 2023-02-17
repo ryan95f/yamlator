@@ -7,6 +7,7 @@ start: instructions*
             | strict_ruleset
             | schema_entry
             | strict_schema_entry
+            | import_statement
 
 ?values: INT -> integer
        | FLOAT -> float
@@ -14,6 +15,8 @@ start: instructions*
 
 schema_entry: "schema" "{" rule+ "}"
 strict_schema_entry: "strict schema" "{" rule+ "}"
+
+import_statement: "import" /[A-Z]{1}[a-zA-Z0-9_]+/ "from" /(?:[a-z]+\/)*[a-z]+.ys/
 
 ruleset: "ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
 strict_ruleset: "strict ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
