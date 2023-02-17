@@ -3,6 +3,7 @@ validator handler chian.
 """
 
 from collections import deque
+from yamlator.types import YamlatorSchema
 from yamlator.types import YamlatorRuleset
 
 from yamlator.validators import AnyTypeValidator
@@ -19,7 +20,7 @@ from yamlator.validators import UnionValidator
 from yamlator.validators.base_validator import Validator
 
 
-def validate_yaml(yaml_data: dict, instructions: dict) -> deque:
+def validate_yaml(yaml_data: dict, instructions: YamlatorSchema) -> deque:
     """Validate YAML data by comparing the data against a set of instructions.
     Any violations will be collected and returned in a `deque`
 
@@ -50,11 +51,11 @@ def validate_yaml(yaml_data: dict, instructions: dict) -> deque:
     return violations
 
 
-def _create_validators_chain(instructions: dict,
+def _create_validators_chain(instructions: YamlatorSchema,
                              violations: deque) -> Validator:
-    ruleset_lookups = instructions.get('rules', {})
-    enum_looksups = instructions.get('enums', {})
-    entry_point = instructions.get('main', YamlatorRuleset('main', []))
+    ruleset_lookups = instructions.rulesets
+    enum_looksups = instructions.enums
+    entry_point = instructions.root
 
     root = EntryPointValidator(violations, entry_point)
     optional_validator = OptionalValidator(violations)

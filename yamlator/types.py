@@ -312,9 +312,9 @@ class ImportStatement(YamlatorType):
 
 class YamlatorSchema:
     def __init__(self, root, enums: dict, rulesets: dict, imports: list):
-        self.root = root
-        self.enums = enums
-        self.rulesets = rulesets
+        self._root = root
+        self._enums = enums
+        self._rulesets = rulesets
         self.__shake_imports(imports)
 
     def __shake_imports(self, imports):
@@ -322,6 +322,24 @@ class YamlatorSchema:
         for state in imports:
             import_statements[state.path].append(state.item)
         self._imports = import_statements
+
+    @property
+    def root(self):
+        if self._root is None:
+            return YamlatorRuleset('main', [])
+        return self._root
+
+    @property
+    def rulesets(self):
+        if self._rulesets is None:
+            return {}
+        return self._rulesets
+
+    @property
+    def enums(self):
+        if self._enums is None:
+            return {}
+        return self._enums
 
     @property
     def imports(self):

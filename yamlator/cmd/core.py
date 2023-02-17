@@ -1,14 +1,13 @@
 """Handles the command line utility functions and entry point"""
-import os
+
 import enum
 import argparse
 
 from typing import Iterator
 
 from yamlator.utils import load_yaml_file
-from yamlator.utils import load_schema
 from yamlator.parser import SchemaSyntaxError
-from yamlator.parser import parse_schema
+from yamlator.parser import parse_yamlator_schema
 from yamlator.validators.core import validate_yaml
 
 from yamlator.exceptions import SchemaParseError
@@ -96,14 +95,8 @@ def validate_yaml_data_from_file(yaml_filepath: str,
         a valid filename that ends with the `.ys` extension.
     """
     yaml_data = load_yaml_file(yaml_filepath)
-    schema_data = load_schema(schema_filepath)
-
-    context = load_schema_path_context(schema_filepath)
-
-    instructions = parse_schema(schema_data)
-    load_child_resources(instructions, context)
-    # return validate_yaml(yaml_data, instructions)
-    return []
+    instructions = parse_yamlator_schema(schema_filepath)
+    return validate_yaml(yaml_data, instructions)
 
 
 class DisplayMethod(enum.Enum):
@@ -146,22 +139,3 @@ def display_violations(violations: Iterator[Violation],
 
     display_option = strategies.get(method, TableOutput)
     return display_option.display(violations)
-
-
-def load_schema_path_context(schema_path):
-    context = schema_path.split('\\')[:-1]
-    return os.path.join(*context)
-
-
-def load_child_resources(root_schema, context):
-    import_statements = root_schema.imports
-    for path, items in import_statements.items():
-        full_path = os.path.join(context, path)
-        schema = load_schema(full_path)
-        parsed_schema = parse_schema(schema)
-        rulesets = parsed_schema.rulesets
-
-        for item in items:
-            item = rulesets.get(item)
-            root_schema.rulesets[item.name] = item
-    print(root_schema)
