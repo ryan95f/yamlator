@@ -29,6 +29,7 @@ class SchemaTypes(enum.Enum):
     REGEX = enum.auto()
     BOOL = enum.auto()
     UNION = enum.auto()
+    UNKNOWN = enum.auto()
 
 
 class RuleType:
@@ -92,6 +93,10 @@ class RuleType:
     @property
     def schema_type(self):
         return self._schema_type
+    
+    @schema_type.setter
+    def schema_type(self, value):
+        self._schema_type = value
 
     @property
     def lookup(self) -> str:
@@ -116,7 +121,8 @@ class RuleType:
             SchemaTypes.LIST: 'list({})',
             SchemaTypes.MAP: 'map({})',
             SchemaTypes.BOOL: 'bool',
-            SchemaTypes.ANY: 'any'
+            SchemaTypes.ANY: 'any',
+            SchemaTypes.UNKNOWN: f'unknown({self.lookup})'
         }
 
         type_str = types[self.schema_type]
@@ -311,10 +317,15 @@ class ImportStatement(YamlatorType):
 
 
 class YamlatorSchema:
-    def __init__(self, root, enums: dict, rulesets: dict, imports: list):
+    def __init__(self, root, enums: dict, rulesets: dict, imports: list, unknowns: list = None):
         self._root = root
         self._enums = enums
         self._rulesets = rulesets
+        self._unknowns = unknowns
+
+        if unknowns is None:
+            self._unknowns = []
+
         self.__shake_imports(imports)
 
     def __shake_imports(self, imports):
@@ -322,6 +333,19 @@ class YamlatorSchema:
         for state in imports:
             import_statements[state.path].append(state.item)
         self._imports = import_statements
+
+    def update_unknowns(self):
+        while len(self._unknowns) > 0:
+            curr = self._unknowns.pop()
+            if self._enums.get(curr.lookup) is not None:
+                curr.schema_type = SchemaTypes.ENUM
+                continue
+
+            if self._rulesets.get(curr.lookup) is not None:
+                curr.schema_type = SchemaTypes.RULESET
+                continue
+
+            print(f"Could not find {curr.lookup}")
 
     @property
     def root(self):

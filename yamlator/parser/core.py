@@ -36,7 +36,7 @@ _GRAMMAR_FILE = os.path.join(_package_dir, 'grammar/grammar.lark')
 _QUOTES_REGEX = re.compile(r'\"|\'')
 
 
-def parse_schema(schema_content: str) -> dict:
+def parse_schema(schema_content: str) -> YamlatorSchema:
     """Parses a schema into a set of instructions that can be
     used to validate a YAML file.
 
@@ -83,10 +83,14 @@ class SchemaTransformer(Transformer):
                  | rule_name type NEW_LINES
     """
 
-    # Used to track previously seen enums or rulesets to dynamically
-    # determine the type of the rule if a enum or ruleset is used
-    seen_constructs = {}
+    def __init__(self, visit_tokens: bool = True) -> None:
+        super().__init__(visit_tokens)
 
+        # Used to track previously seen enums or rulesets to dynamically
+        # determine the type of the rule if a enum or ruleset is used
+        self.seen_constructs = {}
+        self.unknown_types = []
+    
     def rule_name(self, tokens: 'list[Token]') -> Token:
         """Processes the rule name by removing any quotes"""
         token = tokens[0]
@@ -140,7 +144,7 @@ class SchemaTransformer(Transformer):
         if root is not None:
             del rules['main']
 
-        return YamlatorSchema(root, enums, rules, imports)
+        return YamlatorSchema(root, enums, rules, imports, self.unknown_types)
 
     def str_type(self, _: 'list[Token]') -> RuleType:
         """Transforms a string type token into a RuleType object"""
@@ -195,12 +199,11 @@ class SchemaTransformer(Transformer):
                 enum or ruleset cannot be found
         """
         name = token[0]
-        # schema_type = self.seen_constructs.get(name)
-        # if schema_type is None:
-        #     raise ConstructNotFoundError(name)
-
-        # TODO: Make this work for enums as well
-        return RuleType(schema_type=SchemaTypes.RULESET, lookup=name)
+        schema_type = self.seen_constructs.get(name, SchemaTypes.UNKNOWN)
+        rule_type = RuleType(schema_type=schema_type, lookup=name)
+        if schema_type == SchemaTypes.UNKNOWN:
+            self.unknown_types.append(rule_type)
+        return rule_type
 
     def regex_type(self, tokens: 'list[Token]') -> RuleType:
         """Transforms a regex type token into a RuleType object"""
