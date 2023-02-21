@@ -29,6 +29,9 @@ class SchemaTypes(enum.Enum):
     REGEX = enum.auto()
     BOOL = enum.auto()
     UNION = enum.auto()
+
+    # Used when importing enums and ruleset
+    # at runtime since the actual type is not known
     UNKNOWN = enum.auto()
 
 
@@ -310,42 +313,39 @@ class YamlatorEnum(YamlatorType):
 
 class ImportStatement(YamlatorType):
     def __init__(self, item: str, path: str):
-        name = f'({item}){path}'
-        super().__init__(name, ContainerTypes.IMPORT)
         self.item = item
         self.path = path
 
+        name = f'({item}){path}'
+        super().__init__(name, ContainerTypes.IMPORT)
+
 
 class YamlatorSchema:
-    def __init__(self, root, enums: dict, rulesets: dict, imports: list, unknowns: list = None):
+    """A Yamlator schema that maintains a rulesets and enums
+    used during the validation processes
+
+    Attributes:
+        root (yamlator.types.YamlatorRuleset):
+        rulesets (dict):
+        enums (dict)
+    """
+
+    def __init__(self, root: YamlatorRuleset, rulesets: dict,  enums: dict):
+        """YamlatorSchema init
+
+        Args:
+            root (yamlator.types.YamlatorRuleset): The entry point ruleset
+                called `main` that is used to start the validation process
+            rulesets (dict): Maintains a lookup of the rulesets defined in
+                the schema. The key is the ruleset name and the value in the
+                    dictionary is an instance of `YamlatorRuleset`
+            enums (dict): Maintains a lookup of the enums defined in the
+                the schema file. The key is the enum type name and the value
+                    in the dictionary is an instance of `YamlatorEnum`
+        """
         self._root = root
         self._enums = enums
         self._rulesets = rulesets
-        self._unknowns = unknowns
-
-        if unknowns is None:
-            self._unknowns = []
-
-        self.__shake_imports(imports)
-
-    def __shake_imports(self, imports):
-        import_statements = defaultdict(list)
-        for state in imports:
-            import_statements[state.path].append(state.item)
-        self._imports = import_statements
-
-    def update_unknowns(self):
-        while len(self._unknowns) > 0:
-            curr = self._unknowns.pop()
-            if self._enums.get(curr.lookup) is not None:
-                curr.schema_type = SchemaTypes.ENUM
-                continue
-
-            if self._rulesets.get(curr.lookup) is not None:
-                curr.schema_type = SchemaTypes.RULESET
-                continue
-
-            print(f"Could not find {curr.lookup}")
 
     @property
     def root(self):
@@ -357,17 +357,13 @@ class YamlatorSchema:
     def rulesets(self):
         if self._rulesets is None:
             return {}
-        return self._rulesets
+        return self._rulesets.copy()
 
     @property
     def enums(self):
         if self._enums is None:
             return {}
-        return self._enums
-
-    @property
-    def imports(self):
-        return self._imports.copy()
+        return self._enums.copy()
 
     def __str__(self) -> str:
         return str({
@@ -375,3 +371,29 @@ class YamlatorSchema:
             'enums': self.enums,
             'rulesets': self.rulesets
         })
+
+
+class LoadedYamlatorSchema(YamlatorSchema):
+    def __init__(self, root: YamlatorRuleset, rulesets: dict, enums: dict,
+                 imports: list, unknowns: list = None):
+        super().__init__(root, rulesets, enums)
+
+        self._unknowns = unknowns
+        if unknowns is None:
+            self._unknowns = []
+
+        self.__shake_imports(imports)
+
+    def __shake_imports(self, imports):
+        import_statements = defaultdict(list)
+        for state in imports:
+            import_statements[state.path].append(state.item)
+        self._imports = import_statements
+
+    @property
+    def imports(self):
+        return self._imports.copy()
+
+    @property
+    def unknowns_rule_types(self) -> Iterator[RuleType]:
+        return self._unknowns.copy()

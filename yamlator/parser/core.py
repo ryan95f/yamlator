@@ -19,14 +19,13 @@ from yamlator.types import ContainerTypes
 from yamlator.types import YamlatorRuleset
 from yamlator.types import YamlatorEnum
 from yamlator.types import YamlatorType
-from yamlator.types import YamlatorSchema
+from yamlator.types import LoadedYamlatorSchema
 from yamlator.types import RuleType
 from yamlator.types import UnionRuleType
 from yamlator.types import EnumItem
 from yamlator.types import SchemaTypes
 from yamlator.types import ImportStatement
 from yamlator.exceptions import NestedUnionError
-from yamlator.exceptions import ConstructNotFoundError
 from yamlator.exceptions import SchemaParseError
 
 
@@ -36,7 +35,7 @@ _GRAMMAR_FILE = os.path.join(_package_dir, 'grammar/grammar.lark')
 _QUOTES_REGEX = re.compile(r'\"|\'')
 
 
-def parse_schema(schema_content: str) -> YamlatorSchema:
+def parse_schema(schema_content: str) -> LoadedYamlatorSchema:
     """Parses a schema into a set of instructions that can be
     used to validate a YAML file.
 
@@ -144,7 +143,7 @@ class SchemaTransformer(Transformer):
         if root is not None:
             del rules['main']
 
-        return YamlatorSchema(root, enums, rules, imports, self.unknown_types)
+        return LoadedYamlatorSchema(root, rules, enums, imports, self.unknown_types)
 
     def str_type(self, _: 'list[Token]') -> RuleType:
         """Transforms a string type token into a RuleType object"""
