@@ -312,22 +312,64 @@ class YamlatorEnum(YamlatorType):
 
 
 class ImportStatement(YamlatorType):
+    """Represents a import statement in the Yamlator schema
+
+    Attributes:
+        item (str): The name of the enum or ruleset that is being imported
+        path (str): The path to the schema file that contains the enum
+            or ruleset
+    """
+
     def __init__(self, item: str, path: str):
-        self.item = item
-        self.path = path
+        """ImportStatement init
+
+        Args:
+            item (str): The name of the enum or ruleset that is being imported
+            path (str): The path to the schema file that contains the enum
+                or ruleset
+
+        Raises:
+            ValueError: If the `item` or `path` parameters are `None`
+                or are not a string
+        """
+        if (item is None) or (not isinstance(item, str)):
+            raise ValueError('Expected parameter item to be a string')
+
+        if (path is None) or (not isinstance(item, str)):
+            raise ValueError('Expected parameter path to be a string')
+
+        self._item = item
+        self._path = path
 
         name = f'({item}){path}'
         super().__init__(name, ContainerTypes.IMPORT)
 
+    @property
+    def item(self) -> str:
+        return self._item
+
+    @property
+    def path(self) -> str:
+        return self._path
 
 class YamlatorSchema:
-    """A Yamlator schema that maintains a rulesets and enums
-    used during the validation processes
+    """Maintains the rules and types that were defined in a Yamlator
+    schema which can then used to validate a YAML file. The schema will
+    keep a reference to a root ruleset, which acts as the entry point
+    for the validation process
 
     Attributes:
-        root (yamlator.types.YamlatorRuleset):
-        rulesets (dict):
-        enums (dict)
+        root (yamlator.types.YamlatorRuleset): The entry point ruleset
+            to start the validation process. The root will be defined
+            as a `schema` block in the `.ys` file and will called `main
+
+        rulesets (dict): A lookup to the ruleset objects that were defined
+            in the schema file. The key will be the ruleset name and the value
+            will be a `yamlator.types.YamlatorRuleset` object
+
+        enums (dict): A lookup to the enum objects that were defined
+            in the schema file. The key will be the enum name and the value
+            will be a `yamlator.types.YamlatorEnum` object
     """
 
     def __init__(self, root: YamlatorRuleset, rulesets: dict,  enums: dict):
@@ -335,13 +377,15 @@ class YamlatorSchema:
 
         Args:
             root (yamlator.types.YamlatorRuleset): The entry point ruleset
-                called `main` that is used to start the validation process
-            rulesets (dict): Maintains a lookup of the rulesets defined in
-                the schema. The key is the ruleset name and the value in the
-                    dictionary is an instance of `YamlatorRuleset`
-            enums (dict): Maintains a lookup of the enums defined in the
-                the schema file. The key is the enum type name and the value
-                    in the dictionary is an instance of `YamlatorEnum`
+                that is used to start the validation process
+
+            rulesets (dict): A lookup to the ruleset objects that were
+                defined in the schema file. The key will be the ruleset name
+                and the value will be a `yamlator.types.YamlatorRuleset` object
+
+            enums (dict): A lookup to the enum objects that were defined
+                in the schema file. The key will be the enum name and the
+                value will be a `yamlator.types.YamlatorEnum` object
         """
         self._root = root
         self._enums = enums
@@ -374,24 +418,76 @@ class YamlatorSchema:
 
 
 class LoadedYamlatorSchema(YamlatorSchema):
+    """Represents a Yamlator schema that has been loaded from a file.
+    Unlike `yamlator.types.YamlatorSchema`, this object will contain
+    any import statements and imported types that during the parsing
+    process are unknown on load
+
+    Attributes:
+        root (yamlator.types.YamlatorRuleset): The entry point ruleset
+            to start the validation process. The root will be defined
+            as a `schema` block in the `.ys` file and will called `main
+
+        rulesets (dict): A lookup to the ruleset objects that were defined
+            in the schema file. The key will be the ruleset name and the value
+            will be a `yamlator.types.YamlatorRuleset` object
+
+        enums (dict): A lookup to the enum objects that were defined
+            in the schema file. The key will be the enum name and the value
+            will be a `yamlator.types.YamlatorEnum` object
+
+        imports (Iterator[yamlator.types.ImportStatement]): A list of
+            `yamlator.types.ImportStatement` that contain all the import
+            statements that were defined in the schema file
+
+        unknowns (Iterator[yamlator.types.RuleType]): A list of
+            `yamlator.types.RuleType` objects that have a schema type of
+            `yamlator.types.SchemaTypes.UNKNOWN`
+    """
+
     def __init__(self, root: YamlatorRuleset, rulesets: dict, enums: dict,
-                 imports: list, unknowns: list = None):
+                 imports: Iterator[ImportStatement],
+                 unknowns: Iterator[RuleType] = None):
+        """LoadedYamlatorSchema init
+
+        Args:
+            root (yamlator.types.YamlatorRuleset): The entry point ruleset
+                that is used to start the validation process
+
+            rulesets (dict): A lookup to the ruleset objects that were
+                defined in the schema file. The key will be the ruleset name
+                and the value will be a `yamlator.types.YamlatorRuleset` object
+
+            enums (dict): A lookup to the enum objects that were defined
+                in the schema file. The key will be the enum name and the
+                value will be a `yamlator.types.YamlatorEnum` object
+
+            imports (Iterator[yamlator.types.ImportStatement]): A list
+                `yamlator.types.ImportStatement` that contain all import
+                statements that were defined in the schema file
+
+            unknowns (Iterator[yamlator.types.RuleType]): A list of
+                `yamlator.types.RuleType` objects that have a schema type
+                of `yamlator.types.SchemaTypes.UNKNOWN`
+        """
         super().__init__(root, rulesets, enums)
 
         self._unknowns = unknowns
         if unknowns is None:
             self._unknowns = []
 
-        self.__shake_imports(imports)
+        self.__group_imports(imports)
 
-    def __shake_imports(self, imports):
+    def __group_imports(self, imports: Iterator[ImportStatement]) -> None:
+        # Group imports and the requested type to prevent
+        # loading the same schema file multiple times
         import_statements = defaultdict(list)
         for state in imports:
             import_statements[state.path].append(state.item)
         self._imports = import_statements
 
     @property
-    def imports(self):
+    def imports(self) -> Iterator[ImportStatement]:
         return self._imports.copy()
 
     @property
