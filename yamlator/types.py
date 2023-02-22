@@ -96,7 +96,7 @@ class RuleType:
     @property
     def schema_type(self):
         return self._schema_type
-    
+
     @schema_type.setter
     def schema_type(self, value):
         self._schema_type = value
@@ -352,6 +352,7 @@ class ImportStatement(YamlatorType):
     def path(self) -> str:
         return self._path
 
+
 class YamlatorSchema:
     """Maintains the rules and types that were defined in a Yamlator
     schema which can then used to validate a YAML file. The schema will
@@ -417,11 +418,12 @@ class YamlatorSchema:
         })
 
 
-class LoadedYamlatorSchema(YamlatorSchema):
-    """Represents a Yamlator schema that has been loaded from a file.
-    Unlike `yamlator.types.YamlatorSchema`, this object will contain
-    any import statements and imported types that during the parsing
-    process are unknown on load
+class PartiallyLoadedYamlatorSchema(YamlatorSchema):
+    """Represents a Yamlator schema that has been loaded from a file
+    but has not resolved all the types that have been defined. Unlike
+    `yamlator.types.YamlatorSchema`, this object will contain any import
+    statements and imported types that during the parsing process are
+    unknown on load
 
     Attributes:
         root (yamlator.types.YamlatorRuleset): The entry point ruleset
@@ -448,7 +450,7 @@ class LoadedYamlatorSchema(YamlatorSchema):
     def __init__(self, root: YamlatorRuleset, rulesets: dict, enums: dict,
                  imports: Iterator[ImportStatement],
                  unknowns: Iterator[RuleType] = None):
-        """LoadedYamlatorSchema init
+        """PartiallyLoadedYamlatorSchema init
 
         Args:
             root (yamlator.types.YamlatorRuleset): The entry point ruleset
@@ -487,7 +489,7 @@ class LoadedYamlatorSchema(YamlatorSchema):
         self._imports = import_statements
 
     @property
-    def imports(self) -> Iterator[ImportStatement]:
+    def imports(self) -> dict:
         return self._imports.copy()
 
     @property
