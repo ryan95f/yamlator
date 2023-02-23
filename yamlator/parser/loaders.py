@@ -159,7 +159,7 @@ def resolve_unknown_types(unknown_types: 'list[RuleType]',
             type was not found
     """
     while len(unknown_types) > 0:
-        curr = unknown_types.pop()
+        curr: RuleType = unknown_types.pop()
         if enums.get(curr.lookup) is not None:
             curr.schema_type = SchemaTypes.ENUM
             continue

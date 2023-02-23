@@ -89,7 +89,7 @@ class SchemaTransformer(Transformer):
         # determine the type of the rule if a enum or ruleset is used
         self.seen_constructs = {}
         self.unknown_types = []
-    
+
     def rule_name(self, tokens: 'list[Token]') -> Token:
         """Processes the rule name by removing any quotes"""
         token = tokens[0]
@@ -323,7 +323,16 @@ class _RulesetInstructionHandler(_InstructionHandler):
 
 
 class _ImportInstructionHandler(_InstructionHandler):
+    """Import statement handler for putting all the
+    import statements into a single data structure
+    """
+
     def __init__(self, imports: list):
+        """_ImportInstructionHandler init
+
+        imports (list): Reference to a list that will store all the
+            import statements that were referenced in the Yamlator schema
+        """
         super().__init__()
         self.imports = imports
 

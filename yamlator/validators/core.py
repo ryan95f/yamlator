@@ -4,7 +4,6 @@ validator handler chian.
 
 from collections import deque
 from yamlator.types import YamlatorSchema
-from yamlator.types import YamlatorRuleset
 
 from yamlator.validators import AnyTypeValidator
 from yamlator.validators import BuiltInTypeValidator
