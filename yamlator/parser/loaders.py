@@ -1,5 +1,5 @@
 """Contains functions to load """
-
+import re
 import os
 import typing
 
@@ -14,6 +14,9 @@ from yamlator.parser.core import parse_schema
 from yamlator.exceptions import ConstructNotFoundError
 
 
+_SLASHES_REGEX = re.compile(r'(?:\\{1}|\/{1})')
+
+
 def parse_yamlator_schema(schema_path: str) -> YamlatorSchema:
     """Parses a Yamlator schema from a given path on the file system
 
@@ -26,7 +29,7 @@ def parse_yamlator_schema(schema_path: str) -> YamlatorSchema:
         be processed by Yamlator
 
     Raises:
-        ValueError: If the schema path is None, not a string
+        ValueError: If the schema path is `None`, not a string
             or is an empty string
 
         yamlator.exceptions.InvalidSchemaFilenameError: If the filename
@@ -62,14 +65,17 @@ def fetch_schema_path(schema_path: str) -> str:
         ValueError: If the parameter `schema_path` is `None` or not
             a string
     """
-    if (not schema_path) or (not isinstance(schema_path, str)):
+    if not schema_path:
         raise ValueError(
             'Expected parameter schema_path to be a non-empty string')
 
-    context = schema_path.split('\\')[:-1]
+    if not isinstance(schema_path, str):
+        raise TypeError('Expected parameter schema_path to be a string')
+
+    context = _SLASHES_REGEX.split(schema_path)[:-1]
     if not context:
         return '.'
-    return os.path.join(*context)
+    return _SLASHES_REGEX.sub('/', os.path.join(*context))
 
 
 def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
