@@ -8,6 +8,7 @@ from .core import SchemaSyntaxError
 from .core import MissingRulesError
 from .core import MalformedRulesetNameError
 from .core import MalformedEnumNameError
+from .core import SchemaParseError
 from .loaders import parse_yamlator_schema
 
 __all__ = [
@@ -15,6 +16,7 @@ __all__ = [
     'SchemaTransformer',
     'SchemaSyntaxError',
     'MissingRulesError',
+    'SchemaParseError',
     'MalformedRulesetNameError',
     'MalformedEnumNameError',
     'parse_yamlator_schema'

@@ -123,7 +123,8 @@ class SchemaTransformer(Transformer):
         self.seen_constructs[name] = SchemaTypes.RULESET
         return YamlatorRuleset(name, rules, is_strict=True)
 
-    def start(self, instructions: Iterator[YamlatorType]) -> dict:
+    def start(self, instructions: Iterator[YamlatorType]) \
+            -> PartiallyLoadedYamlatorSchema:
         """Transforms the instructions into a dict that sorts the rulesets,
         enums and entry point to validate the YAML data"""
         root = None

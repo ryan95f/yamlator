@@ -11,6 +11,7 @@ from yamlator.parser import parse_yamlator_schema
 from yamlator.validators.core import validate_yaml
 
 from yamlator.exceptions import SchemaParseError
+from yamlator.exceptions import ConstructNotFoundError
 from yamlator.exceptions import InvalidSchemaFilenameError
 from yamlator.violations import Violation
 
@@ -93,9 +94,15 @@ def validate_yaml_data_from_file(yaml_filepath: str,
         FileNotFoundError: If either argument cannot be found on the file system
         InvalidSchemaFilenameError: If `schema_filepath` does not have
         a valid filename that ends with the `.ys` extension.
+        SchemaParseError: If there was an error parsing the schema, e.g
+            syntax error or a type that was not found
     """
     yaml_data = load_yaml_file(yaml_filepath)
-    instructions = parse_yamlator_schema(schema_filepath)
+    instructions = None
+    try:
+        instructions = parse_yamlator_schema(schema_filepath)
+    except ConstructNotFoundError as ex:
+        raise SchemaParseError(ex) from ex
     return validate_yaml(yaml_data, instructions)
 
 

@@ -62,10 +62,13 @@ def fetch_schema_path(schema_path: str) -> str:
         ValueError: If the parameter `schema_path` is `None` or not
             a string
     """
-    if (schema_path is None) or (not isinstance(schema_path, str)):
-        raise ValueError('Expected parameter schema_path to be a string')
+    if (not schema_path) or (not isinstance(schema_path, str)):
+        raise ValueError(
+            'Expected parameter schema_path to be a non-empty string')
 
     context = schema_path.split('\\')[:-1]
+    if not context:
+        return '.'
     return os.path.join(*context)
 
 

@@ -19,14 +19,14 @@ from yamlator.validators import UnionValidator
 from yamlator.validators.base_validator import Validator
 
 
-def validate_yaml(yaml_data: dict, instructions: YamlatorSchema) -> deque:
+def validate_yaml(yaml_data: dict, schema: YamlatorSchema) -> deque:
     """Validate YAML data by comparing the data against a set of instructions.
     Any violations will be collected and returned in a `deque`
 
     Args:
         yaml_data    (dict): The YAML data to validate. Assumes the YAML
         contains a root key
-        instructions (dict): Contains the enums and rulesets that will be
+        schema (dict): Contains the enums and rulesets that will be
         used to validate the YAML data
 
     Returns:
@@ -38,13 +38,13 @@ def validate_yaml(yaml_data: dict, instructions: YamlatorSchema) -> deque:
     if yaml_data is None:
         raise ValueError('yaml_data should not be None')
 
-    if instructions is None:
+    if schema is None:
         raise ValueError('instructions should not be None')
 
     default_key = '-'
     violations = deque()
 
-    validators = _create_validators_chain(instructions, violations)
+    validators = _create_validators_chain(schema, violations)
     validators.validate(default_key, yaml_data, default_key, None)
 
     return violations
