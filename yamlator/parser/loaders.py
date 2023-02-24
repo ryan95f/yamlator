@@ -111,8 +111,16 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
     if loaded_schema is None:
         raise ValueError('Parameter loaded_schema should not None')
 
-    if (schema_path is None) or (not isinstance(schema_path, str)):
-        raise ValueError('Expected parameter schema_path to be a string')
+    if not schema_path:
+        raise ValueError(
+            'Expected parameter schema_path to be a non-empty string')
+
+    if not isinstance(schema_path, str):
+        raise TypeError('Expected parameter schema_path to be a string')
+
+    if not isinstance(loaded_schema, PartiallyLoadedYamlatorSchema):
+        raise TypeError(
+            'Expected schema to be yamlator.types.PartiallyLoadedYamlatorSchema')
 
     import_statements = loaded_schema.imports
     root_rulesets = loaded_schema.rulesets
@@ -137,14 +145,12 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
                 continue
 
     unknown_types = loaded_schema.unknowns_rule_types
-    ruleset, enums = resolve_unknown_types(unknown_types,
-                                           root_rulesets, root_enums)
-    return YamlatorSchema(loaded_schema.root, ruleset, enums)
+    resolve_unknown_types(unknown_types, root_rulesets, root_enums)
+    return YamlatorSchema(loaded_schema.root, root_rulesets, root_enums)
 
 
 def resolve_unknown_types(unknown_types: 'list[RuleType]',
-                          rulesets: dict,
-                          enums: dict) -> typing.Tuple[dict, dict]:
+                          rulesets: dict, enums: dict) -> bool:
     """Resolves any types that are marked as unknown since the ruleset
     or enum was imported into the schema. This function will go through
     each unknown type and populate with the relevant rule type
@@ -160,13 +166,26 @@ def resolve_unknown_types(unknown_types: 'list[RuleType]',
             import statements defined in the schema
 
     Returns:
-        A tuple containing the rulesets and enums from the schema where any
-        unknown types have been resolved
+        A boolean (true) to indicate it has executed successfully
 
     Raises:
         yamlator.exceptions.ConstructNotFoundError: If the ruleset or enum
             type was not found
     """
+    if unknown_types is None:
+        raise ValueError('Expected parameter unknown_types to not be None')
+
+    if not isinstance(unknown_types, list):
+        raise TypeError('Expected unknown_types to be a list')
+
+    if (rulesets is None) or (enums is None):
+        raise ValueError(
+            'Expected parameters rulesets and enums to not be None')
+
+    if (not isinstance(rulesets, dict)) or (not isinstance(enums, dict)):
+        raise TypeError(
+            'Expected parameters rulesets and enums to be dictionaries')
+
     while len(unknown_types) > 0:
         curr: RuleType = unknown_types.pop()
         if enums.get(curr.lookup) is not None:
@@ -178,4 +197,4 @@ def resolve_unknown_types(unknown_types: 'list[RuleType]',
             continue
 
         raise ConstructNotFoundError(curr.lookup)
-    return rulesets, enums
+    return True
