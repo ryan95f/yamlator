@@ -19,22 +19,23 @@ from yamlator.types import ContainerTypes
 from yamlator.types import YamlatorRuleset
 from yamlator.types import YamlatorEnum
 from yamlator.types import YamlatorType
+from yamlator.types import PartiallyLoadedYamlatorSchema
 from yamlator.types import RuleType
 from yamlator.types import UnionRuleType
 from yamlator.types import EnumItem
 from yamlator.types import SchemaTypes
+from yamlator.types import ImportStatement
 from yamlator.exceptions import NestedUnionError
-from yamlator.exceptions import ConstructNotFoundError
 from yamlator.exceptions import SchemaParseError
 
 
-_package_dir = Path(__file__).parent.absolute()
+_package_dir = Path(__file__).parent.parent.absolute()
 _GRAMMAR_FILE = os.path.join(_package_dir, 'grammar/grammar.lark')
 
 _QUOTES_REGEX = re.compile(r'\"|\'')
 
 
-def parse_schema(schema_content: str) -> dict:
+def parse_schema(schema_content: str) -> PartiallyLoadedYamlatorSchema:
     """Parses a schema into a set of instructions that can be
     used to validate a YAML file.
 
@@ -81,9 +82,13 @@ class SchemaTransformer(Transformer):
                  | rule_name type NEW_LINES
     """
 
-    # Used to track previously seen enums or rulesets to dynamically
-    # determine the type of the rule if a enum or ruleset is used
-    seen_constructs = {}
+    def __init__(self, visit_tokens: bool = True) -> None:
+        super().__init__(visit_tokens)
+
+        # Used to track previously seen enums or rulesets to dynamically
+        # determine the type of the rule is a enum or ruleset
+        self.seen_constructs = {}
+        self.unknown_types = []
 
     def rule_name(self, tokens: 'list[Token]') -> Token:
         """Processes the rule name by removing any quotes"""
@@ -118,15 +123,19 @@ class SchemaTransformer(Transformer):
         self.seen_constructs[name] = SchemaTypes.RULESET
         return YamlatorRuleset(name, rules, is_strict=True)
 
-    def start(self, instructions: Iterator[YamlatorType]) -> dict:
+    def start(self, instructions: Iterator[YamlatorType]) \
+            -> PartiallyLoadedYamlatorSchema:
         """Transforms the instructions into a dict that sorts the rulesets,
         enums and entry point to validate the YAML data"""
         root = None
         rules = {}
         enums = {}
+        imports = []
 
+        enum_handler = _EnumInstructionHandler(enums)
         handler_chain = _RulesetInstructionHandler(rules)
-        handler_chain.set_next_handler(_EnumInstructionHandler(enums))
+        handler_chain.set_next_handler(enum_handler)
+        enum_handler.set_next_handler(_ImportInstructionHandler(imports))
 
         for instruction in instructions:
             handler_chain.handle(instruction)
@@ -135,11 +144,8 @@ class SchemaTransformer(Transformer):
         if root is not None:
             del rules['main']
 
-        return {
-            'main': root,
-            'rules': rules,
-            'enums': enums
-        }
+        return PartiallyLoadedYamlatorSchema(root, rules, enums,
+                                             imports, self.unknown_types)
 
     def str_type(self, _: 'list[Token]') -> RuleType:
         """Transforms a string type token into a RuleType object"""
@@ -194,10 +200,11 @@ class SchemaTransformer(Transformer):
                 enum or ruleset cannot be found
         """
         name = token[0]
-        schema_type = self.seen_constructs.get(name)
-        if schema_type is None:
-            raise ConstructNotFoundError(name)
-        return RuleType(schema_type=schema_type, lookup=name)
+        schema_type = self.seen_constructs.get(name, SchemaTypes.UNKNOWN)
+        rule_type = RuleType(schema_type=schema_type, lookup=name)
+        if schema_type == SchemaTypes.UNKNOWN:
+            self.unknown_types.append(rule_type)
+        return rule_type
 
     def regex_type(self, tokens: 'list[Token]') -> RuleType:
         """Transforms a regex type token into a RuleType object"""
@@ -252,6 +259,15 @@ class SchemaTransformer(Transformer):
         from the value
         """
         return _QUOTES_REGEX.sub('', token)
+
+    def import_statement(self, tokens: 'list[Token]') -> ImportStatement:
+        """Transforms an import statement into a
+        `yamlator.types.ImportStatement` object
+        """
+        item = tokens[0]
+        path = tokens[1]
+        path = _QUOTES_REGEX.sub('', path.value)
+        return ImportStatement(item.value, path)
 
 
 class _InstructionHandler:
@@ -308,6 +324,28 @@ class _RulesetInstructionHandler(_InstructionHandler):
             return
 
         self._rulesets[instruction.name] = instruction
+
+
+class _ImportInstructionHandler(_InstructionHandler):
+    """Import statement handler for putting all the
+    import statements into a single data structure
+    """
+
+    def __init__(self, imports: list):
+        """_ImportInstructionHandler init
+
+        imports (list): Reference to a list that will store all the
+            import statements that were referenced in the Yamlator schema
+        """
+        super().__init__()
+        self.imports = imports
+
+    def handle(self, instruction: YamlatorType) -> None:
+        if instruction.container_type != ContainerTypes.IMPORT:
+            super().handle(instruction)
+            return
+
+        self.imports.append(instruction)
 
 
 class SchemaSyntaxError(SyntaxError):

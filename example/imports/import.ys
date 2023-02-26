@@ -1,0 +1,7 @@
+import Project from "../lists/lists.ys"
+import Values from "common.ys"
+
+schema {
+    user Project
+    value Values
+}

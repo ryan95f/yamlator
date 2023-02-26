@@ -1,0 +1,8 @@
+import Employee from "base.ys"
+import User from "base.ys"
+import Status from "base.ys"
+
+schema {
+    employees list(Employee)
+    status Status
+}

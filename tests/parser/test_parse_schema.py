@@ -50,7 +50,7 @@ class TestParseSchema(unittest.TestCase):
 
         schema_content = load_schema(schema_path)
         instructions = parse_schema(schema_content)
-        main = instructions.get('main')
+        main = instructions.root
 
         self.assertIsNotNone(instructions)
         self.assertIsNotNone(main)
@@ -77,11 +77,6 @@ class TestParseSchema(unittest.TestCase):
             'with_invalid_ruleset_name',
             './tests/files/invalid_files/invalid_ruleset_name.ys',
             MalformedRulesetNameError
-        ),
-        (
-            'with_ruleset_not_defined',
-            './tests/files/invalid_files/missing_defined_ruleset.ys',
-            SchemaParseError
         ),
         (
             'union_with_nested_union',

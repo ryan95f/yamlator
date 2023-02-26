@@ -1,0 +1,5 @@
+import Project from "../strict_mode/strict.ys"
+
+enum Values {
+    TEST = 1
+}
