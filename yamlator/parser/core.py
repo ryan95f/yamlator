@@ -86,7 +86,7 @@ class SchemaTransformer(Transformer):
         super().__init__(visit_tokens)
 
         # Used to track previously seen enums or rulesets to dynamically
-        # determine the type of the rule if a enum or ruleset is used
+        # determine the type of the rule is a enum or ruleset
         self.seen_constructs = {}
         self.unknown_types = []
 
@@ -260,7 +260,10 @@ class SchemaTransformer(Transformer):
         """
         return _QUOTES_REGEX.sub('', token)
 
-    def import_statement(self, tokens: 'list[Token]'):
+    def import_statement(self, tokens: 'list[Token]') -> ImportStatement:
+        """Transforms an import statement into a
+        `yamlator.types.ImportStatement` object
+        """
         item = tokens[0]
         path = tokens[1]
         path = _QUOTES_REGEX.sub('', path.value)

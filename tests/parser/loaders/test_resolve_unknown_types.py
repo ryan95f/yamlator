@@ -3,8 +3,11 @@
 import unittest
 
 from parameterized import parameterized
-from yamlator.types import RuleType, SchemaTypes
-from yamlator.types import YamlatorEnum, YamlatorRuleset
+
+from yamlator.types import RuleType
+from yamlator.types import SchemaTypes
+from yamlator.types import YamlatorEnum
+from yamlator.types import YamlatorRuleset
 from yamlator.parser.loaders import resolve_unknown_types
 from yamlator.exceptions import ConstructNotFoundError
 
@@ -25,7 +28,7 @@ class TestResolveUnknownTypes(unittest.TestCase):
     def test_resolve_unknown_types_invalid_parameters(
             self, name: str, unknown_types: list,
             rulesets: dict, enums: dict, expected_exception: Exception):
-
+        # Unused by test case, however is required by the parameterized library
         del name
 
         with self.assertRaises(expected_exception):

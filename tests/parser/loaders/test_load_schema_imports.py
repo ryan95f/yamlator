@@ -4,9 +4,12 @@ import unittest
 
 from parameterized import parameterized
 
-from yamlator.types import PartiallyLoadedYamlatorSchema
+from yamlator.types import Rule
+from yamlator.types import RuleType
+from yamlator.types import SchemaTypes
+from yamlator.types import ImportStatement
 from yamlator.types import YamlatorRuleset
-from yamlator.types import Rule, RuleType, SchemaTypes, ImportStatement
+from yamlator.types import PartiallyLoadedYamlatorSchema
 from yamlator.parser.loaders import load_schema_imports
 
 
@@ -35,10 +38,12 @@ class TestLoadSchemaImports(unittest.TestCase):
         ('with_wrong_schema_path_type_', BASIC_SCHEMA, ['test.ys'], TypeError),
         ('with_empty_schema_path_string', BASIC_SCHEMA, '', ValueError)
     ])
-    def test_load_schema_imports_with_invalid_parameters(
+    def test_load_schema_imports_with_invalid_params(
             self, name: str,
             loaded_schema: PartiallyLoadedYamlatorSchema,
             schema_path: str, expected_exception: Exception):
+
+        # Unused by test case, however is required by the parameterized library
         del name
 
         with self.assertRaises(expected_exception):

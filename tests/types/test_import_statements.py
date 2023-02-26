@@ -20,7 +20,9 @@ class TestImportStatement(unittest.TestCase):
     def test_import_statements_invalid_params(self, name: str, item: str,
                                               path: str,
                                               expected_exception: Exception):
+        # Unused by test case, however is required by the parameterized library
         del name
+
         with self.assertRaises(expected_exception):
             ImportStatement(item, path)
 

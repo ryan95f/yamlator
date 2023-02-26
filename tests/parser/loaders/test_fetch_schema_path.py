@@ -15,7 +15,7 @@ class TestFetchSchemaPath(unittest.TestCase):
     @parameterized.expand([
         ('with_none_str', None, ValueError),
         ('with_empty_str', '', ValueError),
-        ('with_none_str_path', ['./path/file.js'], TypeError),
+        ('with_none_str_path', ['./path/file.ys'], TypeError),
     ])
     def test_fetch_path_with_invalid_paths(self, name: str, schema_path: Any,
                                            expected_exception: Exception):
