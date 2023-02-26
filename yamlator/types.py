@@ -320,7 +320,7 @@ class ImportStatement(YamlatorType):
             or ruleset
     """
 
-    def __init__(self, item: str, path: str):
+    def __init__(self, item: str, path: str, namespace: str = None):
         """ImportStatement init
 
         Args:
@@ -348,8 +348,11 @@ class ImportStatement(YamlatorType):
 
         self._item = item
         self._path = path
+        self._namespace = namespace
 
         name = f'({item}){path}'
+        if namespace is not None:
+            name = f'({namespace}.{item}){path}'
         super().__init__(name, ContainerTypes.IMPORT)
 
     @property
@@ -359,6 +362,10 @@ class ImportStatement(YamlatorType):
     @property
     def path(self) -> str:
         return self._path
+
+    @property
+    def namespace(self) -> str:
+        return self._namespace 
 
 
 class YamlatorSchema:
@@ -493,7 +500,7 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
         # loading the same schema file multiple times
         import_statements = defaultdict(list)
         for state in imports:
-            import_statements[state.path].append(state.item)
+            import_statements[state.path].append((state.item, state.namespace))
         self._imports = import_statements
 
     @property

@@ -131,15 +131,24 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
         imported_rulesets = schema.rulesets
         imported_enums = schema.enums
 
-        for resource in resource_type:
+        for (resource, namespace) in resource_type:
+
             ruleset: YamlatorRuleset = imported_rulesets.get(resource)
             if ruleset is not None:
-                root_rulesets[ruleset.name] = ruleset
+                if namespace is not None:
+                    name = f'{namespace}.{ruleset.name}'
+                    root_rulesets[name] = ruleset
+                else:
+                    root_rulesets[ruleset.name] = ruleset
                 continue
 
             enum: YamlatorEnum = imported_enums.get(resource)
             if enum is not None:
-                root_enums[enum.name] = enum
+                if namespace is not None:
+                    name = f'{namespace}.{enum.name}'
+                    root_enums[name] = enum
+                else:
+                    root_enums[enum.name] = enum
                 continue
 
     unknown_types = loaded_schema.unknowns_rule_types

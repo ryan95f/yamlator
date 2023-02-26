@@ -16,7 +16,7 @@ start: instructions*
 schema_entry: "schema" "{" rule+ "}"
 strict_schema_entry: "strict schema" "{" rule+ "}"
 
-import_statement: "import" /[A-Z]{1}[a-zA-Z0-9_]+/ "from" /\"(?:[\S]+\/)*[\S]+.ys\"/
+import_statement: "import" /[A-Z]{1}[a-zA-Z0-9_]+/ "from" /\"(?:[\S]+\/)*[\S]+.ys\"/ ("as" NAMESPACE)?
 
 ruleset: "ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
 strict_ruleset: "strict ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
@@ -55,11 +55,12 @@ float_type: "float"
 bool_type: "bool"
 list_type: "list""(" type ")"
 map_type: "map""(" type ")"
-container_type: /[A-Z]{1}[a-zA-Z0-9_]+/
+container_type: (NAMESPACE".")? /[A-Z]{1}[a-zA-Z0-9_]+/
 regex_type: "regex""(" string ")"
 union_type: "union""(" [type ("," type)+] ")"
 
 NEW_LINES: "\n"+
+NAMESPACE: /[a-z]+/
 
 string: ESCAPED_STRING
 
