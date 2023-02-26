@@ -5,8 +5,7 @@ import os
 from yamlator.utils import load_schema
 from yamlator.types import RuleType
 from yamlator.types import YamlatorSchema
-from yamlator.types import YamlatorRuleset
-from yamlator.types import YamlatorEnum
+from yamlator.types import YamlatorType
 from yamlator.types import SchemaTypes
 from yamlator.types import PartiallyLoadedYamlatorSchema
 from yamlator.parser.core import parse_schema
@@ -132,28 +131,32 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
         imported_enums = schema.enums
 
         for (resource, namespace) in resource_type:
-
-            ruleset: YamlatorRuleset = imported_rulesets.get(resource)
-            if ruleset is not None:
-                if namespace is not None:
-                    name = f'{namespace}.{ruleset.name}'
-                    root_rulesets[name] = ruleset
-                else:
-                    root_rulesets[ruleset.name] = ruleset
+            has_mapped_rulesets = map_imported_resource(namespace,
+                                                        resource,
+                                                        root_rulesets,
+                                                        imported_rulesets)
+            if has_mapped_rulesets:
                 continue
 
-            enum: YamlatorEnum = imported_enums.get(resource)
-            if enum is not None:
-                if namespace is not None:
-                    name = f'{namespace}.{enum.name}'
-                    root_enums[name] = enum
-                else:
-                    root_enums[enum.name] = enum
-                continue
+            map_imported_resource(namespace, resource,
+                                  root_enums, imported_enums)
 
     unknown_types = loaded_schema.unknowns_rule_types
     resolve_unknown_types(unknown_types, root_rulesets, root_enums)
     return YamlatorSchema(loaded_schema.root, root_rulesets, root_enums)
+
+
+def map_imported_resource(namespace: str, resource: str, type_lookup: dict,
+                          imported_types: dict) -> dict:
+    imported_type: YamlatorType = imported_types.get(resource)
+    if imported_type is None:
+        return False
+
+    if namespace is not None:
+        resource = f'{namespace}.{resource}'
+
+    type_lookup[resource] = imported_type
+    return True
 
 
 def resolve_unknown_types(unknown_types: 'list[RuleType]',
