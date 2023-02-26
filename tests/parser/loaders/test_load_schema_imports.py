@@ -1,3 +1,5 @@
+"""Test cases for the load_schema_imports function"""
+
 import unittest
 
 from parameterized import parameterized
@@ -21,7 +23,10 @@ def create_basic_loaded_schema():
 
 BASIC_SCHEMA = create_basic_loaded_schema()
 
+
 class TestLoadSchemaImports(unittest.TestCase):
+    """Test cases for the load_schema_imports function"""
+
     @parameterized.expand([
         ('with_none_schema', None, './path/test.ys', ValueError),
         ('with_wrong_schema_type', YamlatorRuleset('main', []),
@@ -49,10 +54,10 @@ class TestLoadSchemaImports(unittest.TestCase):
         loaded_schema = PartiallyLoadedYamlatorSchema(
             root=YamlatorRuleset('main', [
                 Rule('employees',
-                    RuleType(
+                     RuleType(
                         SchemaTypes.LIST, sub_type=unknown_types[0]
-                    ),
-                True),
+                     ),
+                     True),
                 Rule('status', unknown_types[1], True)
             ]),
             rulesets={},

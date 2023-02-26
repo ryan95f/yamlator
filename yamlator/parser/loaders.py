@@ -1,7 +1,6 @@
 """Contains functions to load """
 import re
 import os
-import typing
 
 from yamlator.utils import load_schema
 from yamlator.types import RuleType
@@ -119,8 +118,7 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
         raise TypeError('Expected parameter schema_path to be a string')
 
     if not isinstance(loaded_schema, PartiallyLoadedYamlatorSchema):
-        raise TypeError(
-            'Expected schema to be yamlator.types.PartiallyLoadedYamlatorSchema')
+        raise TypeError('Expected schema to be yamlator.types.PartiallyLoadedYamlatorSchema')  # nopep8 pylint: disable=C0301
 
     import_statements = loaded_schema.imports
     root_rulesets = loaded_schema.rulesets

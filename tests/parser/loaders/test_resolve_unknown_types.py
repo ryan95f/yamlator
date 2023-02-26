@@ -1,3 +1,5 @@
+"""Test cases for the resolve_unknown_types function"""
+
 import unittest
 
 from parameterized import parameterized
@@ -8,6 +10,8 @@ from yamlator.exceptions import ConstructNotFoundError
 
 
 class TestResolveUnknownTypes(unittest.TestCase):
+    """Test cases for the resolve_unknown_types function"""
+
     @parameterized.expand([
         ('with_unknown_types_is_none', None, {}, {}, ValueError),
         ('with_wrong_type_for_unknown_types', {}, {}, {}, TypeError),
@@ -57,6 +61,7 @@ class TestResolveUnknownTypes(unittest.TestCase):
         self.assertEqual(SchemaTypes.RULESET, unknown_types[0].schema_type)
         self.assertEqual(SchemaTypes.ENUM, unknown_types[1].schema_type)
         self.assertEqual(SchemaTypes.RULESET, unknown_types[2].schema_type)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,3 +1,6 @@
+"""Test cases for the fetch_schema_path function"""
+
+
 import unittest
 
 from typing import Any
@@ -7,6 +10,7 @@ from yamlator.parser.loaders import fetch_schema_path
 
 
 class TestFetchSchemaPath(unittest.TestCase):
+    """Test cases for the fetch_schema_path function"""
 
     @parameterized.expand([
         ('with_none_str', None, ValueError),

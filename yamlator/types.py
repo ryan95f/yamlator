@@ -332,11 +332,19 @@ class ImportStatement(YamlatorType):
             ValueError: If the `item` or `path` parameters are `None`
                 or are not a string
         """
-        if (item is None) or (not isinstance(item, str)):
-            raise ValueError('Expected parameter item to be a string')
+        if not item:
+            raise ValueError(
+                'Expected parameter item to not be an empty string or None')
 
-        if (path is None) or (not isinstance(item, str)):
-            raise ValueError('Expected parameter path to be a string')
+        if not path:
+            raise ValueError(
+                'Expected parameter path to be an empty string or None')
+
+        if not isinstance(item, str):
+            raise TypeError('Expected parameter item to be a string')
+
+        if not isinstance(path, str):
+            raise TypeError('Expected parameter path to be a string')
 
         self._item = item
         self._path = path
@@ -362,7 +370,7 @@ class YamlatorSchema:
     Attributes:
         root (yamlator.types.YamlatorRuleset): The entry point ruleset
             to start the validation process. The root will be defined
-            as a `schema` block in the `.ys` file and will called `main
+            as a `schema` block in the `.ys` file and will called `main`
 
         rulesets (dict): A lookup to the ruleset objects that were defined
             in the schema file. The key will be the ruleset name and the value

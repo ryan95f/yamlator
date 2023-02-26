@@ -1,3 +1,5 @@
+"""Test cases for the parse_yamlator_schema function"""
+
 import unittest
 import typing
 
@@ -9,6 +11,7 @@ from yamlator.parser import parse_yamlator_schema
 
 
 class TestParseYamlatorSchema(unittest.TestCase):
+    """Test cases for the parse_yamlator_schema function"""
 
     @parameterized.expand([
         ('with_none_path', None, ValueError),
