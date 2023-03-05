@@ -365,7 +365,7 @@ class ImportStatement(YamlatorType):
 
     @property
     def namespace(self) -> str:
-        return self._namespace 
+        return self._namespace
 
 
 class YamlatorSchema:

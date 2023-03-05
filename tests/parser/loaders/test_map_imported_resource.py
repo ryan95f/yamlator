@@ -1,3 +1,5 @@
+"""Test case for the `map_imported_resource` function"""
+
 import unittest
 
 from collections import namedtuple
@@ -32,6 +34,8 @@ HELLO_RULESET = {
 
 
 class TestMapImportedResource(unittest.TestCase):
+    """Test cases for `map_imported_resource`"""
+
     @parameterized.expand([
         ('all_none_params', Params(None, None, None, None), ValueError),
         ('none_resource_type',

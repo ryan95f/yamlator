@@ -101,7 +101,6 @@ def load_schema(filename: str) -> str:
         return f.read()
 
 
-
 def type_check(func, *args, **kwargs):
     del args, kwargs
 
@@ -113,10 +112,11 @@ def type_check(func, *args, **kwargs):
             if arg is None:
                 continue
 
-            param_type = hints.get(param_names[idx])
+            param_name = param_names[idx]
+            param_type = hints.get(param_name)
             param_type_str = param_type.__name__
             if not isinstance(arg, param_type):
-                msg = f'Expected parameter {param_names[idx]} to be a {param_type_str}'
+                msg = f'Expected parameter {param_name} to be a {param_type_str}'  # nopep8 pylint: disable=C0301
                 raise TypeError(msg)
         return func(*args, **kwargs)
     return _type_check
