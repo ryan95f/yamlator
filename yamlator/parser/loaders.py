@@ -165,12 +165,12 @@ def map_imported_resource(namespace: str, resource_type: str,
             resource to be mapped to the `resource_type` and/or `namespace
 
         imported_resources (dict): A `dict` containing imported resources
-            from an imported schema. This parameter `namespace` and
-            `resource_type` parameters are used to find the resource
+            from an imported schema. The parameter `resource_type` is used
+            to find the resource in `imported_resources`
 
     Returns:
         True if the imported type was successfully added to the
-        `resource_lookup` object otherwise returns False to indicate
+        `resource_lookup` otherwise returns False to indicate
         it could not find the resource in `imported_resources`
 
     Raises:

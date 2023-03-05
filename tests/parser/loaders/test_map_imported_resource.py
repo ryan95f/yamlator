@@ -34,7 +34,7 @@ HELLO_RULESET = {
 
 
 class TestMapImportedResource(unittest.TestCase):
-    """Test cases for `map_imported_resource`"""
+    """Test cases for `map_imported_resource` function"""
 
     @parameterized.expand([
         ('all_none_params', Params(None, None, None, None), ValueError),

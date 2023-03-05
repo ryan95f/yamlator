@@ -57,3 +57,4 @@
 ## v4.0.0 (TBC)
 
 * Added import statements to the Yamlator schema syntax
+* Added namespaces to the import statements with the `as` keyword

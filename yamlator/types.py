@@ -316,8 +316,12 @@ class ImportStatement(YamlatorType):
 
     Attributes:
         item (str): The name of the enum or ruleset that is being imported
+
         path (str): The path to the schema file that contains the enum
             or ruleset
+
+        namespace (str): The namespace for the resource used in the import
+            statement. If one is not provided then defaults to `None`
     """
 
     def __init__(self, item: str, path: str, namespace: str = None):
@@ -325,8 +329,13 @@ class ImportStatement(YamlatorType):
 
         Args:
             item (str): The name of the enum or ruleset that is being imported
+
             path (str): The path to the schema file that contains the enum
                 or ruleset
+
+            namespace (str, optional): The alias for the imported resource to
+                make them unique if the same resource name is not unique.
+                If one is not present, then this will be `None`
 
         Raises:
             ValueError: If the `item` or `path` parameters are `None`
