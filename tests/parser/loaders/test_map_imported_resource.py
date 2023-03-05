@@ -45,12 +45,8 @@ class TestMapImportedResource(unittest.TestCase):
                    {'Hello': HELLO_RULESET}), ValueError),
         ('none_imported_resources',
             Params(None, HELLO_RESOURCE_NAME, {}, None), ValueError),
-        ('namespace_wrong_type',
-            Params(1, HELLO_RESOURCE_NAME, {}, None), TypeError),
-        ('resource_name_wrong_type',
-            Params(NAMESPACE, [HELLO_RESOURCE_NAME], {}, None), TypeError),
         ('resource_lookup_wrong_type',
-            Params(NAMESPACE, HELLO_RESOURCE_NAME, [], None), TypeError),
+            Params(NAMESPACE, HELLO_RESOURCE_NAME, [], {}), TypeError),
         ('imported_resources_wrong_type',
             Params(NAMESPACE, HELLO_RESOURCE_NAME, {}, []), TypeError),
     ])

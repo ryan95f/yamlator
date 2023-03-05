@@ -3,7 +3,6 @@
 
 import yaml
 import re
-import typing
 
 from typing import Any
 from yamlator.types import Rule
@@ -99,24 +98,3 @@ def load_schema(filename: str) -> str:
 
     with open(filename, 'r', encoding='utf-8') as f:
         return f.read()
-
-
-def type_check(func, *args, **kwargs):
-    del args, kwargs
-
-    def _type_check(*args, **kwargs):
-        hints = typing.get_type_hints(func)
-        param_names = list(hints.keys())
-
-        for idx, arg in enumerate(args):
-            if arg is None:
-                continue
-
-            param_name = param_names[idx]
-            param_type = hints.get(param_name)
-            param_type_str = param_type.__name__
-            if not isinstance(arg, param_type):
-                msg = f'Expected parameter {param_name} to be a {param_type_str}'  # nopep8 pylint: disable=C0301
-                raise TypeError(msg)
-        return func(*args, **kwargs)
-    return _type_check

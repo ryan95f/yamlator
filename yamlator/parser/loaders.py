@@ -2,7 +2,7 @@
 import re
 import os
 
-from yamlator.utils import type_check
+from typing import List
 from yamlator.utils import load_schema
 from yamlator.types import RuleType
 from yamlator.types import YamlatorSchema
@@ -147,7 +147,6 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
     return YamlatorSchema(loaded_schema.root, root_rulesets, root_enums)
 
 
-@type_check
 def map_imported_resource(namespace: str, resource_type: str,
                           resource_lookup: dict,
                           imported_resources: dict) -> dict:
@@ -173,6 +172,13 @@ def map_imported_resource(namespace: str, resource_type: str,
         True if the imported type was successfully added to the
         `resource_lookup` object otherwise returns False to indicate
         it could not find the resource in `imported_resources`
+
+    Raises:
+        ValueError: If the `resource_type`, `resource_lookup` or
+            `imported_resources` is `None`
+
+        TypeError: if `resource_lookup` or `imported_resources` is
+            not a `dict`
     """
     if resource_type is None:
         raise ValueError('Parameter resource_type should not be None')
@@ -182,6 +188,12 @@ def map_imported_resource(namespace: str, resource_type: str,
 
     if imported_resources is None:
         raise ValueError('Parameter imported_resources should not be None')
+
+    if not isinstance(resource_lookup, dict):
+        raise TypeError('Parameter resource_lookup should be a dictionary')
+
+    if not isinstance(imported_resources, dict):
+        raise TypeError('Parameter imported_resources should be a dictionary')
 
     imported_type: YamlatorType = imported_resources.get(resource_type)
     if imported_type is None:
@@ -194,7 +206,7 @@ def map_imported_resource(namespace: str, resource_type: str,
     return True
 
 
-def resolve_unknown_types(unknown_types: 'list[RuleType]',
+def resolve_unknown_types(unknown_types: List[RuleType],
                           rulesets: dict, enums: dict) -> bool:
     """Resolves any types that are marked as unknown since the ruleset
     or enum was imported into the schema. This function will go through

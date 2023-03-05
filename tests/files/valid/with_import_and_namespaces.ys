@@ -1,0 +1,8 @@
+import Employee from "base.ys" as e
+import User from "base.ys"
+import Status from "base.ys" as core
+
+schema {
+    employees list(e.Employee)
+    status core.Status
+}
