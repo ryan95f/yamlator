@@ -34,7 +34,7 @@ HELLO_RULESET = {
 
 
 class TestMapImportedResource(unittest.TestCase):
-    """Test cases for `map_imported_resource` function"""
+    """Test cases for the `map_imported_resource` function"""
 
     @parameterized.expand([
         ('all_none_params', Params(None, None, None, None), ValueError),
@@ -53,6 +53,7 @@ class TestMapImportedResource(unittest.TestCase):
     def test_map_imported_resource_invalid_args(self, name: str,
                                                 params: Params,
                                                 expected_exception: Exception):
+        # Unused by test case, however is required by the parameterized library
         del name
 
         with self.assertRaises(expected_exception):
@@ -75,6 +76,7 @@ class TestMapImportedResource(unittest.TestCase):
     ])
     def test_map_imported_resource(self, name: str, params: Params,
                                    expected_result: bool):
+        # Unused by test case, however is required by the parameterized library
         del name
 
         result = map_imported_resource(
