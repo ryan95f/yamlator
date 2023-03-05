@@ -4,22 +4,18 @@ start: instructions*
 // Collection constructs
 ?instructions: enum
             | ruleset
-            | strict_ruleset
             | schema_entry
-            | strict_schema_entry
             | import_statement
 
 ?values: INT -> integer
        | FLOAT -> float
        | string
 
-schema_entry: "schema" "{" rule+ "}"
-strict_schema_entry: "strict schema" "{" rule+ "}"
 
 import_statement: "import" CONTAINER_TYPE_NAME "from" /\"(?:[\S]+\/)*[\S]+.ys\"/ ("as" NAMESPACE)?
 
-ruleset: "ruleset" CONTAINER_TYPE_NAME "{" rule+ "}"
-strict_ruleset: "strict ruleset" CONTAINER_TYPE_NAME" {" rule+ "}"
+schema_entry: STRICT_KEYWORD? "schema" "{" rule+ "}"
+ruleset: STRICT_KEYWORD? "ruleset" CONTAINER_TYPE_NAME" {" rule+ "}"
 
 // Enum constructs
 enum: "enum" CONTAINER_TYPE_NAME "{" enum_item+ "}"
@@ -63,6 +59,8 @@ NEW_LINES: "\n"+
 NAMESPACE: /[a-z]+/
 CONTAINER_TYPE_NAME: /[A-Z]{1}[a-zA-Z0-9_]+/
 ENUM_ITEM_NAME: /[A-Z0-9_]+/
+
+STRICT_KEYWORD: "strict"
 
 string: ESCAPED_STRING
 

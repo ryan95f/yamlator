@@ -69,15 +69,6 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
         self.assertFalse(ruleset.is_strict)
 
-    def test_strict_ruleset(self):
-        name = lark.Token(type_='TOKEN', value='person')
-        tokens = (name, *self.ruleset_rules)
-        ruleset = self.transformer.strict_ruleset(tokens)
-
-        self.assertEqual(name.value, ruleset.name)
-        self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
-        self.assertTrue(ruleset.is_strict)
-
     def test_start(self):
         # This will be zero since main is removed from the dict
         # when processed by the start transformer
@@ -222,15 +213,6 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(expected_ruleset_name, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
         self.assertFalse(ruleset.is_strict)
-
-    def test_strict_schema_entry(self):
-        expected_ruleset_name = 'main'
-        tokens = (*self.ruleset_rules, )
-        ruleset = self.transformer.strict_schema_entry(tokens)
-
-        self.assertEqual(expected_ruleset_name, ruleset.name)
-        self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
-        self.assertTrue(ruleset.is_strict)
 
     def test_int_transform(self):
         expected_value = 42
