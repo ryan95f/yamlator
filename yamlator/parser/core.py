@@ -242,7 +242,7 @@ class SchemaTransformer(Transformer):
         # then the tokens in the list are all rules
         if not isinstance(first_token, Token):
             return YamlatorRuleset('main', tokens)
-        
+
         # If the first type is `lark.Token` then the
         # first token is an indicator it is in strict mode
         return YamlatorRuleset('main', tokens[1:], True)

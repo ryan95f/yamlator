@@ -63,6 +63,7 @@ NAMESPACE: /[a-z]+/
 CONTAINER_TYPE_NAME: /[A-Z]{1}[a-zA-Z0-9_]+/
 IMPORT_STATEMENT_PATH: /\"(?:[\S]+\/)*[\S]+.ys\"/
 ENUM_ITEM_NAME: /[A-Z0-9_]+/
+
 STRICT_KEYWORD: "strict"
 
 %import common.SH_COMMENT
