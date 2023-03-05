@@ -316,17 +316,26 @@ class ImportStatement(YamlatorType):
 
     Attributes:
         item (str): The name of the enum or ruleset that is being imported
+
         path (str): The path to the schema file that contains the enum
             or ruleset
+
+        namespace (str): The namespace for the resource used in the import
+            statement. If one is not provided then defaults to `None`
     """
 
-    def __init__(self, item: str, path: str):
+    def __init__(self, item: str, path: str, namespace: str = None):
         """ImportStatement init
 
         Args:
             item (str): The name of the enum or ruleset that is being imported
+
             path (str): The path to the schema file that contains the enum
                 or ruleset
+
+            namespace (str, optional): The alias for the imported resource to
+                make them unique if the same resource name is not unique.
+                If one is not present, then this will be `None`
 
         Raises:
             ValueError: If the `item` or `path` parameters are `None`
@@ -348,8 +357,11 @@ class ImportStatement(YamlatorType):
 
         self._item = item
         self._path = path
+        self._namespace = namespace
 
         name = f'({item}){path}'
+        if namespace is not None:
+            name = f'({namespace}.{item}){path}'
         super().__init__(name, ContainerTypes.IMPORT)
 
     @property
@@ -359,6 +371,10 @@ class ImportStatement(YamlatorType):
     @property
     def path(self) -> str:
         return self._path
+
+    @property
+    def namespace(self) -> str:
+        return self._namespace
 
 
 class YamlatorSchema:
@@ -493,7 +509,7 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
         # loading the same schema file multiple times
         import_statements = defaultdict(list)
         for state in imports:
-            import_statements[state.path].append(state.item)
+            import_statements[state.path].append((state.item, state.namespace))
         self._imports = import_statements
 
     @property

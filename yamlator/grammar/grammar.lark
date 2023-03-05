@@ -16,14 +16,14 @@ start: instructions*
 schema_entry: "schema" "{" rule+ "}"
 strict_schema_entry: "strict schema" "{" rule+ "}"
 
-import_statement: "import" /[A-Z]{1}[a-zA-Z0-9_]+/ "from" /\"(?:[\S]+\/)*[\S]+.ys\"/
+import_statement: "import" CONTAINER_TYPE_NAME "from" /\"(?:[\S]+\/)*[\S]+.ys\"/ ("as" NAMESPACE)?
 
-ruleset: "ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
-strict_ruleset: "strict ruleset" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" rule+ "}"
+ruleset: "ruleset" CONTAINER_TYPE_NAME "{" rule+ "}"
+strict_ruleset: "strict ruleset" CONTAINER_TYPE_NAME" {" rule+ "}"
 
 // Enum constructs
-enum: "enum" /[A-Z]{1}[a-zA-Z0-9_]+/ "{" enum_item+ "}"
-enum_item: /[A-Z0-9_]+/ "=" values
+enum: "enum" CONTAINER_TYPE_NAME "{" enum_item+ "}"
+enum_item: ENUM_ITEM_NAME "=" values
 
 // Rule definitions
 ?rule: required_rule
@@ -55,11 +55,14 @@ float_type: "float"
 bool_type: "bool"
 list_type: "list""(" type ")"
 map_type: "map""(" type ")"
-container_type: /[A-Z]{1}[a-zA-Z0-9_]+/
+container_type: (NAMESPACE".")? CONTAINER_TYPE_NAME
 regex_type: "regex""(" string ")"
 union_type: "union""(" [type ("," type)+] ")"
 
 NEW_LINES: "\n"+
+NAMESPACE: /[a-z]+/
+CONTAINER_TYPE_NAME: /[A-Z]{1}[a-zA-Z0-9_]+/
+ENUM_ITEM_NAME: /[A-Z0-9_]+/
 
 string: ESCAPED_STRING
 

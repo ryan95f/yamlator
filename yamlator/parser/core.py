@@ -192,14 +192,17 @@ class SchemaTransformer(Transformer):
         self.seen_constructs[name] = SchemaTypes.ENUM
         return YamlatorEnum(name.value, enums)
 
-    def container_type(self, token: 'list[Token]') -> RuleType:
+    def container_type(self, tokens: 'list[Token]') -> RuleType:
         """Transforms a container type token into a RuleType object
 
         Raises:
             yamlator.exceptions.ConstructNotFoundError: Raised if the
                 enum or ruleset cannot be found
         """
-        name = token[0]
+        name = tokens[0]
+        if len(tokens) > 1:
+            name = f'{tokens[0]}.{tokens[1]}'
+
         schema_type = self.seen_constructs.get(name, SchemaTypes.UNKNOWN)
         rule_type = RuleType(schema_type=schema_type, lookup=name)
         if schema_type == SchemaTypes.UNKNOWN:
@@ -266,8 +269,15 @@ class SchemaTransformer(Transformer):
         """
         item = tokens[0]
         path = tokens[1]
+
+        namespace = None
+        try:
+            namespace = tokens[2].value
+        except IndexError:
+            pass
+
         path = _QUOTES_REGEX.sub('', path.value)
-        return ImportStatement(item.value, path)
+        return ImportStatement(item.value, path, namespace)
 
 
 class _InstructionHandler:

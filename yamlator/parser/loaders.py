@@ -2,11 +2,11 @@
 import re
 import os
 
+from typing import List
 from yamlator.utils import load_schema
 from yamlator.types import RuleType
 from yamlator.types import YamlatorSchema
-from yamlator.types import YamlatorRuleset
-from yamlator.types import YamlatorEnum
+from yamlator.types import YamlatorType
 from yamlator.types import SchemaTypes
 from yamlator.types import PartiallyLoadedYamlatorSchema
 from yamlator.parser.core import parse_schema
@@ -131,23 +131,82 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
         imported_rulesets = schema.rulesets
         imported_enums = schema.enums
 
-        for resource in resource_type:
-            ruleset: YamlatorRuleset = imported_rulesets.get(resource)
-            if ruleset is not None:
-                root_rulesets[ruleset.name] = ruleset
+        for (resource, namespace) in resource_type:
+            has_mapped_rulesets = map_imported_resource(namespace,
+                                                        resource,
+                                                        root_rulesets,
+                                                        imported_rulesets)
+            if has_mapped_rulesets:
                 continue
 
-            enum: YamlatorEnum = imported_enums.get(resource)
-            if enum is not None:
-                root_enums[enum.name] = enum
-                continue
+            map_imported_resource(namespace, resource,
+                                  root_enums, imported_enums)
 
     unknown_types = loaded_schema.unknowns_rule_types
     resolve_unknown_types(unknown_types, root_rulesets, root_enums)
     return YamlatorSchema(loaded_schema.root, root_rulesets, root_enums)
 
 
-def resolve_unknown_types(unknown_types: 'list[RuleType]',
+def map_imported_resource(namespace: str, resource_type: str,
+                          resource_lookup: dict,
+                          imported_resources: dict) -> dict:
+    """Maps the imported resources to the `resource_lookup` dictionary so that
+    the resource can be used in the schema that imported the type
+
+    Args:
+        namespace (str): The namespace given in the schema when importing
+            the resource. If the namespace is `None` then a namespace
+            was not used in the schema
+
+        resource_type (str): The resource type name. E.g if we had a ruleset
+            or enum defined in the schema, it may be called `Foo`.
+
+        resource_lookup (dict): A reference to a `dict` that requires the
+            resource to be mapped to the `resource_type` and/or `namespace
+
+        imported_resources (dict): A `dict` containing imported resources
+            from an imported schema. The parameter `resource_type` is used
+            to find the resource in `imported_resources`
+
+    Returns:
+        True if the imported type was successfully added to the
+        `resource_lookup` otherwise returns False to indicate
+        it could not find the resource in `imported_resources`
+
+    Raises:
+        ValueError: If the `resource_type`, `resource_lookup` or
+            `imported_resources` is `None`
+
+        TypeError: if `resource_lookup` or `imported_resources` is
+            not a `dict`
+    """
+    if resource_type is None:
+        raise ValueError('Parameter resource_type should not be None')
+
+    if resource_lookup is None:
+        raise ValueError('Parameter resource_lookup should not be None')
+
+    if imported_resources is None:
+        raise ValueError('Parameter imported_resources should not be None')
+
+    if not isinstance(resource_lookup, dict):
+        raise TypeError('Parameter resource_lookup should be a dictionary')
+
+    if not isinstance(imported_resources, dict):
+        raise TypeError('Parameter imported_resources should be a dictionary')
+
+    imported_type: YamlatorType = imported_resources.get(resource_type)
+    if imported_type is None:
+        return False
+
+    if namespace is not None:
+        resource_type = f'{namespace}.{resource_type}'
+
+    resource_lookup[resource_type] = imported_type
+    return True
+
+
+def resolve_unknown_types(unknown_types: List[RuleType],
                           rulesets: dict, enums: dict) -> bool:
     """Resolves any types that are marked as unknown since the ruleset
     or enum was imported into the schema. This function will go through
