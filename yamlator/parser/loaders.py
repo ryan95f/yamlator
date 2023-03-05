@@ -2,6 +2,7 @@
 import re
 import os
 
+from yamlator.utils import type_check
 from yamlator.utils import load_schema
 from yamlator.types import RuleType
 from yamlator.types import YamlatorSchema
@@ -146,16 +147,50 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
     return YamlatorSchema(loaded_schema.root, root_rulesets, root_enums)
 
 
-def map_imported_resource(namespace: str, resource: str, type_lookup: dict,
-                          imported_types: dict) -> dict:
-    imported_type: YamlatorType = imported_types.get(resource)
+@type_check
+def map_imported_resource(namespace: str, resource_type: str,
+                          resource_lookup: dict,
+                          imported_resources: dict) -> dict:
+    """Maps the imported resources to the `resource_lookup` dictionary so that
+    the resource can be used in the schema that imported the type
+
+    Args:
+        namespace (str): The namespace given in the schema when importing
+            the resource. If the namespace is `None` then a namespace
+            was not used in the schema
+
+        resource_type (str): The resource type name. E.g if we had a ruleset
+            or enum defined in the schema, it may be called `Foo`.
+
+        resource_lookup (dict): A reference to a `dict` that requires the
+            resource to be mapped to the `resource_type` and/or `namespace
+
+        imported_resources (dict): A `dict` containing imported resources
+            from an imported schema. This parameter `namespace` and
+            `resource_type` parameters are used to find the resource
+
+    Returns:
+        True if the imported type was successfully added to the
+        `resource_lookup` object otherwise returns False to indicate
+        it could not find the resource in `imported_resources`
+    """
+    if resource_type is None:
+        raise ValueError('Parameter resource_type should not be None')
+
+    if resource_lookup is None:
+        raise ValueError('Parameter resource_lookup should not be None')
+
+    if imported_resources is None:
+        raise ValueError('Parameter imported_resources should not be None')
+
+    imported_type: YamlatorType = imported_resources.get(resource_type)
     if imported_type is None:
         return False
 
     if namespace is not None:
-        resource = f'{namespace}.{resource}'
+        resource_type = f'{namespace}.{resource_type}'
 
-    type_lookup[resource] = imported_type
+    resource_lookup[resource_type] = imported_type
     return True
 
 
