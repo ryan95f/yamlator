@@ -26,6 +26,7 @@ from yamlator.types import UnionRuleType
 from yamlator.types import EnumItem
 from yamlator.types import SchemaTypes
 from yamlator.types import ImportStatement
+from yamlator.types import YamlatorImportContainer
 from yamlator.exceptions import NestedUnionError
 from yamlator.exceptions import SchemaParseError
 
@@ -268,8 +269,10 @@ class SchemaTransformer(Transformer):
         """Transforms an import statement into a
         `yamlator.types.ImportStatement` object
         """
-        item = tokens[0]
+        items: 'list[Token]' = tokens[0]
+
         path = tokens[1]
+        path = _QUOTES_REGEX.sub('', path.value)
 
         namespace = None
         try:
@@ -277,8 +280,13 @@ class SchemaTransformer(Transformer):
         except IndexError:
             pass
 
-        path = _QUOTES_REGEX.sub('', path.value)
-        return ImportStatement(item.value, path, namespace)
+        statements = []
+        for item in items:
+            statements.append(ImportStatement(item.value, path, namespace))
+        return YamlatorImportContainer(statements)
+
+    def imported_types(self, tokens: 'list[Token]') -> 'list[Token]':
+        return tokens
 
 
 class GrammarKeywords(str, enum.Enum):
@@ -360,7 +368,8 @@ class _ImportInstructionHandler(_InstructionHandler):
             super().handle(instruction)
             return
 
-        self.imports.append(instruction)
+        instruction: YamlatorImportContainer = instruction
+        self.imports.extend(instruction.imports)
 
 
 class SchemaSyntaxError(SyntaxError):

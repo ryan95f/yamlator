@@ -2,6 +2,7 @@
 
 import re
 import enum
+import random 
 
 from typing import Union
 from typing import Iterator
@@ -311,7 +312,7 @@ class YamlatorEnum(YamlatorType):
         return self._items.copy()
 
 
-class ImportStatement(YamlatorType):
+class ImportStatement:
     """Represents a import statement in the Yamlator schema
 
     Attributes:
@@ -359,11 +360,6 @@ class ImportStatement(YamlatorType):
         self._path = path
         self._namespace = namespace
 
-        name = f'({item}){path}'
-        if namespace is not None:
-            name = f'({namespace}.{item}){path}'
-        super().__init__(name, ContainerTypes.IMPORT)
-
     @property
     def item(self) -> str:
         return self._item
@@ -375,6 +371,14 @@ class ImportStatement(YamlatorType):
     @property
     def namespace(self) -> str:
         return self._namespace
+
+
+class YamlatorImportContainer(YamlatorType):
+    def __init__(self, imports: Iterator[ImportStatement]):
+        self.imports = imports
+
+        container_number = str(random.randint(1, 10000))
+        super().__init__(container_number, ContainerTypes.IMPORT)
 
 
 class YamlatorSchema:
