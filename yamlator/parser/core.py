@@ -25,8 +25,8 @@ from yamlator.types import RuleType
 from yamlator.types import UnionRuleType
 from yamlator.types import EnumItem
 from yamlator.types import SchemaTypes
+from yamlator.types import ImportedType
 from yamlator.types import ImportStatement
-from yamlator.types import YamlatorImportContainer
 from yamlator.exceptions import NestedUnionError
 from yamlator.exceptions import SchemaParseError
 
@@ -265,9 +265,9 @@ class SchemaTransformer(Transformer):
         """
         return _QUOTES_REGEX.sub('', token)
 
-    def import_statement(self, tokens: Iterator[Token]) -> ImportStatement:
+    def import_statement(self, tokens: Iterator[Token]) -> ImportedType:
         """Transforms an import statement into a
-        `yamlator.types.ImportStatement` object
+        `yamlator.types.ImportedType` object
         """
         items: Iterator[Token] = tokens[0]
 
@@ -282,8 +282,8 @@ class SchemaTransformer(Transformer):
 
         statements = []
         for item in items:
-            statements.append(ImportStatement(item.value, path, namespace))
-        return YamlatorImportContainer(statements)
+            statements.append(ImportedType(item.value, path, namespace))
+        return ImportStatement(statements)
 
     def imported_types(self, tokens: Iterator[Token]) -> Iterator[Token]:
         # This method is needed to prevent Lark from wrapping the tokens
@@ -370,7 +370,7 @@ class _ImportInstructionHandler(_InstructionHandler):
             super().handle(instruction)
             return
 
-        instruction: YamlatorImportContainer = instruction
+        instruction: ImportStatement = instruction
         self.imports.extend(instruction.imports)
 
 

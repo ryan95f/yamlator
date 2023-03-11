@@ -7,7 +7,7 @@ from parameterized import parameterized
 from yamlator.types import Rule
 from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
-from yamlator.types import ImportStatement
+from yamlator.types import ImportedType
 from yamlator.types import YamlatorRuleset
 from yamlator.types import PartiallyLoadedYamlatorSchema
 from yamlator.parser.loaders import load_schema_imports
@@ -68,9 +68,9 @@ class TestLoadSchemaImports(unittest.TestCase):
             rulesets={},
             enums={},
             imports=[
-                ImportStatement('Employee', 'base.ys'),
-                ImportStatement('User', 'base.ys'),
-                ImportStatement('Status', 'base.ys'),
+                ImportedType('Employee', 'base.ys'),
+                ImportedType('User', 'base.ys'),
+                ImportedType('Status', 'base.ys'),
             ],
             unknowns=unknown_types
         )

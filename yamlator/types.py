@@ -312,7 +312,7 @@ class YamlatorEnum(YamlatorType):
         return self._items.copy()
 
 
-class ImportStatement:
+class ImportedType:
     """Represents a import statement in the Yamlator schema
 
     Attributes:
@@ -326,7 +326,7 @@ class ImportStatement:
     """
 
     def __init__(self, item: str, path: str, namespace: str = None):
-        """ImportStatement init
+        """ImportedType init
 
         Args:
             item (str): The name of the enum or ruleset that is being imported
@@ -373,10 +373,25 @@ class ImportStatement:
         return self._namespace
 
 
-class YamlatorImportContainer(YamlatorType):
-    def __init__(self, imports: Iterator[ImportStatement]):
+class ImportStatement(YamlatorType):
+    """Maintains the imported types that were defined in a import
+    statement
+
+    Attributes:
+        imports (Iterator[yamlator.types.ImportedType]): The types that
+            were being imported in the Yamlator schema
+    """
+
+    def __init__(self, imports: Iterator[ImportedType]):
+        """ImportStatement init
+
+        Args:
+            imports (Iterator[yamlator.types.ImportedType]): The types
+                that have been defined in the import statement
+        """
         self.imports = imports
 
+        # Assigned a random number to give each container a unique name
         container_number = str(random.randint(1, 10000))
         super().__init__(container_number, ContainerTypes.IMPORT)
 
@@ -466,8 +481,8 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
             in the schema file. The key will be the enum name and the value
             will be a `yamlator.types.YamlatorEnum` object
 
-        imports (Iterator[yamlator.types.ImportStatement]): A list of
-            `yamlator.types.ImportStatement` that contain all the import
+        imports (Iterator[yamlator.types.ImportedType]): A list of
+            `yamlator.types.ImportedType` that contain all the import
             statements that were defined in the schema file
 
         unknowns (Iterator[yamlator.types.RuleType]): A list of
@@ -476,7 +491,7 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
     """
 
     def __init__(self, root: YamlatorRuleset, rulesets: dict, enums: dict,
-                 imports: Iterator[ImportStatement],
+                 imports: Iterator[ImportedType],
                  unknowns: Iterator[RuleType] = None):
         """PartiallyLoadedYamlatorSchema init
 
@@ -492,8 +507,8 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
                 in the schema file. The key will be the enum name and the
                 value will be a `yamlator.types.YamlatorEnum` object
 
-            imports (Iterator[yamlator.types.ImportStatement]): A list
-                `yamlator.types.ImportStatement` that contain all import
+            imports (Iterator[yamlator.types.ImportedType]): A list
+                `yamlator.types.ImportedType` that contain all import
                 statements that were defined in the schema file
 
             unknowns (Iterator[yamlator.types.RuleType]): A list of
@@ -508,7 +523,7 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
 
         self.__group_imports(imports)
 
-    def __group_imports(self, imports: Iterator[ImportStatement]) -> None:
+    def __group_imports(self, imports: Iterator[ImportedType]) -> None:
         # Group imports and the requested type to prevent
         # loading the same schema file multiple times
         import_statements = defaultdict(list)
