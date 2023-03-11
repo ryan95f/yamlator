@@ -58,4 +58,4 @@
 
 * Added import statements to the Yamlator schema syntax
 * Added namespaces to the import statements with the `as` keyword
-* Improvements to the readability of the grammar file
+* Improvements to the grammar file to include new terminals
