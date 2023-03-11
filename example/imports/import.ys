@@ -1,7 +1,12 @@
 import Project from "../lists/lists.ys"
-import Values from "common.ys" as core
+import Values, Status from "common.ys" as core
 
 schema {
     user Project
     value core.Values
+    log Log
+}
+
+ruleset Log {
+    status core.Status
 }

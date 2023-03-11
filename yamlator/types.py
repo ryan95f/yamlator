@@ -2,6 +2,7 @@
 
 import re
 import enum
+import random
 
 from typing import Union
 from typing import Iterator
@@ -311,8 +312,15 @@ class YamlatorEnum(YamlatorType):
         return self._items.copy()
 
 
-class ImportStatement(YamlatorType):
-    """Represents a import statement in the Yamlator schema
+class ImportedType:
+    """Represents an imported type in the import statement. For example,
+    given the following import statement:
+
+    ```
+    import Project from "../lists/lists.ys"
+    ```
+
+    The `Project` in the statement will be represented by this class
 
     Attributes:
         item (str): The name of the enum or ruleset that is being imported
@@ -325,7 +333,7 @@ class ImportStatement(YamlatorType):
     """
 
     def __init__(self, item: str, path: str, namespace: str = None):
-        """ImportStatement init
+        """ImportedType init
 
         Args:
             item (str): The name of the enum or ruleset that is being imported
@@ -359,11 +367,6 @@ class ImportStatement(YamlatorType):
         self._path = path
         self._namespace = namespace
 
-        name = f'({item}){path}'
-        if namespace is not None:
-            name = f'({namespace}.{item}){path}'
-        super().__init__(name, ContainerTypes.IMPORT)
-
     @property
     def item(self) -> str:
         return self._item
@@ -375,6 +378,29 @@ class ImportStatement(YamlatorType):
     @property
     def namespace(self) -> str:
         return self._namespace
+
+
+class ImportStatement(YamlatorType):
+    """Represents an import statement in the schema by maintaining
+    all imported types.
+
+    Attributes:
+        imports (Iterator[yamlator.types.ImportedType]): The types that
+            were being imported in the Yamlator schema
+    """
+
+    def __init__(self, imports: Iterator[ImportedType]):
+        """ImportStatement init
+
+        Args:
+            imports (Iterator[yamlator.types.ImportedType]): The types
+                that have been defined in the import statement
+        """
+        self.imports = imports
+
+        # Assigned a random number to give each container a unique name
+        container_number = str(random.randint(1, 10000))
+        super().__init__(container_number, ContainerTypes.IMPORT)
 
 
 class YamlatorSchema:
@@ -462,8 +488,8 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
             in the schema file. The key will be the enum name and the value
             will be a `yamlator.types.YamlatorEnum` object
 
-        imports (Iterator[yamlator.types.ImportStatement]): A list of
-            `yamlator.types.ImportStatement` that contain all the import
+        imports (Iterator[yamlator.types.ImportedType]): A list of
+            `yamlator.types.ImportedType` that contain all the import
             statements that were defined in the schema file
 
         unknowns (Iterator[yamlator.types.RuleType]): A list of
@@ -472,7 +498,7 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
     """
 
     def __init__(self, root: YamlatorRuleset, rulesets: dict, enums: dict,
-                 imports: Iterator[ImportStatement],
+                 imports: Iterator[ImportedType],
                  unknowns: Iterator[RuleType] = None):
         """PartiallyLoadedYamlatorSchema init
 
@@ -488,8 +514,8 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
                 in the schema file. The key will be the enum name and the
                 value will be a `yamlator.types.YamlatorEnum` object
 
-            imports (Iterator[yamlator.types.ImportStatement]): A list
-                `yamlator.types.ImportStatement` that contain all import
+            imports (Iterator[yamlator.types.ImportedType]): A list
+                `yamlator.types.ImportedType` that contain all import
                 statements that were defined in the schema file
 
             unknowns (Iterator[yamlator.types.RuleType]): A list of
@@ -504,7 +530,7 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
 
         self.__group_imports(imports)
 
-    def __group_imports(self, imports: Iterator[ImportStatement]) -> None:
+    def __group_imports(self, imports: Iterator[ImportedType]) -> None:
         # Group imports and the requested type to prevent
         # loading the same schema file multiple times
         import_statements = defaultdict(list)

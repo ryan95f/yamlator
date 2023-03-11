@@ -56,6 +56,6 @@
 
 ## v4.0.0 (TBC)
 
-* Added import statements to the Yamlator schema syntax
+* Added import statements to the Yamlator schema syntax that support importing one or more types
 * Added namespaces to the import statements with the `as` keyword
 * Improvements to the grammar file to include new terminals and remove duplicate constructs

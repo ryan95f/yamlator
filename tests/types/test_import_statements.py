@@ -1,13 +1,13 @@
-"""Test cases for the ImportStatement class"""
+"""Test cases for the ImportedType class"""
 
 import unittest
 
 from parameterized import parameterized
-from yamlator.types import ImportStatement
+from yamlator.types import ImportedType
 
 
-class TestImportStatement(unittest.TestCase):
-    """Test cases for the ImportStatement class"""
+class TestImportedType(unittest.TestCase):
+    """Test cases for the ImportedType class"""
 
     @parameterized.expand([
         ('with_none_item', None, './test', ValueError),
@@ -24,7 +24,7 @@ class TestImportStatement(unittest.TestCase):
         del name
 
         with self.assertRaises(expected_exception):
-            ImportStatement(item, path)
+            ImportedType(item, path)
 
 
 if __name__ == '__main__':

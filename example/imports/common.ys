@@ -3,3 +3,10 @@ import Project from "../strict_mode/strict.ys"
 enum Values {
     TEST = 1
 }
+
+enum Status {
+    SUCCESS = 0
+    ERR = 1
+    FAILURE = 2
+    WARNING = 3
+}
