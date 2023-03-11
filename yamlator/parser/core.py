@@ -92,24 +92,24 @@ class SchemaTransformer(Transformer):
         self.seen_constructs = {}
         self.unknown_types = []
 
-    def rule_name(self, tokens: 'list[Token]') -> Token:
+    def rule_name(self, tokens: Iterator[Token]) -> Token:
         """Processes the rule name by removing any quotes"""
         token = tokens[0]
         name = token.value.strip()
         name = _QUOTES_REGEX.sub('', name)
         return Token(value=name, type_=token.type)
 
-    def required_rule(self, tokens: 'list[Token]') -> Rule:
+    def required_rule(self, tokens: Iterator[Token]) -> Rule:
         """Transforms the required rule tokens in a Rule object"""
         (name, rtype) = tokens[0:2]
         return Rule(name.value, rtype, True)
 
-    def optional_rule(self, tokens: 'list[Token]') -> Rule:
+    def optional_rule(self, tokens: Iterator[Token]) -> Rule:
         """Transforms the optional rule tokens in a Rule object"""
         (name, rtype) = tokens[0:2]
         return Rule(name.value, rtype, False)
 
-    def ruleset(self, tokens: 'list[Token]') -> YamlatorRuleset:
+    def ruleset(self, tokens: Iterator[Token]) -> YamlatorRuleset:
         """Transforms the ruleset tokens into a YamlatorRuleset object"""
 
         is_strict = False
@@ -146,40 +146,40 @@ class SchemaTransformer(Transformer):
         return PartiallyLoadedYamlatorSchema(root, rules, enums,
                                              imports, self.unknown_types)
 
-    def str_type(self, _: 'list[Token]') -> RuleType:
+    def str_type(self, _: Iterator[Token]) -> RuleType:
         """Transforms a string type token into a RuleType object"""
         return RuleType(schema_type=SchemaTypes.STR)
 
-    def int_type(self, _: 'list[Token]') -> RuleType:
+    def int_type(self, _: Iterator[Token]) -> RuleType:
         """Transforms a int type token into a RuleType object"""
         return RuleType(schema_type=SchemaTypes.INT)
 
-    def float_type(self, _: 'list[Token]') -> RuleType:
+    def float_type(self, _: Iterator[Token]) -> RuleType:
         """Transforms a float type token into a RuleType object"""
         return RuleType(schema_type=SchemaTypes.FLOAT)
 
-    def list_type(self, tokens: 'list[Token]') -> RuleType:
+    def list_type(self, tokens: Iterator[Token]) -> RuleType:
         """Transforms a list type token into a RuleType object"""
         return RuleType(schema_type=SchemaTypes.LIST, sub_type=tokens[0])
 
-    def map_type(self, tokens: 'list[Token]') -> RuleType:
+    def map_type(self, tokens: Iterator[Token]) -> RuleType:
         """Transforms a map type token into a RuleType object"""
         return RuleType(schema_type=SchemaTypes.MAP, sub_type=tokens[0])
 
-    def any_type(self, _: 'list[Token]') -> RuleType:
+    def any_type(self, _: Iterator[Token]) -> RuleType:
         """Transforms the any type token into a RuleType object"""
         return RuleType(schema_type=SchemaTypes.ANY)
 
-    def bool_type(self, _: 'list[Token]') -> RuleType:
+    def bool_type(self, _: Iterator[Token]) -> RuleType:
         """Transforms a bool type token into a RuleType object"""
         return RuleType(schema_type=SchemaTypes.BOOL)
 
-    def enum_item(self, tokens: 'list[Token]') -> EnumItem:
+    def enum_item(self, tokens: Iterator[Token]) -> EnumItem:
         """Transforms a enum item token into a EnumItem object"""
         name, value = tokens
         return EnumItem(name=name, value=value)
 
-    def enum(self, tokens: 'list[Token]') -> YamlatorEnum:
+    def enum(self, tokens: Iterator[Token]) -> YamlatorEnum:
         """Transforms a enum token into a YamlatorEnum object"""
         enums = {}
 
@@ -191,7 +191,7 @@ class SchemaTransformer(Transformer):
         self.seen_constructs[name] = SchemaTypes.ENUM
         return YamlatorEnum(name.value, enums)
 
-    def container_type(self, tokens: 'list[Token]') -> RuleType:
+    def container_type(self, tokens: Iterator[Token]) -> RuleType:
         """Transforms a container type token into a RuleType object
 
         Raises:
@@ -208,7 +208,7 @@ class SchemaTransformer(Transformer):
             self.unknown_types.append(rule_type)
         return rule_type
 
-    def regex_type(self, tokens: 'list[Token]') -> RuleType:
+    def regex_type(self, tokens: Iterator[Token]) -> RuleType:
         """Transforms a regex type token into a RuleType object"""
         (regex, ) = tokens
         return RuleType(schema_type=SchemaTypes.REGEX, regex=regex)
@@ -226,7 +226,7 @@ class SchemaTransformer(Transformer):
                 raise NestedUnionError()
         return UnionRuleType(sub_types=tokens)
 
-    def type(self, tokens: 'list[Token]') -> Any:
+    def type(self, tokens: Iterator[Token]) -> Any:
         """Extracts the type tokens and passes them onto
         the next stage in the transformer
         """
@@ -265,11 +265,11 @@ class SchemaTransformer(Transformer):
         """
         return _QUOTES_REGEX.sub('', token)
 
-    def import_statement(self, tokens: 'list[Token]') -> ImportStatement:
+    def import_statement(self, tokens: Iterator[Token]) -> ImportStatement:
         """Transforms an import statement into a
         `yamlator.types.ImportStatement` object
         """
-        items: 'list[Token]' = tokens[0]
+        items: Iterator[Token] = tokens[0]
 
         path = tokens[1]
         path = _QUOTES_REGEX.sub('', path.value)
@@ -285,7 +285,9 @@ class SchemaTransformer(Transformer):
             statements.append(ImportStatement(item.value, path, namespace))
         return YamlatorImportContainer(statements)
 
-    def imported_types(self, tokens: 'list[Token]') -> 'list[Token]':
+    def imported_types(self, tokens: Iterator[Token]) -> Iterator[Token]:
+        # This method is needed to prevent Lark from wrapping the tokens
+        # a tree object
         return tokens
 
 

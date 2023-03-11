@@ -2,7 +2,7 @@
 
 import re
 import enum
-import random 
+import random
 
 from typing import Union
 from typing import Iterator
