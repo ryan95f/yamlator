@@ -265,9 +265,9 @@ class SchemaTransformer(Transformer):
         """
         return _QUOTES_REGEX.sub('', token)
 
-    def import_statement(self, tokens: Iterator[Token]) -> ImportedType:
+    def import_statement(self, tokens: Iterator[Token]) -> ImportStatement:
         """Transforms an import statement into a
-        `yamlator.types.ImportedType` object
+        `yamlator.types.ImportStatement` object
         """
         items: Iterator[Token] = tokens[0]
 

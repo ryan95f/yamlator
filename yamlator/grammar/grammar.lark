@@ -14,8 +14,7 @@ start: instructions*
 
 
 import_statement: "import" imported_types "from" IMPORT_STATEMENT_PATH ("as" NAMESPACE)?
-
-imported_types: (CONTAINER_TYPE_NAME ("," CONTAINER_TYPE_NAME)* )
+imported_types: (CONTAINER_TYPE_NAME ("," CONTAINER_TYPE_NAME)*)
 
 schema_entry: STRICT_KEYWORD? "schema" "{" rule+ "}"
 ruleset: STRICT_KEYWORD? "ruleset" CONTAINER_TYPE_NAME "{" rule+ "}"

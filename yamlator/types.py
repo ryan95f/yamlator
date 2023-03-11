@@ -313,7 +313,14 @@ class YamlatorEnum(YamlatorType):
 
 
 class ImportedType:
-    """Represents a import statement in the Yamlator schema
+    """Represents an imported type in the import statement. For example,
+    given the following import statement:
+
+    ```
+    import Project from "../lists/lists.ys"
+    ```
+
+    The `Project` in the statement will be represented by this class
 
     Attributes:
         item (str): The name of the enum or ruleset that is being imported
@@ -374,8 +381,8 @@ class ImportedType:
 
 
 class ImportStatement(YamlatorType):
-    """Maintains the imported types that were defined in a import
-    statement
+    """Represents an import statement in the schema by maintaining
+    all imported types.
 
     Attributes:
         imports (Iterator[yamlator.types.ImportedType]): The types that
