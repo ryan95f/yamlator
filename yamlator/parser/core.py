@@ -2,6 +2,7 @@
 
 import re
 import os
+import enum
 
 from pathlib import Path
 from typing import Iterator
@@ -109,19 +110,16 @@ class SchemaTransformer(Transformer):
 
     def ruleset(self, tokens: 'list[Token]') -> YamlatorRuleset:
         """Transforms the ruleset tokens into a YamlatorRuleset object"""
-        name = tokens[0].value
-        rules = tokens[1:]
-        self.seen_constructs[name] = SchemaTypes.RULESET
-        return YamlatorRuleset(name, rules)
 
-    def strict_ruleset(self, tokens: 'list[Token]') -> YamlatorRuleset:
-        """Transforms the ruleset tokens into a YamlatorRuleset object
-        and marks the ruleset as being in strict mode
-        """
+        is_strict = False
+        if tokens[0].type == GrammarKeywords.STRICT:
+            tokens = tokens[1:]
+            is_strict = True
+
         name = tokens[0].value
         rules = tokens[1:]
         self.seen_constructs[name] = SchemaTypes.RULESET
-        return YamlatorRuleset(name, rules, is_strict=True)
+        return YamlatorRuleset(name, rules, is_strict)
 
     def start(self, instructions: Iterator[YamlatorType]) \
             -> PartiallyLoadedYamlatorSchema:
@@ -234,17 +232,20 @@ class SchemaTransformer(Transformer):
         (t, ) = tokens
         return t
 
-    def schema_entry(self, rules: list) -> YamlatorRuleset:
+    def schema_entry(self, tokens: list) -> YamlatorRuleset:
         """Transforms the schema entry point token into a YamlatorRuleset called
         main that will act as the entry point for validating the YAML data
         """
-        return YamlatorRuleset('main', rules)
+        first_token = tokens[0]
 
-    def strict_schema_entry(self, rules: list) -> YamlatorRuleset:
-        """Transforms the schema entry point token into a YamlatorRuleset called
-        main and put the ruleset into `strict` mode
-        """
-        return YamlatorRuleset('main', rules, is_strict=True)
+        # If the first item is not a `lark.Token`
+        # then the tokens in the list are all rules
+        if not isinstance(first_token, Token):
+            return YamlatorRuleset('main', tokens)
+
+        # If the first type is `lark.Token` then the
+        # first token is an indicator it is in strict mode
+        return YamlatorRuleset('main', tokens[1:], True)
 
     @v_args(inline=True)
     def integer(self, token: str) -> int:
@@ -278,6 +279,10 @@ class SchemaTransformer(Transformer):
 
         path = _QUOTES_REGEX.sub('', path.value)
         return ImportStatement(item.value, path, namespace)
+
+
+class GrammarKeywords(str, enum.Enum):
+    STRICT = 'STRICT_KEYWORD'
 
 
 class _InstructionHandler:

@@ -4,22 +4,18 @@ start: instructions*
 // Collection constructs
 ?instructions: enum
             | ruleset
-            | strict_ruleset
             | schema_entry
-            | strict_schema_entry
             | import_statement
 
 ?values: INT -> integer
        | FLOAT -> float
        | string
 
-schema_entry: "schema" "{" rule+ "}"
-strict_schema_entry: "strict schema" "{" rule+ "}"
 
-import_statement: "import" CONTAINER_TYPE_NAME "from" /\"(?:[\S]+\/)*[\S]+.ys\"/ ("as" NAMESPACE)?
+import_statement: "import" CONTAINER_TYPE_NAME "from" IMPORT_STATEMENT_PATH ("as" NAMESPACE)?
 
-ruleset: "ruleset" CONTAINER_TYPE_NAME "{" rule+ "}"
-strict_ruleset: "strict ruleset" CONTAINER_TYPE_NAME" {" rule+ "}"
+schema_entry: STRICT_KEYWORD? "schema" "{" rule+ "}"
+ruleset: STRICT_KEYWORD? "ruleset" CONTAINER_TYPE_NAME "{" rule+ "}"
 
 // Enum constructs
 enum: "enum" CONTAINER_TYPE_NAME "{" enum_item+ "}"
@@ -29,12 +25,12 @@ enum_item: ENUM_ITEM_NAME "=" values
 ?rule: required_rule
      | optional_rule
 
-rule_name: /[\S]+/
-         | /\"[\S ]+\"/
-
 required_rule: rule_name type "required" NEW_LINES
              | rule_name type NEW_LINES
 optional_rule: rule_name type "optional" NEW_LINES
+
+rule_name: /[\S]+/
+         | /\"[\S ]+\"/
 
 // Data types for rules
 type: int_type
@@ -59,12 +55,16 @@ container_type: (NAMESPACE".")? CONTAINER_TYPE_NAME
 regex_type: "regex""(" string ")"
 union_type: "union""(" [type ("," type)+] ")"
 
+string: ESCAPED_STRING
+
+// Terminals
 NEW_LINES: "\n"+
 NAMESPACE: /[a-z]+/
 CONTAINER_TYPE_NAME: /[A-Z]{1}[a-zA-Z0-9_]+/
+IMPORT_STATEMENT_PATH: /\"(?:[\S]+\/)*[\S]+.ys\"/
 ENUM_ITEM_NAME: /[A-Z0-9_]+/
 
-string: ESCAPED_STRING
+STRICT_KEYWORD: "strict"
 
 %import common.SH_COMMENT
 %import common.ESCAPED_STRING

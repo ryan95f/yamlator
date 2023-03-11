@@ -1,4 +1,4 @@
-"""Test cases for the SchemaTransformer"""
+"""Test cases for the `SchemaTransformer` class"""
 
 
 import re
@@ -15,10 +15,11 @@ from yamlator.types import RuleType
 from yamlator.types import YamlatorEnum
 from yamlator.types import YamlatorRuleset
 from yamlator.types import SchemaTypes
+from yamlator.parser.core import GrammarKeywords
 
 
 class TestSchemaTransformer(unittest.TestCase):
-    """Tests the Schema Transformer"""
+    """Tests the SchemaTransformer class"""
 
     def setUp(self):
         self.transformer = SchemaTransformer()
@@ -69,10 +70,11 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
         self.assertFalse(ruleset.is_strict)
 
-    def test_strict_ruleset(self):
+    def test_ruleset_with_strict_token(self):
+        strict_token = lark.Token(type_=GrammarKeywords.STRICT, value='')
         name = lark.Token(type_='TOKEN', value='person')
-        tokens = (name, *self.ruleset_rules)
-        ruleset = self.transformer.strict_ruleset(tokens)
+        tokens = (strict_token, name, *self.ruleset_rules)
+        ruleset = self.transformer.ruleset(tokens)
 
         self.assertEqual(name.value, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
@@ -223,10 +225,11 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
         self.assertFalse(ruleset.is_strict)
 
-    def test_strict_schema_entry(self):
+    def test_schema_entry_with_strict_token(self):
         expected_ruleset_name = 'main'
-        tokens = (*self.ruleset_rules, )
-        ruleset = self.transformer.strict_schema_entry(tokens)
+        strict_token = lark.Token(type_=GrammarKeywords.STRICT, value='')
+        tokens = (strict_token, *self.ruleset_rules, )
+        ruleset = self.transformer.schema_entry(tokens)
 
         self.assertEqual(expected_ruleset_name, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
