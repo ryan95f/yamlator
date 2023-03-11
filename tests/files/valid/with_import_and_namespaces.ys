@@ -1,8 +1,12 @@
 import Employee from "base.ys" as e
-import User from "base.ys"
-import Status from "base.ys" as core
+import Status, User from "base.ys" as core
 
 schema {
-    employees list(e.Employee)
+    employees list(Employee)
     status core.Status
+}
+
+ruleset Employee {
+    employee e.Employee
+    userDetails core.User
 }

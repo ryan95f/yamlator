@@ -1,6 +1,6 @@
 import Employee from "base.ys"
 import User from "base.ys"
-import Status from "base.ys"
+import Status, User from "base.ys"
 
 schema {
     employees list(Employee)
