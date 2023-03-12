@@ -1,2 +1,3 @@
-user: {}
-value: 1
+project:
+  version: 1
+  name: test

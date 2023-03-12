@@ -69,6 +69,7 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(name.value, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
         self.assertFalse(ruleset.is_strict)
+        self.assertIsNone(ruleset.parent)
 
     def test_ruleset_with_strict_token(self):
         strict_token = lark.Token(type_=GrammarKeywords.STRICT, value='')
@@ -79,6 +80,24 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(name.value, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
         self.assertTrue(ruleset.is_strict)
+        self.assertIsNone(ruleset.parent)
+
+    def test_ruleset_with_parent(self):
+        strict_token = lark.Token(type_=GrammarKeywords.STRICT, value='')
+        name = lark.Token(type_='TOKEN', value='person')
+        parent = RuleType(SchemaTypes.RULESET, lookup='Foo')
+        tokens = (strict_token, name, parent, *self.ruleset_rules)
+        ruleset = self.transformer.ruleset(tokens)
+
+        self.assertEqual(name.value, ruleset.name)
+        self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
+        self.assertTrue(ruleset.is_strict)
+        self.assertIsNotNone(ruleset.parent)
+
+    def test_ruleset_parent(self):
+        parent_rule_type = RuleType(SchemaTypes.RULESET, lookup='Foo')
+        result = self.transformer.ruleset_parent([parent_rule_type])
+        self.assertEqual(parent_rule_type, result)
 
     def test_start(self):
         # This will be zero since main is removed from the dict

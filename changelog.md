@@ -58,4 +58,5 @@
 
 * Added import statements to the Yamlator schema syntax that support importing one or more types
 * Added namespaces to the import statements with the `as` keyword
+* Added ruleset inheritance to allow a ruleset to inherit rules from a different ruleset. If the child ruleset has a rule with the same name as the parent, then the child rule name will be preserved to reflect that the parent has been overridden. This works for rulesets where the parent is in the same or different schema files
 * Improvements to the grammar file to include new terminals and remove duplicate constructs

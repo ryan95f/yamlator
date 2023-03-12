@@ -111,7 +111,6 @@ class SchemaTransformer(Transformer):
 
     def ruleset(self, tokens: Iterator[Token]) -> YamlatorRuleset:
         """Transforms the ruleset tokens into a YamlatorRuleset object"""
-
         is_strict = False
         if tokens[0].type == GrammarKeywords.STRICT:
             tokens = tokens[1:]
@@ -119,8 +118,18 @@ class SchemaTransformer(Transformer):
 
         name = tokens[0].value
         rules = tokens[1:]
+
         self.seen_constructs[name] = SchemaTypes.RULESET
+        parent_token = tokens[1]
+        if isinstance(parent_token, RuleType):
+            return YamlatorRuleset(name, tokens[2:], is_strict, parent_token)
         return YamlatorRuleset(name, rules, is_strict)
+
+    def ruleset_parent(self, tokens: Iterator[RuleType]) -> RuleType:
+        """Extracts the ruleset parent from the token list"""
+        # This method is needed to prevent Lark from wrapping the tokens
+        # a tree object
+        return tokens[0]
 
     def start(self, instructions: Iterator[YamlatorType]) \
             -> PartiallyLoadedYamlatorSchema:

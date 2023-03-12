@@ -1,12 +1,13 @@
-import Project from "../lists/lists.ys"
-import Values, Status from "common.ys" as core
+import Project from "../lists/lists.ys" as base
+import Values, Status, ProjectDetails from "common.ys" as core
 
 schema {
-    user Project
+    project Project
     value core.Values
-    log Log
 }
 
-ruleset Log {
+strict ruleset Project(base.Project) {
     status core.Status
+    apis list(str)
+    details core.ProjectDetails
 }

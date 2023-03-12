@@ -5,7 +5,7 @@ import enum
 import random
 
 from typing import Union
-from typing import Iterator
+from typing import List
 from collections import namedtuple
 from collections import defaultdict
 
@@ -144,6 +144,12 @@ class RuleType:
                                         self.lookup,
                                         self.sub_type)
 
+        if self.schema_type == SchemaTypes.UNKNOWN:
+            repr_template = '{}(type={}, lookup={})'
+            return repr_template.format(self.__class__.__name__,
+                                        self.schema_type,
+                                        self.lookup)
+
         repr_template = '{}(type={}, sub_type={})'
         return repr_template.format(self.__class__.__name__,
                                     self.schema_type,
@@ -154,24 +160,24 @@ class UnionRuleType(RuleType):
     """Represents a Union data type that is defined in the Yamlator schema
 
     Attributes:
-        sub_types (Iterator[yamlator.types.RuleType]): A list of sub types
+        sub_types (List[yamlator.types.RuleType]): A list of sub types
             that are considered valid types when validating the data. For
             example, given `Union(int, str)`, a rule type will be created
             for the `int` and `str`
     """
 
-    def __init__(self, sub_types: 'Iterator[RuleType]') -> None:
+    def __init__(self, sub_types: List[RuleType]) -> None:
         """UnionRuleType init
 
         Args:
-            sub_types (Iterator[yamlator.types.RuleType]): An iterable of rule
+            sub_types (List[yamlator.types.RuleType]): An iterable of rule
                 types that the union will compare
         """
         super().__init__(SchemaTypes.UNION)
         self._sub_types = sub_types
 
     @property
-    def sub_types(self) -> 'Iterator[RuleType]':
+    def sub_types(self) -> List[RuleType]:
         return self._sub_types
 
     def __str__(self) -> str:
@@ -238,35 +244,50 @@ class YamlatorRuleset(YamlatorType):
             representation of the current type. This will always be
             `ContainerTypes.RULESET`
 
-        rules (Iterator[yamlator.types.Rule]): The list of rules in the ruleset
+        rules (List[yamlator.types.Rule]): The list of rules in the ruleset
 
-        is_strict (bool, optional): If the ruleset is in strict mode. When
+        is_strict (bool): If the ruleset is in strict mode. When
             enabled any additional keys that are not part of the ruleset
             will raise a strict mode violation
+
+        parent (yamlator.types.RuleType): The parent ruleset which
+            this ruleset should inherit additional rules from. If a parent
+            is not specified this defaults to `None`
     """
 
-    def __init__(self, name: str, rules: Iterator[Rule],
-                 is_strict: bool = False):
+    def __init__(self, name: str, rules: List[Rule],
+                 is_strict: bool = False, parent: RuleType = None):
         """YamlatorRuleset init
 
         Args:
             name (str): The name of the ruleset
+
             rules (list): A list of rules for the ruleset
+
             is_strict (bool, optional): Sets the ruleset to be in strict mode.
                 When used with the validators, it will check to ensure any
                 extra fields are raised as a violation
+
+            parent (yamlator.types.RuleType, optional): The parent ruleset
+                which this ruleset should inherit additional rules from.
+                To indicate this ruleset does not have a parent, set to `None`
         """
         super().__init__(name, ContainerTypes.RULESET)
         self._rules = rules
         self._is_strict = is_strict
+        self._parent = parent
 
     @property
-    def rules(self) -> Iterator[Rule]:
+    def rules(self) -> List[Rule]:
         return self._rules
 
     @property
     def is_strict(self) -> bool:
         return self._is_strict
+
+    @property
+    def parent(self) -> RuleType:
+        return self._parent
 
 
 class YamlatorEnum(YamlatorType):
@@ -385,15 +406,15 @@ class ImportStatement(YamlatorType):
     all imported types.
 
     Attributes:
-        imports (Iterator[yamlator.types.ImportedType]): The types that
+        imports (List[yamlator.types.ImportedType]): The types that
             were being imported in the Yamlator schema
     """
 
-    def __init__(self, imports: Iterator[ImportedType]):
+    def __init__(self, imports: List[ImportedType]):
         """ImportStatement init
 
         Args:
-            imports (Iterator[yamlator.types.ImportedType]): The types
+            imports (List[yamlator.types.ImportedType]): The types
                 that have been defined in the import statement
         """
         self.imports = imports
@@ -488,18 +509,18 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
             in the schema file. The key will be the enum name and the value
             will be a `yamlator.types.YamlatorEnum` object
 
-        imports (Iterator[yamlator.types.ImportedType]): A list of
+        imports (List[yamlator.types.ImportedType]): A list of
             `yamlator.types.ImportedType` that contain all the import
             statements that were defined in the schema file
 
-        unknowns (Iterator[yamlator.types.RuleType]): A list of
+        unknowns (List[yamlator.types.RuleType]): A list of
             `yamlator.types.RuleType` objects that have a schema type of
             `yamlator.types.SchemaTypes.UNKNOWN`
     """
 
     def __init__(self, root: YamlatorRuleset, rulesets: dict, enums: dict,
-                 imports: Iterator[ImportedType],
-                 unknowns: Iterator[RuleType] = None):
+                 imports: List[ImportedType],
+                 unknowns: List[RuleType] = None):
         """PartiallyLoadedYamlatorSchema init
 
         Args:
@@ -514,11 +535,11 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
                 in the schema file. The key will be the enum name and the
                 value will be a `yamlator.types.YamlatorEnum` object
 
-            imports (Iterator[yamlator.types.ImportedType]): A list
+            imports (List[yamlator.types.ImportedType]): A list
                 `yamlator.types.ImportedType` that contain all import
                 statements that were defined in the schema file
 
-            unknowns (Iterator[yamlator.types.RuleType]): A list of
+            unknowns (List[yamlator.types.RuleType]): A list of
                 `yamlator.types.RuleType` objects that have a schema type
                 of `yamlator.types.SchemaTypes.UNKNOWN`
         """
@@ -530,7 +551,7 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
 
         self.__group_imports(imports)
 
-    def __group_imports(self, imports: Iterator[ImportedType]) -> None:
+    def __group_imports(self, imports: List[ImportedType]) -> None:
         # Group imports and the requested type to prevent
         # loading the same schema file multiple times
         import_statements = defaultdict(list)
@@ -543,5 +564,5 @@ class PartiallyLoadedYamlatorSchema(YamlatorSchema):
         return self._imports.copy()
 
     @property
-    def unknowns_rule_types(self) -> Iterator[RuleType]:
+    def unknowns_rule_types(self) -> List[RuleType]:
         return self._unknowns.copy()
