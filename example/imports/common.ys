@@ -10,3 +10,8 @@ enum Status {
     FAILURE = 2
     WARNING = 3
 }
+
+ruleset ProjectDetails(Project) {
+    status Status
+    value int
+}

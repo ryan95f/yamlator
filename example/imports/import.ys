@@ -1,14 +1,12 @@
-import Project from "../lists/lists.ys" as wow
-# import Values, Status from "common.ys" as core
+import Project from "../lists/lists.ys" as base
+import Values, Status, ProjectDetails from "common.ys" as core
 
 schema {
-#    user Project
-#    value core.Values
-    log Test
+    project Project
+    value core.Values
 }
 
-
-
-strict ruleset Test(wow.Project) {
-    test str
+strict ruleset Project(base.Project) {
+    status core.Status
+    apis list(str)
 }

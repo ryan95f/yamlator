@@ -1,4 +1,3 @@
-user: {}
-value: 1
-log:
-  users: wow
+project:
+  version: 1
+  name: test
