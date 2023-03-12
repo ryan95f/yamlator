@@ -291,6 +291,10 @@ def resolve_ruleset_inheritance(rulesets: Dict[str, YamlatorRuleset]) -> dict:
     if rulesets is None:
         raise ValueError('Parameter rulesets cannot be None')
 
+    if not isinstance(rulesets, dict):
+        raise TypeError(
+            'Parameter rulesets cannot be None should be a dictionary')
+
     updated_rulesets = {}
 
     for key, ruleset in rulesets.items():
