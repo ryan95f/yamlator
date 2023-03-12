@@ -2,6 +2,7 @@
 import re
 import os
 
+from typing import Dict
 from typing import List
 from yamlator.utils import load_schema
 from yamlator.types import RuleType
@@ -260,23 +261,63 @@ def resolve_unknown_types(unknown_types: List[RuleType],
     return True
 
 
-def resolve_ruleset_inheritance(rulesets_map: dict) -> dict:
+def resolve_ruleset_inheritance(rulesets: Dict[str, YamlatorRuleset]) -> dict:
+    """Resolves any rulesets that have a parent ruleset defined in the schema.
+    For example:
+
+    ```text
+    ruleset Foo(Bar) {
+        ...
+    }
+    ```
+
+    This function will extract all the rules defined in parent ruleset (`Bar`)
+    and include them in the `Foo` ruleset. If both parent and child have a rule
+    with the same name, the child rule will been used.
+
+    Args:
+        rulesets (dict): The rulesets defined in the schema where the key is the
+            type and the value is a `yamlator.types.YamlatorRuleset`
+
+    Returns:
+        A dictionary where all the rulesets have had the parent dependency
+        resolved by merging the parent rules in the child rules
+
+    Raises:
+        ValueError: If the ruleset parameter is `None`
+        yamlator.exceptions.ConstructNotFoundError: If the parent of the ruleset
+            cannot be found in the `rulesets` parameter
+    """
+    if rulesets is None:
+        raise ValueError('Parameter rulesets cannot be None')
+
     updated_rulesets = {}
 
-    for key, ruleset in rulesets_map.items():
+    for key, ruleset in rulesets.items():
         if ruleset.parent is None:
             updated_rulesets[key] = ruleset
             continue
-    
+
         parent_name = ruleset.parent.lookup
-        parent = rulesets_map.get(parent_name)
+        parent = rulesets.get(parent_name)
+        if parent is None:
+            raise ConstructNotFoundError(parent)
 
         base_rules = ruleset.rules.copy()
         parent_rules = parent.rules.copy()
 
-        base_rules_index = { rule.name : rule for rule in base_rules }
-        parent_rules_index = { rule.name : rule for rule in parent_rules }
+        # Index the rules in the base and parent rulesets to make it
+        # easier to merge the different rules together
+        base_rules_index = {rule.name: rule for rule in base_rules}
+        parent_rules_index = {rule.name: rule for rule in parent_rules}
 
+        # Merged the 2 rule lists together. If a rule name is present
+        # in both the base rules will be prioritised since it assumed
+        # it is being overridden
         merged_rules = list({**parent_rules_index, **base_rules_index}.values())
-        updated_rulesets[key] = YamlatorRuleset(ruleset.name, merged_rules, ruleset.is_strict)
+        updated_rulesets[key] = YamlatorRuleset(
+            name=ruleset.name,
+            rules=merged_rules,
+            is_strict=ruleset.is_strict
+        )
     return updated_rulesets
