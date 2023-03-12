@@ -111,7 +111,6 @@ class SchemaTransformer(Transformer):
 
     def ruleset(self, tokens: Iterator[Token]) -> YamlatorRuleset:
         """Transforms the ruleset tokens into a YamlatorRuleset object"""
-
         is_strict = False
         if tokens[0].type == GrammarKeywords.STRICT:
             tokens = tokens[1:]
@@ -119,8 +118,15 @@ class SchemaTransformer(Transformer):
 
         name = tokens[0].value
         rules = tokens[1:]
+
         self.seen_constructs[name] = SchemaTypes.RULESET
+
+        if isinstance(tokens[1], RuleType):
+            return YamlatorRuleset(name, tokens[2:], is_strict, tokens[1])
         return YamlatorRuleset(name, rules, is_strict)
+
+    def ruleset_parent(self, tokens: Iterator[Token]):
+        return tokens[0]
 
     def start(self, instructions: Iterator[YamlatorType]) \
             -> PartiallyLoadedYamlatorSchema:

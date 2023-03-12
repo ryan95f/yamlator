@@ -6,6 +6,7 @@ from typing import List
 from yamlator.utils import load_schema
 from yamlator.types import RuleType
 from yamlator.types import YamlatorSchema
+from yamlator.types import YamlatorRuleset
 from yamlator.types import YamlatorType
 from yamlator.types import SchemaTypes
 from yamlator.types import PartiallyLoadedYamlatorSchema
@@ -144,6 +145,8 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
 
     unknown_types = loaded_schema.unknowns_rule_types
     resolve_unknown_types(unknown_types, root_rulesets, root_enums)
+
+    root_rulesets = resolve_ruleset_inheritance(root_rulesets)
     return YamlatorSchema(loaded_schema.root, root_rulesets, root_enums)
 
 
@@ -255,3 +258,25 @@ def resolve_unknown_types(unknown_types: List[RuleType],
 
         raise ConstructNotFoundError(curr.lookup)
     return True
+
+
+def resolve_ruleset_inheritance(rulesets_map: dict) -> dict:
+    updated_rulesets = {}
+
+    for key, ruleset in rulesets_map.items():
+        if ruleset.parent is None:
+            updated_rulesets[key] = ruleset
+            continue
+    
+        parent_name = ruleset.parent.lookup
+        parent = rulesets_map.get(parent_name)
+
+        base_rules = ruleset.rules.copy()
+        parent_rules = parent.rules.copy()
+
+        base_rules_index = { rule.name : rule for rule in base_rules }
+        parent_rules_index = { rule.name : rule for rule in parent_rules }
+
+        merged_rules = list({**parent_rules_index, **base_rules_index}.values())
+        updated_rulesets[key] = YamlatorRuleset(ruleset.name, merged_rules, ruleset.is_strict)
+    return updated_rulesets

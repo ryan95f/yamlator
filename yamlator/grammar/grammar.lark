@@ -17,7 +17,8 @@ import_statement: "import" imported_types "from" IMPORT_STATEMENT_PATH ("as" NAM
 imported_types: (CONTAINER_TYPE_NAME ("," CONTAINER_TYPE_NAME)*)
 
 schema_entry: STRICT_KEYWORD? "schema" "{" rule+ "}"
-ruleset: STRICT_KEYWORD? "ruleset" CONTAINER_TYPE_NAME "{" rule+ "}"
+ruleset: STRICT_KEYWORD? "ruleset" CONTAINER_TYPE_NAME (ruleset_parent)? "{" rule+ "}"
+ruleset_parent: "(" container_type ")"
 
 // Enum constructs
 enum: "enum" CONTAINER_TYPE_NAME "{" enum_item+ "}"

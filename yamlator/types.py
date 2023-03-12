@@ -144,6 +144,12 @@ class RuleType:
                                         self.lookup,
                                         self.sub_type)
 
+        if self.schema_type == SchemaTypes.UNKNOWN:
+            repr_template = '{}(type={}, lookup={})'
+            return repr_template.format(self.__class__.__name__,
+                                        self.schema_type,
+                                        self.lookup)
+
         repr_template = '{}(type={}, sub_type={})'
         return repr_template.format(self.__class__.__name__,
                                     self.schema_type,
@@ -246,7 +252,7 @@ class YamlatorRuleset(YamlatorType):
     """
 
     def __init__(self, name: str, rules: Iterator[Rule],
-                 is_strict: bool = False):
+                 is_strict: bool = False, parent: RuleType = None):
         """YamlatorRuleset init
 
         Args:
@@ -259,6 +265,7 @@ class YamlatorRuleset(YamlatorType):
         super().__init__(name, ContainerTypes.RULESET)
         self._rules = rules
         self._is_strict = is_strict
+        self._parent = parent
 
     @property
     def rules(self) -> Iterator[Rule]:
@@ -267,6 +274,10 @@ class YamlatorRuleset(YamlatorType):
     @property
     def is_strict(self) -> bool:
         return self._is_strict
+
+    @property
+    def parent(self) -> RuleType:
+        return self._parent
 
 
 class YamlatorEnum(YamlatorType):
