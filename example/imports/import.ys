@@ -9,4 +9,5 @@ schema {
 strict ruleset Project(base.Project) {
     status core.Status
     apis list(str)
+    details core.ProjectDetails
 }

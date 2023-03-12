@@ -280,11 +280,12 @@ def resolve_ruleset_inheritance(rulesets: Dict[str, YamlatorRuleset]) -> dict:
             type and the value is a `yamlator.types.YamlatorRuleset`
 
     Returns:
-        A dictionary where all the rulesets have had the parent dependency
+        A dictionary where all the rulesets parent dependencies have been
         resolved by merging the parent rules in the child rules
 
     Raises:
         ValueError: If the ruleset parameter is `None`
+        TypeError: If the ruleset parameter is not a `dict`
         yamlator.exceptions.ConstructNotFoundError: If the parent of the ruleset
             cannot be found in the `rulesets` parameter
     """

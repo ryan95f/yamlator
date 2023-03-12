@@ -31,6 +31,7 @@ class TestResolveRulesetInheritance(unittest.TestCase):
     ])
     def test_resolve_ruleset_raises_error(self, name: str, rulesets: Any,
                                           expected_exception: Exception):
+        # Unused by test case, however is required by the parameterized library
         del name
 
         with self.assertRaises(expected_exception):

@@ -251,8 +251,8 @@ class YamlatorRuleset(YamlatorType):
             will raise a strict mode violation
 
         parent (yamlator.types.RuleType): The parent ruleset which
-            this ruleset should inherit additional rules. If a parent is not
-            specified this defaults to `None`
+            this ruleset should inherit additional rules from. If a parent
+            is not specified this defaults to `None`
     """
 
     def __init__(self, name: str, rules: List[Rule],
@@ -269,8 +269,8 @@ class YamlatorRuleset(YamlatorType):
                 extra fields are raised as a violation
 
             parent (yamlator.types.RuleType, optional): The parent ruleset
-                which this ruleset should inherit additional rules. To indicate
-                this ruleset does not have a parent, set to `None`
+                which this ruleset should inherit additional rules from.
+                To indicate this ruleset does not have a parent, set to `None`
         """
         super().__init__(name, ContainerTypes.RULESET)
         self._rules = rules
