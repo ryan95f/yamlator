@@ -5,53 +5,39 @@ from collections import defaultdict
 class DependencyManager:
     def __init__(self) -> None:
         self._graph = defaultdict(list)
-        self.vertices = {}
-        self.lu = []
 
-    def add(self, curr: str) -> str:
-        self.vertices[curr] = len(self)
-        self.lu.append(curr)
-        self._graph[curr] = []
-        return curr
-        # md5 = hashlib.md5(curr.encode('utf-8'))
-        # md5_digest = md5.hexdigest()
-        # self._graph[md5_digest] = []
-        # return md5_digest
+    def add(self, content: str) -> str:
+        md5 = hashlib.md5(content.encode('utf-8'))
+        digest = md5.hexdigest()
 
-    def add_child(self, parent: str, content: str) -> str:
-        self._graph[parent].append(content)
+        self._graph[digest] = []
+        return digest
 
-        # md5 = hashlib.md5(content.encode('utf-8'))
-        # md5_digest = md5.hexdigest()
+    def add_child(self, parent_hash: str, child_hash: str) -> str:
+        self._graph[parent_hash].append(child_hash)
 
-        # self._graph[parent].append(md5_digest)
-        # return md5_digest
+    def has_cycle(self) -> bool:
+        visited = defaultdict(bool)
+        rec_stack = defaultdict(bool)
 
-    def hash_cycle(self, parent: str) -> bool:
-        visited = [False] * (len(self.vertices) + 1)
-        rec_stack = [False] * (len(self.vertices) + 1)
-
-        for node in range(len(self.vertices)):
+        for node in self._graph.keys():
             if not visited[node]:
                 if self._detect_cycle(node, visited, rec_stack):
                     return True
         return False
 
-    def _detect_cycle(self, v, visited, rec_stack):
-        visited[v] = True
-        rec_stack[v] = True
+    def _detect_cycle(self, curr_node, visited, rec_stack):
+        visited[curr_node] = True
+        rec_stack[curr_node] = True
 
-        k = self.lu[v]
-        for n in self._graph[k]:
-            t = self.vertices[n]
-
-            if not visited[t]:
-                if self._detect_cycle(t, visited, rec_stack):
+        for child_node in self._graph[curr_node]:
+            if not visited[child_node]:
+                if self._detect_cycle(child_node, visited, rec_stack):
                     return True
-            elif rec_stack[t]:
+            elif rec_stack[child_node]:
                 return True
 
-        rec_stack[v] = False
+        rec_stack[curr_node] = False
         return False
 
     def __len__(self) -> int:
