@@ -42,6 +42,12 @@ class TestDependencyManager(unittest.TestCase):
         has_cycle = mgmr.has_cycle()
         self.assertTrue(has_cycle)
 
+    def test_add(self):
+        mgmr = DependencyManager()
+        n1_v1 = mgmr.add('n1')
+        n1_v2 = mgmr.add('n1')
+        self.assertEqual(n1_v1, n1_v2)
+
 
 if __name__ == '__main__':
     unittest.main()

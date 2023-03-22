@@ -14,12 +14,15 @@ from yamlator.types import SchemaTypes
 from yamlator.types import PartiallyLoadedYamlatorSchema
 from yamlator.parser.core import parse_schema
 from yamlator.exceptions import ConstructNotFoundError
+from yamlator.parser.dependency import DependencyManager
 
 
 _SLASHES_REGEX = re.compile(r'(?:\\{1}|\/{1})')
 
+dp = DependencyManager()
 
-def parse_yamlator_schema(schema_path: str) -> YamlatorSchema:
+
+def parse_yamlator_schema(schema_path: str, parent: str = None) -> YamlatorSchema:
     """Parses a Yamlator schema from a given path on the file system
 
     Args:
@@ -47,10 +50,17 @@ def parse_yamlator_schema(schema_path: str) -> YamlatorSchema:
         raise ValueError('Expected parameter schema_path to be a string')
 
     schema_content = load_schema(schema_path)
+
+    h = dp.add(schema_content)
+
+    # print(schema_path, h, parent)
+    if parent is not None:
+        dp.add_child(parent, h)
+
     schema = parse_schema(schema_content)
 
     context = fetch_schema_path(schema_path)
-    schema = load_schema_imports(schema, context)
+    schema = load_schema_imports(schema, context, h)
     return schema
 
 
@@ -81,7 +91,7 @@ def fetch_schema_path(schema_path: str) -> str:
 
 
 def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
-                        schema_path: str) -> YamlatorSchema:
+                        schema_path: str, parent: str) -> YamlatorSchema:
     """Loads all import statements that have been defined in a Yamlator
     schema file. This function will automatically load any import
     statements from child schema files
@@ -127,9 +137,21 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
     root_rulesets = loaded_schema.rulesets
     root_enums = loaded_schema.enums
 
+    schemas = []
     for path, resource_type in import_statements.items():
         full_path = os.path.join(schema_path, path)
-        schema = parse_yamlator_schema(full_path)
+
+        a = load_schema(full_path)
+        v = dp.add(a)
+        dp.add_child(parent, v)
+
+        if dp.has_cycle():
+            raise ValueError("I found a cycle")
+
+        ps = parse_schema(a)
+
+        context = fetch_schema_path(full_path)
+        schema = load_schema_imports(ps, context, parent)
 
         imported_rulesets = schema.rulesets
         imported_enums = schema.enums
