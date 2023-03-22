@@ -14,6 +14,7 @@ from yamlator.types import SchemaTypes
 from yamlator.types import PartiallyLoadedYamlatorSchema
 from yamlator.parser.core import parse_schema
 from yamlator.exceptions import ConstructNotFoundError
+from yamlator.exceptions import CycleDependencyError
 from yamlator.parser.dependency import DependencyManager
 
 
@@ -22,7 +23,8 @@ _SLASHES_REGEX = re.compile(r'(?:\\{1}|\/{1})')
 dp = DependencyManager()
 
 
-def parse_yamlator_schema(schema_path: str, parent: str = None) -> YamlatorSchema:
+def parse_yamlator_schema(schema_path: str,
+                          parent_hash: str = None) -> YamlatorSchema:
     """Parses a Yamlator schema from a given path on the file system
 
     Args:
@@ -50,17 +52,15 @@ def parse_yamlator_schema(schema_path: str, parent: str = None) -> YamlatorSchem
         raise ValueError('Expected parameter schema_path to be a string')
 
     schema_content = load_schema(schema_path)
+    schema_hash = dp.add(schema_content)
 
-    h = dp.add(schema_content)
-
-    # print(schema_path, h, parent)
-    if parent is not None:
-        dp.add_child(parent, h)
+    if parent_hash is not None:
+        dp.add_child(parent_hash, schema_hash)
 
     schema = parse_schema(schema_content)
 
     context = fetch_schema_path(schema_path)
-    schema = load_schema_imports(schema, context, h)
+    schema = load_schema_imports(schema, context, schema_hash)
     return schema
 
 
@@ -91,7 +91,7 @@ def fetch_schema_path(schema_path: str) -> str:
 
 
 def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
-                        schema_path: str, parent: str) -> YamlatorSchema:
+                        schema_path: str, parent_hash: str) -> YamlatorSchema:
     """Loads all import statements that have been defined in a Yamlator
     schema file. This function will automatically load any import
     statements from child schema files
@@ -137,41 +137,54 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
     root_rulesets = loaded_schema.rulesets
     root_enums = loaded_schema.enums
 
-    schemas = []
     for path, resource_type in import_statements.items():
         full_path = os.path.join(schema_path, path)
 
-        a = load_schema(full_path)
-        v = dp.add(a)
-        dp.add_child(parent, v)
-
-        if dp.has_cycle():
-            raise ValueError("I found a cycle")
-
-        ps = parse_schema(a)
-
-        context = fetch_schema_path(full_path)
-        schema = load_schema_imports(ps, context, parent)
+        schema = __load_child_schema(full_path, parent_hash)
 
         imported_rulesets = schema.rulesets
         imported_enums = schema.enums
 
         for (resource, namespace) in resource_type:
-            has_mapped_rulesets = map_imported_resource(namespace,
-                                                        resource,
-                                                        root_rulesets,
-                                                        imported_rulesets)
+            has_mapped_rulesets = map_imported_resource(
+                namespace,
+                resource,
+                root_rulesets,
+                imported_rulesets
+            )
+
             if has_mapped_rulesets:
                 continue
 
-            map_imported_resource(namespace, resource,
-                                  root_enums, imported_enums)
+            map_imported_resource(
+                namespace,
+                resource,
+                root_enums,
+                imported_enums
+            )
 
     unknown_types = loaded_schema.unknowns_rule_types
     resolve_unknown_types(unknown_types, root_rulesets, root_enums)
 
     root_rulesets = resolve_ruleset_inheritance(root_rulesets)
     return YamlatorSchema(loaded_schema.root, root_rulesets, root_enums)
+
+
+def __load_child_schema(schema_path, parent_hash):
+    schema_content = load_schema(schema_path)
+    schema_hash = dp.add(schema_content)
+
+    dp.add_child(parent_hash, schema_hash)
+
+    if dp.has_cycle():
+        message = f'A cycle was detected when loading {schema_path}'
+        raise CycleDependencyError(message)
+
+    parsed_schema = parse_schema(schema_content)
+
+    context = fetch_schema_path(schema_path)
+    schema = load_schema_imports(parsed_schema, context, parent_hash)
+    return schema
 
 
 def map_imported_resource(namespace: str, resource_type: str,

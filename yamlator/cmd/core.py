@@ -48,6 +48,9 @@ def main() -> int:
     except FileNotFoundError as ex:
         print(ex)
         return SuccessCode.ERR
+    except RuntimeError as ex:
+        print(ex)
+        return SuccessCode.ERR
     except ValueError as ex:
         print(ex)
         return SuccessCode.ERR

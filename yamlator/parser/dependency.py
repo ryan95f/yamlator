@@ -39,11 +39,3 @@ class DependencyManager:
 
         rec_stack[curr_node] = False
         return False
-
-    def __len__(self) -> int:
-        return len(self._graph)
-    
-    def display(self):
-        print()
-        for v in self._graph.items():
-            print(v)
