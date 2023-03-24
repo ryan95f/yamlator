@@ -23,8 +23,7 @@ _SLASHES_REGEX = re.compile(r'(?:\\{1}|\/{1})')
 dp = DependencyManager()
 
 
-def parse_yamlator_schema(schema_path: str,
-                          parent_hash: str = None) -> YamlatorSchema:
+def parse_yamlator_schema(schema_path: str) -> YamlatorSchema:
     """Parses a Yamlator schema from a given path on the file system
 
     Args:
@@ -53,9 +52,6 @@ def parse_yamlator_schema(schema_path: str,
 
     schema_content = load_schema(schema_path)
     schema_hash = dp.add(schema_content)
-
-    if parent_hash is not None:
-        dp.add_child(parent_hash, schema_hash)
 
     schema = parse_schema(schema_content)
 

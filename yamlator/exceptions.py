@@ -45,4 +45,7 @@ class NestedUnionError(RuntimeError):
 
 
 class CycleDependencyError(RuntimeError):
+    """Represents a cycle has been detected when checking
+    a dependency chain
+    """
     pass
