@@ -50,7 +50,7 @@ def main() -> int:
         print(ex)
         return SuccessCode.ERR
     except CycleDependencyError as ex:
-        print(f"Cycle Detected Error: {ex}")
+        print(f'Cycle Detected Error: {ex}')
         return SuccessCode.ERR
     except ValueError as ex:
         print(ex)

@@ -30,14 +30,18 @@ class DependencyManager:
         self._graph[digest] = []
         return digest
 
-    def add_child(self, parent_hash: str, child_hash: str) -> None:
+    def add_child(self, parent_hash: str, child_hash: str) -> bool:
         """Adds a child node to a parent node in the dependency chain
 
         Args:
             parent_hash (str): The Md5 hash of the parent node
             child_hash (str): The Md5 hash of the child node
+
+        Returns:
+            True to indicate that the function completed successfully
         """
         self._graph[parent_hash].append(child_hash)
+        return True
 
     def has_cycle(self) -> bool:
         """Detects a cycle against the contents the manager is representing
