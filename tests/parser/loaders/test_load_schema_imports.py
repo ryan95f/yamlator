@@ -1,5 +1,5 @@
 """Test cases for the load_schema_imports function"""
-
+import hashlib
 import unittest
 
 from parameterized import parameterized
@@ -29,6 +29,9 @@ BASIC_SCHEMA = create_basic_loaded_schema()
 
 class TestLoadSchemaImports(unittest.TestCase):
     """Test cases for the load_schema_imports function"""
+    def setUp(self):
+        md5_digest = hashlib.md5('root'.encode('utf-8'))
+        self.parent_hash = md5_digest.hexdigest()
 
     @parameterized.expand([
         ('with_none_schema', None, './path/test.ys', ValueError),
@@ -47,7 +50,7 @@ class TestLoadSchemaImports(unittest.TestCase):
         del name
 
         with self.assertRaises(expected_exception):
-            load_schema_imports(loaded_schema, schema_path)
+            load_schema_imports(loaded_schema, schema_path, self.parent_hash)
 
     def test_load_schema_imports(self):
         schema_path = './tests/files/valid'
@@ -78,7 +81,8 @@ class TestLoadSchemaImports(unittest.TestCase):
         expected_ruleset_count = 2
         expected_enum_count = 1
 
-        schema = load_schema_imports(loaded_schema, schema_path)
+        schema = load_schema_imports(loaded_schema, schema_path,
+                                     self.parent_hash)
         self.assertEqual(expected_ruleset_count, len(schema.rulesets))
         self.assertEqual(expected_enum_count, len(schema.enums))
 
