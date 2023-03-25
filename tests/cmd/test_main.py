@@ -74,6 +74,11 @@ class TestMain(unittest.TestCase):
             HELLO_YAML_FILE_PATH,
             './tests/files/invalid_files/missing_defined_ruleset.ys',
             DisplayMethod.TABLE.value
+        ), SuccessCode.ERR),
+        ('with_cyle_in_ruleset', ValidateArgs(
+            HELLO_YAML_FILE_PATH,
+            './tests/files/invalid_files/cycle_dependencies/self_cycle.ys',
+            DisplayMethod.TABLE.value
         ), SuccessCode.ERR)
     ])
     @patch('argparse.ArgumentParser')
