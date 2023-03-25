@@ -1,9 +1,13 @@
+"""Test cases for the DependencyManager class"""
+
 import unittest
 
 from yamlator.parser.dependency import DependencyManager
 
 
 class TestDependencyManager(unittest.TestCase):
+    """Test cases for the DependencyManager"""
+
     def setUp(self):
         self.dependencies = DependencyManager()
 
