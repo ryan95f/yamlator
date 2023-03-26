@@ -18,7 +18,7 @@ VALID_SCHEMA = f'{_BASE_VALID_PATH}/valid.ys'
 VALID_KEYLESS_DIRECTIVE_SCHEMA = f'{_BASE_VALID_PATH}/keyless_directive.ys'
 VALID_KEYLESS_RULES_SCHEMA = f'{_BASE_VALID_PATH}/keyless_and_standard_rules.ys'
 
-# These files don't exists and are used to force specific errors in tests
+# These files don't exists and are used to force specific errors in the tests
 NONE_PATH = None
 EMPTY_PATH = ''
 NOT_FOUND_SCHEMA = 'not_found.ys'

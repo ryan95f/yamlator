@@ -1,5 +1,5 @@
 """Maintains utility functions that can load Yamlator schemas,
-load any import statements
+load any import statements in the schema and checks for cycles
 """
 
 import re
@@ -106,7 +106,7 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
         parent_hash (str): A string hash of the parent of this schema
 
         dependencies (yamlator.parser.dependency.DependencyManager): A utility
-            class that manages represents dependencies as a graph which can
+            class that represents dependencies as a graph which can
             be used to detect cycles
 
     Returns:
@@ -127,7 +127,7 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
             is detected in the schema
 
         yamlator.parser.CycleDependencyError: Raised if a cycle was deteted
-            when loading a schema and its depedency schema files
+            when loading a schema and its imported child schema files
     """
     if loaded_schema is None:
         raise ValueError('Parameter loaded_schema should not None')

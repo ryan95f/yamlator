@@ -137,7 +137,7 @@ class TestLoadSchemaImports(unittest.TestCase):
         )
 
         # Load the actual schema file so the md5 hash can be extracted
-        #  so subsequent load imports hashes match to detect the cycle
+        # so subsequent load imports hashes match to detect the cycle
         file_path = f'{schema_path}/root.ys'
         schema = load_schema(file_path)
         schema_hash = self.dependencies.add(schema)
@@ -177,7 +177,7 @@ class TestLoadSchemaImports(unittest.TestCase):
         )
 
         # Load the actual schema file so the md5 hash can be extracted
-        #  so subsequent load imports hashes match to detect the cycle
+        # so subsequent load imports hashes match to detect the cycle
         file_path = f'{schema_path}/self_cycle.ys'
         schema = load_schema(file_path)
         schema_hash = self.dependencies.add(schema)
