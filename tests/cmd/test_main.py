@@ -74,7 +74,7 @@ class TestMain(unittest.TestCase):
             constants.MISSING_RULESET_DEF_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
-        ('with_cyle_in_ruleset', ValidateArgs(
+        ('with_self_cycle_in_ruleset', ValidateArgs(
             constants.VALID_YAML_DATA,
             constants.SELF_CYCLE_SCHEMA,
             DisplayMethod.TABLE.value
