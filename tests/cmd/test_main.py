@@ -19,9 +19,8 @@ from yamlator.cmd import main
 from yamlator.cmd import DisplayMethod
 from yamlator.cmd.outputs import SuccessCode
 
-HELLO_YAML_FILE_PATH = './tests/files/valid/valid.yaml'
-HELLO_RULESET_FILE_PATH = './tests/files/valid/valid.ys'
-INVALID_HELLO_YAML_FILE_PATH = './tests/files/valid/invalid.yaml'
+from tests.cmd import constants
+
 
 ValidateArgs = namedtuple('ValidateArgs', ['file', 'ruleset_schema', 'output'])
 
@@ -31,53 +30,53 @@ class TestMain(unittest.TestCase):
 
     @parameterized.expand([
         ('with_yaml_matching_ruleset', ValidateArgs(
-            HELLO_YAML_FILE_PATH,
-            HELLO_RULESET_FILE_PATH,
+            constants.VALID_YAML_DATA,
+            constants.VALID_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.SUCCESS),
         ('with_yaml_containing_ruleset_violations', ValidateArgs(
-            INVALID_HELLO_YAML_FILE_PATH,
-            HELLO_RULESET_FILE_PATH,
+            constants.INVALID_YAML_DATA,
+            constants.VALID_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_ruleset_file_not_found', ValidateArgs(
-            HELLO_YAML_FILE_PATH,
+            constants.VALID_YAML_DATA,
             '/test/files/not_found.ys',
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_yaml_data_not_found', ValidateArgs(
             './tests/files/not_found.yaml',
-            HELLO_RULESET_FILE_PATH,
+            constants.VALID_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_empty_yaml_file_path', ValidateArgs(
             '',
-            HELLO_RULESET_FILE_PATH,
+            constants.VALID_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_empty_ruleset_path', ValidateArgs(
-            HELLO_YAML_FILE_PATH,
+            constants.VALID_YAML_DATA,
             '',
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_invalid_ruleset_extension', ValidateArgs(
-            HELLO_YAML_FILE_PATH,
+            constants.VALID_YAML_DATA,
             './tests/files/hello.ruleset',
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_syntax_errors', ValidateArgs(
-            HELLO_YAML_FILE_PATH,
-            './tests/files/invalid_files/invalid_enum_name.ys',
+            constants.VALID_YAML_DATA,
+            constants.INVALID_ENUM_NAME_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_ruleset_not_defined', ValidateArgs(
-            HELLO_YAML_FILE_PATH,
-            './tests/files/invalid_files/missing_defined_ruleset.ys',
+            constants.VALID_YAML_DATA,
+            constants.MISSING_RULESET_DEF_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_cyle_in_ruleset', ValidateArgs(
-            HELLO_YAML_FILE_PATH,
-            './tests/files/invalid_files/cycle/self_cycle.ys',
+            constants.VALID_YAML_DATA,
+            constants.SELF_CYCLE_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR)
     ])

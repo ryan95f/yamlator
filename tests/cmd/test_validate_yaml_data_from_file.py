@@ -17,6 +17,9 @@ from parameterized import parameterized
 from yamlator.cmd import validate_yaml_data_from_file
 from yamlator.exceptions import InvalidSchemaFilenameError
 
+from tests.cmd import constants
+
+
 EMPTY_STR = ''
 VALID_YAML_DATA_FILE_PATH = './tests/files/valid/valid.yaml'
 VALID_SCHEMA_FILE_PATH = './tests/files/valid/valid.ys'
@@ -32,16 +35,16 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
 
     @parameterized.expand([
         ('none_yaml_path',
-            ValidateArgs(None, VALID_SCHEMA_FILE_PATH), ValueError),
+            ValidateArgs(None, constants.VALID_SCHEMA), ValueError),
         ('none_schema_path',
-            ValidateArgs(VALID_YAML_DATA_FILE_PATH, None), ValueError),
+            ValidateArgs(constants.VALID_YAML_DATA, None), ValueError),
         ('none_yaml_and_schema_path',
             ValidateArgs(None, None), ValueError),
         ('empty_yaml_path_str', ValidateArgs(
-            EMPTY_STR, VALID_SCHEMA_FILE_PATH
+            EMPTY_STR, constants.VALID_SCHEMA
         ), ValueError),
         ('empty_schema_path_str', ValidateArgs(
-            VALID_YAML_DATA_FILE_PATH,
+            constants.VALID_YAML_DATA,
             EMPTY_STR
         ), ValueError),
         ('empty_yaml_and_path_str', ValidateArgs(
@@ -50,14 +53,14 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
         ), ValueError),
         ('yaml_data_file_not_found', ValidateArgs(
             'not_found.yaml',
-            VALID_SCHEMA_FILE_PATH
+            constants.VALID_SCHEMA
         ), FileNotFoundError),
         ('schema_file_not_found', ValidateArgs(
-            VALID_YAML_DATA_FILE_PATH,
+            constants.VALID_YAML_DATA,
             'not_found.ys'
         ), FileNotFoundError),
         ('schema_invalid_file_extension', ValidateArgs(
-            VALID_YAML_DATA_FILE_PATH,
+            constants.VALID_YAML_DATA,
             './tests/files/hello.ruleset'
         ), InvalidSchemaFilenameError)
     ])
