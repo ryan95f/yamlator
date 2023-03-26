@@ -51,8 +51,8 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
             constants.EMPTY_PATH
         ), ValueError),
         ('empty_yaml_and_path_str', ValidateArgs(
-             constants.EMPTY_PATH,
-             constants.EMPTY_PATH
+            constants.EMPTY_PATH,
+            constants.EMPTY_PATH
         ), ValueError),
         ('yaml_data_file_not_found', ValidateArgs(
             constants.NOT_FOUND_YAML_DATA,
