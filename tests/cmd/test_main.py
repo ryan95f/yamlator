@@ -41,27 +41,27 @@ class TestMain(unittest.TestCase):
         ), SuccessCode.ERR),
         ('with_ruleset_file_not_found', ValidateArgs(
             constants.VALID_YAML_DATA,
-            '/test/files/not_found.ys',
+            constants.NOT_FOUND_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_yaml_data_not_found', ValidateArgs(
-            './tests/files/not_found.yaml',
+            constants.NOT_FOUND_YAML_DATA,
             constants.VALID_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_empty_yaml_file_path', ValidateArgs(
-            '',
+            constants.EMPTY_PATH,
             constants.VALID_SCHEMA,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_empty_ruleset_path', ValidateArgs(
             constants.VALID_YAML_DATA,
-            '',
+            constants.EMPTY_PATH,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_invalid_ruleset_extension', ValidateArgs(
             constants.VALID_YAML_DATA,
-            './tests/files/hello.ruleset',
+            constants.INVALID_SCHEMA_EXTENSION,
             DisplayMethod.TABLE.value
         ), SuccessCode.ERR),
         ('with_syntax_errors', ValidateArgs(
