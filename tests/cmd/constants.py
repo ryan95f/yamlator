@@ -3,7 +3,7 @@
 _BASE_INVALID_PATH = './tests/files/invalid_files'
 
 INVALID_ENUM_NAME_SCHEMA = f'{_BASE_INVALID_PATH}/invalid_enum_name.ys'
-INVALID_RULESET_NAME_SCHEMA = f'{_BASE_INVALID_PATH}/invalid_enum_name.ys'
+INVALID_RULESET_NAME_SCHEMA = f'{_BASE_INVALID_PATH}/invalid_ruleset_name.ys'
 INVALID_SYNTAX_SCHEMA = f'{_BASE_INVALID_PATH}/invalid_syntax.ys'
 MISSING_RULESET_DEF_SCHEMA = f'{_BASE_INVALID_PATH}/missing_defined_ruleset.ys'
 NESTED_UNION_SCHEMA = f'{_BASE_INVALID_PATH}/nested_union.ys'
