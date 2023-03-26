@@ -186,5 +186,6 @@ class TestLoadSchemaImports(unittest.TestCase):
             load_schema_imports(loaded_schema, schema_path,
                                 schema_hash, self.dependencies)
 
+
 if __name__ == '__main__':
     unittest.main()
