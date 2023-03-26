@@ -149,7 +149,7 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
     for path, resource_type in import_statements.items():
         full_path = os.path.join(schema_path, path)
 
-        schema = __load_child_schema(full_path, parent_hash, dependencies)
+        schema = _load_child_schema(full_path, parent_hash, dependencies)
 
         imported_rulesets = schema.rulesets
         imported_enums = schema.enums
@@ -179,8 +179,8 @@ def load_schema_imports(loaded_schema: PartiallyLoadedYamlatorSchema,
     return YamlatorSchema(loaded_schema.root, root_rulesets, root_enums)
 
 
-def __load_child_schema(schema_path: str, parent_hash: str,
-                        dependencies: DependencyManager) -> YamlatorSchema:
+def _load_child_schema(schema_path: str, parent_hash: str,
+                       dependencies: DependencyManager) -> YamlatorSchema:
     schema_content = load_schema(schema_path)
     schema_hash = dependencies.add(schema_content)
 
