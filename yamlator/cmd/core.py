@@ -13,6 +13,7 @@ from yamlator.validators.core import validate_yaml
 from yamlator.exceptions import SchemaParseError
 from yamlator.exceptions import ConstructNotFoundError
 from yamlator.exceptions import InvalidSchemaFilenameError
+from yamlator.exceptions import CycleDependencyError
 from yamlator.violations import Violation
 
 from yamlator.cmd.outputs import SuccessCode
@@ -47,6 +48,9 @@ def main() -> int:
         return SuccessCode.ERR
     except FileNotFoundError as ex:
         print(ex)
+        return SuccessCode.ERR
+    except CycleDependencyError as ex:
+        print(f'Cycle Detected Error: {ex}')
         return SuccessCode.ERR
     except ValueError as ex:
         print(ex)

@@ -12,14 +12,15 @@ from typing import Type
 from parameterized import parameterized
 
 from yamlator.utils import load_yaml_file
+from tests.cmd import constants
 
 
 class TestLoadYamlFile(unittest.TestCase):
     """Test cases for the Load Yaml File function"""
 
     @parameterized.expand([
-        ('with_empty_str', '', ValueError),
-        ('with_none', None, ValueError)
+        ('with_empty_str', constants.EMPTY_PATH, ValueError),
+        ('with_none_path', constants.NONE_PATH, ValueError)
     ])
     def test_yaml_file_invalid_filename(self, name: str, filename: str,
                                         expected_exception: Type[Exception]):
@@ -30,7 +31,7 @@ class TestLoadYamlFile(unittest.TestCase):
             load_yaml_file(filename)
 
     @parameterized.expand([
-        ('yaml_file', 'tests/files/valid/valid.yaml')
+        ('with_a_valid_yaml_file', constants.VALID_YAML_DATA)
     ])
     def test_load_yaml_file(self, name: str, filename: str):
         # Unused by test case, however is required by the parameterized library

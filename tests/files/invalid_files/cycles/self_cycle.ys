@@ -1,0 +1,10 @@
+import Test from "self_cycle.ys"
+
+ruleset Test {
+    data str
+    number int
+}
+
+schema {
+    test Test optional
+}
