@@ -6,7 +6,7 @@ schema {
     value core.Values
 }
 
-strict ruleset Project(base.Project) {
+strict ruleset Project {
     status core.Status
     apis list(str)
     details core.ProjectDetails
