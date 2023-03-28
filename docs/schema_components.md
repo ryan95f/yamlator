@@ -18,6 +18,7 @@ Below are the various components that can be used to construct a schema with Yam
   * [Enum Type](#enum-type)
   * [Union Type](#union-type)
 * [Importing schemas](#importing-schemas)
+  * [Schema import paths](#schema-import-paths)
 
 ## Schema
 
@@ -427,7 +428,19 @@ schema {
 
 ## Importing Schemas
 
-As of version `0.4.0`, Yamlator now supports importing rulesets and enums from other schema files. A single import statement can import one or more resources but does not support importing schema blocks or wildcards to import every resource. Imports can also be alias with an optional namespace to support importing multiple resources with the same name but from different schemas. For example, given the schema called `main.ys`:
+As of version `0.4.0`, Yamlator now supports importing rulesets and enums from other schema files. A single import statement can import one or more resources. Imports can also be alias with an optional namespace to support importing multiple resources with the same name from different schemas. The structure of an import statement without a namespace:
+
+```text
+import <COMMA SEPARATED LIST OF RESOURCES> from <RESOURCE PATH>
+```
+
+Or with a namespace:
+
+```text
+import <COMMA SEPARATED LIST OF RESOURCES> from <RESOURCE PATH> as <NAMESPACE>
+```
+
+For example, given the schema called `main.ys`, which is importing resources from two different schemas:
 
 ```text
 import Api from "../web/apis.ys"
@@ -444,7 +457,11 @@ strict ruleset Project {
 }
 ```
 
-Any imported resources that use a namespace but have the namespace and the resource type specified in the rules. For example, in the case of importing `ProjectDetails`, which is coming from the `core` namespace.
+Any imported resources that use a namespace must have the namespace and the resource type specified in the rule type. For example, in the case of importing `ProjectDetails`, which is coming from the `core` namespace, you can see that the rule type is `core.ProjectDetails`. If the namespace is omitted for an imported resource that uses a namespace, a unknown type error will be shown and Yamlator will exit with a non-zero status code.
+
+__NOTE__: Importing schema blocks and using wildcards (typically seen as `*`) to import every resource are not supported in Yamlator.
+
+### Schema import paths
 
 When importing a schema, the path is the location of the schema relative to schema that is using its resources. For example, given the schema above, it would exist in the following file structure:
 
@@ -456,4 +473,6 @@ main/
     main.ys
 ```
 
-The `apis` will be fetched from the `web` directory and `common.ys` is located in the same directory location as the `main.ys` file.
+The `apis` will be fetched from the `web` directory and `common.ys` is located in the same directory location as the `main.ys` file. An full example of importing schemas can be found in [example folder](../example/imports/).
+
+__NOTE__: If an import cycle is detected, Yamlator will exit with a non-zero status code.

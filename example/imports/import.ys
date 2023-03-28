@@ -1,4 +1,3 @@
-import Project from "../lists/lists.ys" as base
 import Values, Status, ProjectDetails from "common.ys" as core
 
 schema {
