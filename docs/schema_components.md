@@ -17,6 +17,7 @@ Below are the various components that can be used to construct a schema with Yam
   * [Ruleset Type](#ruleset-type)
   * [Enum Type](#enum-type)
   * [Union Type](#union-type)
+* [Importing schemas](#importing-schemas)
 
 ## Schema
 
@@ -423,3 +424,36 @@ schema {
     items list(Item)
 }
 ```
+
+## Importing Schemas
+
+As of version `0.4.0`, Yamlator now supports importing rulesets and enums from other schema files. A single import statement can import one or more resources but does not support importing schema blocks or wildcards to import every resource. Imports can also be alias with an optional namespace to support importing multiple resources with the same name but from different schemas. For example, given the schema called `main.ys`:
+
+```text
+import Api from "../web/apis.ys"
+import Status, ProjectDetails from "common.ys" as core
+
+schema {
+    project Project
+}
+
+strict ruleset Project {
+    status core.Status
+    apis list(Api)
+    details core.ProjectDetails
+}
+```
+
+Any imported resources that use a namespace but have the namespace and the resource type specified in the rules. For example, in the case of importing `ProjectDetails`, which is coming from the `core` namespace.
+
+When importing a schema, the path is the location of the schema relative to schema that is using its resources. For example, given the schema above, it would exist in the following file structure:
+
+```text
+web/
+    apis.ys
+main/
+    common.ys
+    main.ys
+```
+
+The `apis` will be fetched from the `web` directory and `common.ys` is located in the same directory location as the `main.ys` file.
