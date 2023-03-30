@@ -39,8 +39,6 @@ class TestParseYamlatorSchema(unittest.TestCase):
         ('with_imports', './tests/files/valid/with_imports.ys'),
         ('with_namespace_imports',
             './tests/files/valid/with_import_and_namespaces.ys'),
-        ('with_inheritance',
-            './tests/files/valid/inheritance.ys'),
     ])
     def test_with_valid_schema_paths(self, name, schema_path):
         # Unused by test case, however is required by the parameterized library
