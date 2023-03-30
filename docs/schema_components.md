@@ -428,13 +428,13 @@ schema {
 
 ## Importing Schemas
 
-As of version `0.4.0`, Yamlator now supports importing rulesets and enums from other schema files. A single import statement can import one or more resources. Imports can also be alias with an optional namespace to support importing multiple resources with the same name from different schemas. The structure of an import statement without a namespace:
+As of version `0.4.0`, Yamlator now supports importing rulesets and enums from other schema files. A single import statement can import one or more resources. Imports can also be given an optional namespace to support importing multiple resources with the same name from different schemas. For example, below is an import statement structure without a namespace:
 
 ```text
 import <COMMA SEPARATED LIST OF RESOURCES> from <RESOURCE PATH>
 ```
 
-Or with a namespace:
+Or an import statement with a namespace:
 
 ```text
 import <COMMA SEPARATED LIST OF RESOURCES> from <RESOURCE PATH> as <NAMESPACE>
