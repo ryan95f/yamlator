@@ -54,7 +54,7 @@
 * Minor docstring and structure improvements in the `tests/` module
 * Improvements to the codebase docstrings
 
-## v4.0.0 (30th March 2023)
+## v0.4.0 (30th March 2023)
 
 * Added import statements to the Yamlator schema syntax that support importing one or more types
 * Added namespaces to the import statements with the `as` keyword
