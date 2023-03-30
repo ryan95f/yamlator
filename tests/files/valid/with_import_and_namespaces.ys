@@ -1,0 +1,12 @@
+import Employee from "base.ys" as e
+import Status, User from "base.ys" as core
+
+schema {
+    employees list(Employee)
+    status core.Status
+}
+
+ruleset Employee {
+    employee e.Employee
+    userDetails core.User
+}

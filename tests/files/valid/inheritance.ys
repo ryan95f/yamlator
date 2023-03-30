@@ -1,0 +1,13 @@
+import Employee from "base.ys" as base
+import User from "base.ys"
+import Status, User from "base.ys"
+
+schema {
+    employees list(Employee)
+    status Status
+}
+
+ruleset Employee (base.Employee) {
+    department str
+    salary float
+}

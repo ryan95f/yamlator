@@ -42,3 +42,10 @@ class NestedUnionError(RuntimeError):
 
         message = 'Unions cannot have a union nested within it'
         super().__init__(message)
+
+
+class CycleDependencyError(RuntimeError):
+    """Represents a cycle has been detected when checking
+    a dependency chain
+    """
+    pass

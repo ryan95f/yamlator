@@ -17,9 +17,8 @@ from parameterized import parameterized
 from yamlator.cmd import validate_yaml_data_from_file
 from yamlator.exceptions import InvalidSchemaFilenameError
 
-EMPTY_STR = ''
-VALID_YAML_DATA_FILE_PATH = './tests/files/valid/valid.yaml'
-VALID_SCHEMA_FILE_PATH = './tests/files/valid/valid.ys'
+from tests.cmd import constants
+
 
 ValidateArgs = namedtuple('ValidateArgs', ['yaml_filepath', 'schema_filepath'])
 
@@ -31,34 +30,41 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
     """
 
     @parameterized.expand([
-        ('none_yaml_path',
-            ValidateArgs(None, VALID_SCHEMA_FILE_PATH), ValueError),
-        ('none_schema_path',
-            ValidateArgs(VALID_YAML_DATA_FILE_PATH, None), ValueError),
-        ('none_yaml_and_schema_path',
-            ValidateArgs(None, None), ValueError),
+        ('none_yaml_path', ValidateArgs(
+            constants.NONE_PATH,
+            constants.VALID_SCHEMA
+        ), ValueError),
+        ('none_schema_path', ValidateArgs(
+            constants.VALID_YAML_DATA,
+            constants.NONE_PATH
+        ), ValueError),
+        ('none_yaml_and_schema_path', ValidateArgs(
+            constants.NONE_PATH,
+            constants.NONE_PATH
+        ), ValueError),
         ('empty_yaml_path_str', ValidateArgs(
-            EMPTY_STR, VALID_SCHEMA_FILE_PATH
+            constants.EMPTY_PATH,
+            constants.VALID_SCHEMA
         ), ValueError),
         ('empty_schema_path_str', ValidateArgs(
-            VALID_YAML_DATA_FILE_PATH,
-            EMPTY_STR
+            constants.VALID_YAML_DATA,
+            constants.EMPTY_PATH
         ), ValueError),
         ('empty_yaml_and_path_str', ValidateArgs(
-            EMPTY_STR,
-            EMPTY_STR
+            constants.EMPTY_PATH,
+            constants.EMPTY_PATH
         ), ValueError),
         ('yaml_data_file_not_found', ValidateArgs(
-            'not_found.yaml',
-            VALID_SCHEMA_FILE_PATH
+            constants.NOT_FOUND_YAML_DATA,
+            constants.VALID_SCHEMA
         ), FileNotFoundError),
         ('schema_file_not_found', ValidateArgs(
-            VALID_YAML_DATA_FILE_PATH,
-            'not_found.ys'
+            constants.VALID_YAML_DATA,
+            constants.NOT_FOUND_SCHEMA
         ), FileNotFoundError),
         ('schema_invalid_file_extension', ValidateArgs(
-            VALID_YAML_DATA_FILE_PATH,
-            './tests/files/hello.ruleset'
+            constants.VALID_YAML_DATA,
+            constants.INVALID_SCHEMA_EXTENSION
         ), InvalidSchemaFilenameError)
     ])
     def test_validate_yaml_data_from_file_with_invalid_args(self, name: str,
@@ -74,8 +80,8 @@ class TestValidateYamlDataFromFile(unittest.TestCase):
     def test_validate_yaml_data_from_file_with_valid_data(self):
         expected_violation_count = 0
         violations = validate_yaml_data_from_file(
-            yaml_filepath=VALID_YAML_DATA_FILE_PATH,
-            schema_filepath=VALID_SCHEMA_FILE_PATH
+            yaml_filepath=constants.VALID_YAML_DATA,
+            schema_filepath=constants.VALID_SCHEMA
         )
         actual_violation_count = len(violations)
 

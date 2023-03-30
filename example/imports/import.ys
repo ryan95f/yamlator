@@ -1,0 +1,12 @@
+import Values, Status, ProjectDetails from "common.ys" as core
+
+schema {
+    project Project
+    value core.Values
+}
+
+strict ruleset Project {
+    status core.Status
+    apis list(str)
+    details core.ProjectDetails
+}

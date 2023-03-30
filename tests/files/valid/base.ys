@@ -1,0 +1,15 @@
+ruleset User {
+    firstName str
+    surname str
+    age int optional
+}
+
+enum Status {
+    NEW_HIRE = 0
+    ON_LEAVE = 1
+}
+
+ruleset Employee {
+    person User
+    status Status
+}

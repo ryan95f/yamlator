@@ -25,6 +25,8 @@ from yamlator.parser import MissingRulesError
 from yamlator.parser import SchemaParseError
 from yamlator.parser import SchemaSyntaxError
 
+from tests.cmd import constants
+
 
 class TestParseSchema(unittest.TestCase):
     """Tests the parse schema function"""
@@ -38,10 +40,12 @@ class TestParseSchema(unittest.TestCase):
         self.assertIsNotNone(instructions)
 
     @parameterized.expand([
-        ('with_root_key_schema', './tests/files/valid/valid.ys', 4),
-        ('with_keyless_schema', './tests/files/valid/keyless_directive.ys', 1),
+        ('with_root_key_schema',
+            constants.VALID_SCHEMA, 4),
         ('with_keyless_schema',
-         './tests/files/valid/keyless_and_standard_rules.ys', 2),
+            constants.VALID_KEYLESS_DIRECTIVE_SCHEMA, 1),
+        ('with_keyless_schema_and_rules',
+            constants.VALID_KEYLESS_RULES_SCHEMA, 2),
     ])
     def test_parse_with_valid_content(self, name: str, schema_path: str,
                                       expected_schema_rule_count: int):
@@ -50,7 +54,7 @@ class TestParseSchema(unittest.TestCase):
 
         schema_content = load_schema(schema_path)
         instructions = parse_schema(schema_content)
-        main = instructions.get('main')
+        main = instructions.root
 
         self.assertIsNotNone(instructions)
         self.assertIsNotNone(main)
@@ -60,37 +64,32 @@ class TestParseSchema(unittest.TestCase):
     @parameterized.expand([
         (
             'with_schema_missing_rules',
-            './tests/files/invalid_files/schema_missing_rules.ys',
+            constants.MISSING_SCHEMA_RULES_SCHEMA,
             MissingRulesError
         ),
         (
             'with_ruleset_missing_rules',
-            './tests/files/invalid_files/schema_missing_rules.ys',
+            constants.MISSING_RULESET_RULES_SCHEMA,
             MissingRulesError
         ),
         (
             'with_invalid_enum_name',
-            './tests/files/invalid_files/invalid_enum_name.ys',
+            constants.INVALID_ENUM_NAME_SCHEMA,
             MalformedEnumNameError
         ),
         (
             'with_invalid_ruleset_name',
-            './tests/files/invalid_files/invalid_ruleset_name.ys',
+            constants.INVALID_RULESET_NAME_SCHEMA,
             MalformedRulesetNameError
         ),
         (
-            'with_ruleset_not_defined',
-            './tests/files/invalid_files/missing_defined_ruleset.ys',
-            SchemaParseError
-        ),
-        (
             'union_with_nested_union',
-            './tests/files/invalid_files/nested_union.ys',
+            constants.NESTED_UNION_SCHEMA,
             SchemaParseError
         ),
         (
             'with_invalid_rule_syntax',
-            './tests/files/invalid_files/invalid_syntax.ys',
+            constants.INVALID_SYNTAX_SCHEMA,
             SchemaSyntaxError
         )
     ])

@@ -5,7 +5,7 @@ ruleset User {
 strict ruleset Project {
     version int required
     name str required
-    users list(User) optional
+    users list(User)
 }
 
 strict schema {

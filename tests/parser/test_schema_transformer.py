@@ -1,4 +1,4 @@
-"""Test cases for the SchemaTransformer"""
+"""Test cases for the `SchemaTransformer` class"""
 
 
 import re
@@ -6,16 +6,20 @@ import unittest
 import lark
 
 from parameterized import parameterized
-from yamlator.exceptions import ConstructNotFoundError
 from yamlator.exceptions import NestedUnionError
 
 from yamlator.parser import SchemaTransformer
-from yamlator.types import EnumItem, Rule, RuleType
-from yamlator.types import YamlatorEnum, YamlatorRuleset, SchemaTypes
+from yamlator.types import EnumItem
+from yamlator.types import Rule
+from yamlator.types import RuleType
+from yamlator.types import YamlatorEnum
+from yamlator.types import YamlatorRuleset
+from yamlator.types import SchemaTypes
+from yamlator.parser.core import GrammarKeywords
 
 
 class TestSchemaTransformer(unittest.TestCase):
-    """Tests the Schema Transformer"""
+    """Tests the SchemaTransformer class"""
 
     def setUp(self):
         self.transformer = SchemaTransformer()
@@ -38,6 +42,7 @@ class TestSchemaTransformer(unittest.TestCase):
     def test_rule_name(self, name: str, rule_name: str, expected: str):
         # Unused by test case, however is required by the parameterized library
         del name
+
         token = lark.Token('TOKEN', value=rule_name)
         processed_token = self.transformer.rule_name([token])
         self.assertEqual(expected, processed_token.value)
@@ -64,15 +69,35 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(name.value, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
         self.assertFalse(ruleset.is_strict)
+        self.assertIsNone(ruleset.parent)
 
-    def test_strict_ruleset(self):
+    def test_ruleset_with_strict_token(self):
+        strict_token = lark.Token(type_=GrammarKeywords.STRICT, value='')
         name = lark.Token(type_='TOKEN', value='person')
-        tokens = (name, *self.ruleset_rules)
-        ruleset = self.transformer.strict_ruleset(tokens)
+        tokens = (strict_token, name, *self.ruleset_rules)
+        ruleset = self.transformer.ruleset(tokens)
 
         self.assertEqual(name.value, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
         self.assertTrue(ruleset.is_strict)
+        self.assertIsNone(ruleset.parent)
+
+    def test_ruleset_with_parent(self):
+        strict_token = lark.Token(type_=GrammarKeywords.STRICT, value='')
+        name = lark.Token(type_='TOKEN', value='person')
+        parent = RuleType(SchemaTypes.RULESET, lookup='Foo')
+        tokens = (strict_token, name, parent, *self.ruleset_rules)
+        ruleset = self.transformer.ruleset(tokens)
+
+        self.assertEqual(name.value, ruleset.name)
+        self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
+        self.assertTrue(ruleset.is_strict)
+        self.assertIsNotNone(ruleset.parent)
+
+    def test_ruleset_parent(self):
+        parent_rule_type = RuleType(SchemaTypes.RULESET, lookup='Foo')
+        result = self.transformer.ruleset_parent([parent_rule_type])
+        self.assertEqual(parent_rule_type, result)
 
     def test_start(self):
         # This will be zero since main is removed from the dict
@@ -90,11 +115,11 @@ class TestSchemaTransformer(unittest.TestCase):
             ])
         ]
 
-        ruleset_items = self.transformer.start(instructions)
-        rulesets = ruleset_items.get('rules')
-        enums = ruleset_items.get('enums')
+        schema = self.transformer.start(instructions)
+        rulesets = schema.rulesets
+        enums = schema.enums
 
-        self.assertIsNotNone(ruleset_items.get('main'))
+        self.assertIsNotNone(schema.root)
         self.assertEqual(expected_enum_count, len(enums))
         self.assertEqual(expected_ruleset_count, len(rulesets))
 
@@ -169,10 +194,13 @@ class TestSchemaTransformer(unittest.TestCase):
     ])
     def test_container_type_construct_does_not_exist(self, name: str,
                                                      seen_constructs: dict):
-        token = lark.Token(type_='TOKEN', value=name)
+        # Unused by test case, however is required by the parameterized library
+        del name
+
+        token = lark.Token(type_='TOKEN', value='Foo')
         self.transformer.seen_constructs = seen_constructs
-        with self.assertRaises(ConstructNotFoundError):
-            self.transformer.container_type(token)
+        rule = self.transformer.container_type(token)
+        self.assertEqual(SchemaTypes.UNKNOWN, rule.schema_type)
 
     def test_regex_type(self):
         token = 'test{1}'
@@ -216,10 +244,11 @@ class TestSchemaTransformer(unittest.TestCase):
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))
         self.assertFalse(ruleset.is_strict)
 
-    def test_strict_schema_entry(self):
+    def test_schema_entry_with_strict_token(self):
         expected_ruleset_name = 'main'
-        tokens = (*self.ruleset_rules, )
-        ruleset = self.transformer.strict_schema_entry(tokens)
+        strict_token = lark.Token(type_=GrammarKeywords.STRICT, value='')
+        tokens = (strict_token, *self.ruleset_rules, )
+        ruleset = self.transformer.schema_entry(tokens)
 
         self.assertEqual(expected_ruleset_name, ruleset.name)
         self.assertEqual(len(self.ruleset_rules), len(ruleset.rules))

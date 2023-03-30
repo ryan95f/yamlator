@@ -14,13 +14,15 @@ from parameterized import parameterized
 from yamlator.utils import load_schema
 from yamlator.exceptions import InvalidSchemaFilenameError
 
+from tests.cmd import constants
+
 
 class TestLoadSchema(unittest.TestCase):
     """Test cases for the Load Schema function"""
 
     @parameterized.expand([
-        ('with_empty_str', '', ValueError),
-        ('with_none', None, ValueError),
+        ('with_empty_str', constants.EMPTY_PATH, ValueError),
+        ('with_none', constants.NONE_PATH, ValueError),
         ('with_yaml_extension', 'test.yaml', InvalidSchemaFilenameError),
         ('with_txt_extension', 'test/test.txt', InvalidSchemaFilenameError),
     ])

@@ -1,6 +1,6 @@
-ruleset Details {}
-
 schema {
     message str
     details Details
 }
+
+ruleset Details {}

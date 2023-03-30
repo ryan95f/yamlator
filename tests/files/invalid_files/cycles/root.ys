@@ -1,0 +1,12 @@
+import Values, Status from "common.ys" as core
+
+ruleset Project {
+    version str
+    name str
+    status core.Status optional
+}
+
+schema {
+    project Project
+    value core.Values
+}

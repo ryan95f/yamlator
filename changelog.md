@@ -53,3 +53,10 @@
 * Added top level validation to Yamlator to support data structures that may not be an object or a map
 * Minor docstring and structure improvements in the `tests/` module
 * Improvements to the codebase docstrings
+
+## v4.0.0 (30th March 2023)
+
+* Added import statements to the Yamlator schema syntax that support importing one or more types
+* Added namespaces to the import statements with the `as` keyword
+* Improvements to the loading of rulesets to allow for schema files to be less restrictive in the order resources are defined.
+* Improvements to the grammar file to include new terminals and remove duplicate constructs
