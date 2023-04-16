@@ -345,6 +345,16 @@ def resolve_ruleset_inheritance(rulesets: Dict[str, YamlatorRuleset]) -> dict:
 
     updated_rulesets = {}
 
+    vp = DependencyManager()
+    for key, ruleset in rulesets.items():
+        if not ruleset.parent:
+            continue
+
+        vp.add_child(key, ruleset.parent.lookup)
+
+    if vp.has_cycle():
+        raise CycleDependencyError('Detected cycle when resolving inheritance')
+
     for key, ruleset in rulesets.items():
         if ruleset.parent is None:
             updated_rulesets[key] = ruleset

@@ -5,7 +5,12 @@ schema {
     value core.Values
 }
 
-strict ruleset Project {
+ruleset Test {
+    wow str
+    t int
+}
+
+strict ruleset Project(Test) {
     status core.Status
     apis list(str)
     details core.ProjectDetails
