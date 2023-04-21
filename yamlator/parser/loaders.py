@@ -345,28 +345,27 @@ def resolve_ruleset_inheritance(rulesets: Dict[str, YamlatorRuleset]) -> dict:
 
     updated_rulesets = {}
 
-    vp = DependencyManager()
+    dp = DependencyManager()
     for key, ruleset in rulesets.items():
-        if not ruleset.parent:
-            continue
-
-        vp.add_child(key, ruleset.parent.lookup)
-
-    if vp.has_cycle():
-        raise CycleDependencyError('Detected cycle when resolving inheritance')
-
-    for key, ruleset in rulesets.items():
-        if ruleset.parent is None:
+        parent = ruleset.parent
+        if not parent:
             updated_rulesets[key] = ruleset
             continue
 
-        parent_name = ruleset.parent.lookup
-        parent = rulesets.get(parent_name)
-        if parent is None:
+        if rulesets.get(parent.lookup) is None:
             raise ConstructNotFoundError(parent)
 
-        base_rules = ruleset.rules.copy()
-        parent_rules = parent.rules.copy()
+        dp.add_child(key, ruleset.parent.lookup)
+
+    if dp.has_cycle():
+        raise CycleDependencyError('Detected cycle when resolving inheritance')
+
+    g = dp.graph
+    for node, children in g.items():
+        p = _resolve(node, children[0], rulesets, updated_rulesets, g)
+
+        base_rules = rulesets[node].rules.copy()
+        parent_rules = p.rules.copy()
 
         # Index the rules in the base and parent rulesets to make it
         # easier to merge the different rules together
@@ -377,9 +376,42 @@ def resolve_ruleset_inheritance(rulesets: Dict[str, YamlatorRuleset]) -> dict:
         # in both the base rules will be prioritised since it assumed
         # it is being overridden
         merged_rules = list({**parent_rules_index, **base_rules_index}.values())
-        updated_rulesets[key] = YamlatorRuleset(
-            name=ruleset.name,
+        updated_rulesets[node] = YamlatorRuleset(
+            name=node,
             rules=merged_rules,
-            is_strict=ruleset.is_strict
+            is_strict=rulesets[node].is_strict
         )
+
     return updated_rulesets
+
+
+def _resolve(parent, child, base_data, updated_data, graph) -> YamlatorRuleset:
+    if updated_data.get(child) is not None:
+        return updated_data[child]
+
+    if child is None:
+        return base_data[parent]
+
+    dependents = graph.get(child)
+    if dependents is not None:
+        dependents = dependents[0]
+    p = _resolve(child, dependents, base_data, updated_data, graph)
+
+    base_rules = base_data[parent].rules.copy()
+    parent_rules = p.rules.copy()
+
+    # Index the rules in the base and parent rulesets to make it
+    # easier to merge the different rules together
+    base_rules_index = {rule.name: rule for rule in base_rules}
+    parent_rules_index = {rule.name: rule for rule in parent_rules}
+
+    # Merged the 2 rule lists together. If a rule name is present
+    # in both the base rules will be prioritised since it assumed
+    # it is being overridden
+    merged_rules = list({**parent_rules_index, **base_rules_index}.values())
+    updated_data[parent] = YamlatorRuleset(
+        name=parent,
+        rules=merged_rules,
+        is_strict=base_data[parent].is_strict
+    )
+    return updated_data[parent]

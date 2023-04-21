@@ -1,5 +1,6 @@
 """Utilties for managing dependencies in Yamlator"""
 
+import copy
 import hashlib
 from collections import defaultdict
 
@@ -15,6 +16,10 @@ class DependencyManager:
 
     def __len__(self) -> int:
         return len(self._graph)
+
+    @property
+    def graph(self) -> dict:
+        return copy.deepcopy(self._graph)
 
     def add(self, node: str) -> str:
         """Add a new node to the graph. The contents of the parameter

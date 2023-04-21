@@ -5,9 +5,13 @@ schema {
     value core.Values
 }
 
-ruleset Test {
+ruleset Test(Ab) {
     wow str
     t int
+}
+
+ruleset Ab {
+    a str
 }
 
 strict ruleset Project(Test) {
