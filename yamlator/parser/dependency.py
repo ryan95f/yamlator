@@ -64,7 +64,7 @@ class DependencyManager:
         visited = defaultdict(bool)
         rec_stack = defaultdict(bool)
 
-        for node in self._graph.keys():
+        for node in self._graph:
             if not visited[node]:
                 if self._detect_cycle(node, visited, rec_stack):
                     return True
