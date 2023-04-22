@@ -129,6 +129,41 @@ class TestResolveRulesetInheritance(unittest.TestCase):
         self.assertEqual(expected_ruleset_count, actual_ruleset_count)
         self.assertEqual(expected_foo_rule_count, actual_foo_rule_count)
 
+    def test_resolve_ruleset_inheritance_with_cascading_inheritance(self):
+        rulesets = {
+            'Foo': YamlatorRuleset(
+                name='Foo',
+                rules=[
+                    Rule('message', RuleType(SchemaTypes.STR), True),
+                    Rule('name', RuleType(SchemaTypes.STR), True),
+                ],
+                is_strict=False,
+                parent=RuleType(SchemaTypes.RULESET, lookup='Bar')
+            ),
+            'Bar': YamlatorRuleset(
+                name='Bar',
+                rules=[
+                    Rule('number', RuleType(SchemaTypes.FLOAT), True),
+                ],
+                parent=RuleType(SchemaTypes.RULESET, lookup='Faux')
+            ),
+            'Faux': YamlatorRuleset(
+                name='Faux',
+                rules=[
+                    Rule('version', RuleType(SchemaTypes.STR), True),
+                    Rule('type', RuleType(SchemaTypes.STR), True),
+                ],
+                is_strict=False
+            )
+        }
+
+        expected_foo_rule_count = 5
+
+        updated_rules = resolve_ruleset_inheritance(rulesets)
+
+        actual_foo_rule_count = len(updated_rules['Foo'].rules)
+        self.assertEqual(expected_foo_rule_count, actual_foo_rule_count)
+
 
 if __name__ == '__main__':
     unittest.main()
