@@ -158,11 +158,54 @@ class TestResolveRulesetInheritance(unittest.TestCase):
         }
 
         expected_foo_rule_count = 5
+        expected_bar_rule_count = 3
 
         updated_rules = resolve_ruleset_inheritance(rulesets)
 
         actual_foo_rule_count = len(updated_rules['Foo'].rules)
+        actual_bar_rule_count = len(updated_rules['Bar'].rules)
+
         self.assertEqual(expected_foo_rule_count, actual_foo_rule_count)
+        self.assertEqual(expected_bar_rule_count, actual_bar_rule_count)
+
+    def test_resolve_ruleset_inheritance_multiple_objects_same_dependency(self):
+        rulesets = {
+            'Foo': YamlatorRuleset(
+                name='Foo',
+                rules=[
+                    Rule('message', RuleType(SchemaTypes.STR), True),
+                    Rule('name', RuleType(SchemaTypes.STR), True),
+                ],
+                is_strict=False,
+                parent=RuleType(SchemaTypes.RULESET, lookup='Faux')
+            ),
+            'Bar': YamlatorRuleset(
+                name='Bar',
+                rules=[
+                    Rule('number', RuleType(SchemaTypes.FLOAT), True),
+                ],
+                parent=RuleType(SchemaTypes.RULESET, lookup='Faux')
+            ),
+            'Faux': YamlatorRuleset(
+                name='Faux',
+                rules=[
+                    Rule('version', RuleType(SchemaTypes.STR), True),
+                    Rule('type', RuleType(SchemaTypes.STR), True),
+                ],
+                is_strict=False
+            )
+        }
+
+        expected_foo_rule_count = 4
+        expected_bar_rule_count = 3
+
+        updated_rules = resolve_ruleset_inheritance(rulesets)
+
+        actual_foo_rule_count = len(updated_rules['Foo'].rules)
+        actual_bar_rule_count = len(updated_rules['Bar'].rules)
+
+        self.assertEqual(expected_foo_rule_count, actual_foo_rule_count)
+        self.assertEqual(expected_bar_rule_count, actual_bar_rule_count)
 
 
 if __name__ == '__main__':

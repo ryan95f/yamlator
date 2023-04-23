@@ -333,8 +333,10 @@ def resolve_ruleset_inheritance(rulesets: Dict[str, YamlatorRuleset]) -> dict:
     Raises:
         ValueError: If the ruleset parameter is `None`
         TypeError: If the ruleset parameter is not a `dict`
-        yamlator.exceptions.ConstructNotFoundError: If the parent of the ruleset
-            cannot be found in the `rulesets` parameter
+        yamlator.exceptions.ConstructNotFoundError: If a parent ruleset
+            that is being inherited cannot be found in the `rulesets` parameter
+        yamlator.exceptions.CycleDependencyError: If there is a cycle in the
+            inheritance chain
     """
     if rulesets is None:
         raise ValueError('Parameter rulesets cannot be None')
@@ -345,7 +347,7 @@ def resolve_ruleset_inheritance(rulesets: Dict[str, YamlatorRuleset]) -> dict:
 
     updated_rulesets = {}
 
-    dp = DependencyManager()
+    dependencies_mgmr = DependencyManager()
     for key, ruleset in rulesets.items():
         parent = ruleset.parent
         if not parent:
@@ -355,41 +357,35 @@ def resolve_ruleset_inheritance(rulesets: Dict[str, YamlatorRuleset]) -> dict:
         if rulesets.get(parent.lookup) is None:
             raise ConstructNotFoundError(parent)
 
-        dp.add_child(key, ruleset.parent.lookup)
+        dependencies_mgmr.add_child(key, ruleset.parent.lookup)
 
-    if dp.has_cycle():
+    if dependencies_mgmr.has_cycle():
         raise CycleDependencyError('Detected cycle when resolving inheritance')
 
-    g = dp.graph
-    for node, _ in g.items():
+    dependencies = dependencies_mgmr.graph
+    for node in dependencies:
         if updated_rulesets.get(node) is not None:
             continue
 
         stack = [(node, None)]
         while len(stack) > 0:
-            curr_node, ruleset = stack.pop()
+            curr_node, curr_ruleset = stack.pop()
 
-            if ruleset is not None:
-                if len(stack) == 0:
-                    break
-
-                dependent_node, _ = stack.pop()
-                dependent_ruleset = rulesets[dependent_node]
-                updated_rulesets[dependent_node] = _merge_rulesets(dependent_ruleset, ruleset)
-                stack.append((dependent_node, updated_rulesets[dependent_node]))
+            if curr_ruleset is not None:
+                parent_node, _ = stack.pop()
+                parent_ruleset = rulesets[parent_node]
+                updated_rulesets[parent_node] = _merge_rulesets(parent_ruleset,
+                                                                curr_ruleset)
+                if len(stack) > 1:
+                    stack.append((parent_node, updated_rulesets[parent_node]))
                 continue
 
             if updated_rulesets.get(curr_node) is not None:
                 stack.append((curr_node, updated_rulesets[curr_node]))
                 continue
 
-            dependents = g.get(curr_node)
-            if dependents is None:
-                stack.append((curr_node, updated_rulesets[curr_node]))
-                continue
-
             stack.append((curr_node, None))
-            stack.append((dependents[0], None))
+            stack.append((dependencies[curr_node][0], None))
 
     return updated_rulesets
 
@@ -399,7 +395,7 @@ def _merge_rulesets(ruleset: YamlatorRuleset,
     base_rules = ruleset.rules.copy()
     dependent_rules = dependent_ruleset.rules.copy()
 
-    # Index the rules in the base and parent rulesets to make it
+    # Index the rules in the base and dependent rulesets to make it
     # easier to merge the different rules together
     base_rules_index = {rule.name: rule for rule in base_rules}
     depedent_rules_index = {rule.name: rule for rule in dependent_rules}
