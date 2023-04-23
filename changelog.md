@@ -65,3 +65,4 @@
 
 * Added ruleset inheritance to the Yamlator schema syntax
 * Added dependency management to the ruleset inheritance process
+* Added Python 3.11 to the `test` Github Workflow
