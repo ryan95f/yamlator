@@ -5,9 +5,21 @@ import Status, User from "base.ys"
 schema {
     employees list(Employee)
     status Status
+    projects list(Project)
 }
 
 ruleset Employee (base.Employee) {
     department str
     salary float
+}
+
+ruleset Versions {
+    version str
+    kind str
+}
+
+ruleset Project(Versions) {
+    description str
+    cost float
+    timeline str
 }

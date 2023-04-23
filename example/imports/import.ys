@@ -1,21 +1,17 @@
-import Values, Status, ProjectDetails from "common.ys" as core
+import Envs, Status, ProjectDetails from "common.ys" as core
 
 schema {
     project Project
-    value core.Values
+    env core.Envs
 }
 
-ruleset Test(Ab) {
-    wow str
-    t int
-}
-
-ruleset Ab {
-    a str
-}
-
-strict ruleset Project(Test) {
+strict ruleset Project(Versions) {
     status core.Status
     apis list(str)
     details core.ProjectDetails
+}
+
+ruleset Versions {
+    version str
+    kind str
 }

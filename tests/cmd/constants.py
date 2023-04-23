@@ -17,6 +17,7 @@ VALID_YAML_DATA = f'{_BASE_VALID_PATH}/valid.yaml'
 VALID_SCHEMA = f'{_BASE_VALID_PATH}/valid.ys'
 VALID_KEYLESS_DIRECTIVE_SCHEMA = f'{_BASE_VALID_PATH}/keyless_directive.ys'
 VALID_KEYLESS_RULES_SCHEMA = f'{_BASE_VALID_PATH}/keyless_and_standard_rules.ys'
+VALID_INHERITANCE_SCHEMA = f'{_BASE_VALID_PATH}/inheritance.ys'
 
 # These files don't exists and are used to force specific errors in the tests
 NONE_PATH = None
