@@ -360,7 +360,8 @@ def resolve_ruleset_inheritance(rulesets: Dict[str, YamlatorRuleset]) -> dict:
         dependencies_mgmr.add_child(key, ruleset.parent.lookup)
 
     if dependencies_mgmr.has_cycle():
-        raise CycleDependencyError('Detected cycle when resolving inheritance')
+        msg = 'Detected cycle when resolving inheritance chain'
+        raise CycleDependencyError(msg)
 
     dependencies = dependencies_mgmr.graph
     for node in dependencies:
@@ -398,12 +399,12 @@ def _merge_rulesets(ruleset: YamlatorRuleset,
     # Index the rules in the base and dependent rulesets to make it
     # easier to merge the different rules together
     base_rules_index = {rule.name: rule for rule in base_rules}
-    depedent_rules_index = {rule.name: rule for rule in dependent_rules}
+    dependent_rules_index = {rule.name: rule for rule in dependent_rules}
 
     # Merged the 2 rule lists together. If a rule name is present
-    # in both the base rules will be prioritised since it assumed
+    # in both then the base rules will be prioritized since it assumed
     # it is being overridden
-    merged_rules = list({**depedent_rules_index, **base_rules_index}.values())
+    merged_rules = list({**dependent_rules_index, **base_rules_index}.values())
     return YamlatorRuleset(
         name=ruleset.name,
         rules=merged_rules,

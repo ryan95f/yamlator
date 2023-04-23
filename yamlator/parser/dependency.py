@@ -14,9 +14,6 @@ class DependencyManager:
     def __init__(self) -> None:
         self._graph = {}
 
-    def __len__(self) -> int:
-        return len(self._graph)
-
     @property
     def graph(self) -> dict:
         return copy.deepcopy(self._graph)

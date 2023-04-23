@@ -10,6 +10,7 @@ from yamlator.types import RuleType
 from yamlator.types import SchemaTypes
 from yamlator.types import YamlatorRuleset
 from yamlator.exceptions import ConstructNotFoundError
+from yamlator.exceptions import CycleDependencyError
 from yamlator.parser.loaders import resolve_ruleset_inheritance
 
 
@@ -27,7 +28,21 @@ class TestResolveRulesetInheritance(unittest.TestCase):
                 is_strict=False,
                 parent=RuleType(SchemaTypes.RULESET, lookup='Bar')
             )
-        }, ConstructNotFoundError)
+        }, ConstructNotFoundError),
+        ('with_cycle_ruleset', {
+            'Foo': YamlatorRuleset(
+                name='Foo',
+                rules=[],
+                is_strict=False,
+                parent=RuleType(SchemaTypes.RULESET, lookup='Bar')
+            ),
+            'Bar': YamlatorRuleset(
+                name='Bar',
+                rules=[],
+                is_strict=False,
+                parent=RuleType(SchemaTypes.RULESET, lookup='Foo')
+            )
+        }, CycleDependencyError)
     ])
     def test_resolve_ruleset_raises_error(self, name: str, rulesets: Any,
                                           expected_exception: Exception):
@@ -37,7 +52,7 @@ class TestResolveRulesetInheritance(unittest.TestCase):
         with self.assertRaises(expected_exception):
             resolve_ruleset_inheritance(rulesets)
 
-    def test_resolve_ruleset_inheritance(self):
+    def test_resolve_ruleset_inheritance_with_simple_inheritance(self):
         rulesets = {
             'Foo': YamlatorRuleset(
                 name='Foo',
@@ -186,6 +201,15 @@ class TestResolveRulesetInheritance(unittest.TestCase):
                 ],
                 parent=RuleType(SchemaTypes.RULESET, lookup='Faux')
             ),
+            'Baz': YamlatorRuleset(
+                name='Baz',
+                rules=[
+                    Rule('name', RuleType(SchemaTypes.STR), True),
+                    Rule('item', RuleType(SchemaTypes.STR), False),
+                    Rule('cost', RuleType(SchemaTypes.FLOAT), False),
+                ],
+                parent=RuleType(SchemaTypes.RULESET, lookup='Bar')
+            ),
             'Faux': YamlatorRuleset(
                 name='Faux',
                 rules=[
@@ -198,14 +222,17 @@ class TestResolveRulesetInheritance(unittest.TestCase):
 
         expected_foo_rule_count = 4
         expected_bar_rule_count = 3
+        expected_baz_rule_count = 6
 
         updated_rules = resolve_ruleset_inheritance(rulesets)
 
         actual_foo_rule_count = len(updated_rules['Foo'].rules)
         actual_bar_rule_count = len(updated_rules['Bar'].rules)
+        actual_baz_rule_count = len(updated_rules['Baz'].rules)
 
         self.assertEqual(expected_foo_rule_count, actual_foo_rule_count)
         self.assertEqual(expected_bar_rule_count, actual_bar_rule_count)
+        self.assertEqual(expected_baz_rule_count, actual_baz_rule_count)
 
 
 if __name__ == '__main__':
