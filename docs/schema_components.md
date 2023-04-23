@@ -482,7 +482,7 @@ __NOTE__: If an import cycle is detected, Yamlator will exit with a non-zero sta
 
 ## Ruleset Inheritance
 
-In Yamlator version `0.4.1`, rulesets can now inherit other rulesets to reduce duplicating rules. A Ruleset can be inherited other rulesets from the current schema or from schema that has been imported.
+In Yamlator version `0.4.1`, rulesets can now inherit other rulesets to reduce duplicating rules. A Ruleset can inherited other rulesets from the current schema or from schemas that has been imported.
 
 __NOTE__: A ruleset can only inherit a single ruleset. Multi-inheritance is currently __NOT__ supported.
 
@@ -514,7 +514,7 @@ ruleset Foo(Versions) {
 }
 ```
 
-In this case, the `Foo` ruleset will only have 2 rules since the `kind` rule will be inherited but the `version` rule in `Foo` will override the exiting rule in `Versions`.
+In this case, the `Foo` ruleset will only have 2 rules. The `kind` rule will be inherited but the `version` rule in `Foo` will override the exiting rule in `Versions`.
 
 ### Strict Ruleset Inheritance
 
