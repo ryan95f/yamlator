@@ -19,6 +19,9 @@ Below are the various components that can be used to construct a schema with Yam
   * [Union Type](#union-type)
 * [Importing schemas](#importing-schemas)
   * [Schema import paths](#schema-import-paths)
+* [Ruleset Inheritance](#ruleset-inheritance)
+  * [Strict ruleset inheritance](#strict-ruleset-inheritance)
+  * [Inheritance from imported schemas](#inheritance-from-imported-schemas)
 
 ## Schema
 
@@ -476,3 +479,91 @@ main/
 The `apis` will be fetched from the `web` directory and `common.ys` is located in the same directory location as the `main.ys` file. An full example of importing schemas can be found in [example folder](../example/imports/).
 
 __NOTE__: If an import cycle is detected, Yamlator will exit with a non-zero status code.
+
+## Ruleset Inheritance
+
+In Yamlator version `0.4.1`, rulesets can now inherit other rulesets to reduce duplicating rules. A Ruleset can be inherited other rulesets from the current schema or from schema that has been imported.
+
+__NOTE__: A ruleset can only inherit a single ruleset. Multi-inheritance is currently __NOT__ supported.
+
+An example of ruleset inheritance where the `Employee` ruleset will inherit the rules from the `Person` ruleset:
+
+```text
+ruleset Person {
+    first_name str
+    surname str
+}
+
+ruleset Employee(Person) {
+    employee_id str
+}
+```
+
+The `Employee` ruleset will now contain a total of 3 rules, 2 from the `Person` ruleset and 1 rule from its own block.
+
+If a child ruleset has a rule with the same name as the inherited ruleset, then the child rule will override the parent. For example, given the following example:
+
+```text
+ruleset Versions {
+    version str
+    kind str
+}
+
+ruleset Foo(Versions) {
+    version int
+}
+```
+
+In this case, the `Foo` ruleset will only have 2 rules since the `kind` rule will be inherited but the `version` rule in `Foo` will override the exiting rule in `Versions`.
+
+### Strict Ruleset Inheritance
+
+If the parent ruleset is a strict ruleset, strict mode will __NOT__ be inherited by the child ruleset. In order for the child ruleset to use strict mode, it must specify it is a strict ruleset in its definition. For example:
+
+```text
+strict ruleset Foo {
+    bar str
+    baz int
+}
+
+ruleset Request1(Foo) {
+    id str
+}
+
+strict ruleset Request2(Foo) {
+    id str
+}
+```
+
+In the above case, the ruleset `Request1` will not enforce strict mode. However `Request2` will enforce strict mode since it has been defined as a strict ruleset.
+
+### Inheritance from imported schemas
+
+Rulesets can be inherited by rulesets from other files that have been imported with/without a namespace. For example:
+
+Given the below ruleset is located in a file called `common.ys`
+
+```text
+ruleset Project {
+    id str
+    version str
+    kind str
+}
+```
+
+This ruleset can then imported with or without a namespace and be inherited:
+
+```text
+import Project from "common.ys" as common
+import Project from "common.ys"
+
+ruleset AwesomeProject1(common.Project) {
+    ...
+}
+
+ruleset AwesomeProject2(Project) {
+    ...
+}
+```
+
+__NOTE__: If a inheritance cycle is detected, Yamlator will exit with a non-zero status code.
