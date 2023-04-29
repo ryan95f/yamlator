@@ -60,3 +60,9 @@
 * Added namespaces to the import statements with the `as` keyword
 * Improvements to the loading of rulesets to allow for schema files to be less restrictive in the order resources are defined.
 * Improvements to the grammar file to include new terminals and remove duplicate constructs
+
+## v0.4.1 (29th April 2023)
+
+* Added ruleset inheritance to the Yamlator schema syntax
+* Added dependency management to the ruleset inheritance process
+* Added Python 3.11 to the `test` Github Workflow

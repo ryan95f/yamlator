@@ -1,5 +1,6 @@
 """Utilties for managing dependencies in Yamlator"""
 
+import copy
 import hashlib
 from collections import defaultdict
 
@@ -11,7 +12,11 @@ class DependencyManager:
     """
 
     def __init__(self) -> None:
-        self._graph = defaultdict(list)
+        self._graph = {}
+
+    @property
+    def graph(self) -> dict:
+        return copy.deepcopy(self._graph)
 
     def add(self, node: str) -> str:
         """Add a new node to the graph. The contents of the parameter
@@ -40,6 +45,9 @@ class DependencyManager:
         Returns:
             True to indicate that the function completed successfully
         """
+        if not self._graph.get(parent_hash):
+            self._graph[parent_hash] = []
+
         self._graph[parent_hash].append(child_hash)
         return True
 
@@ -53,7 +61,7 @@ class DependencyManager:
         visited = defaultdict(bool)
         rec_stack = defaultdict(bool)
 
-        for node in self._graph.keys():
+        for node in self._graph:
             if not visited[node]:
                 if self._detect_cycle(node, visited, rec_stack):
                     return True
@@ -64,7 +72,8 @@ class DependencyManager:
         visited[curr_node] = True
         rec_stack[curr_node] = True
 
-        for child_node in self._graph[curr_node]:
+        parent_node = self._graph.get(curr_node, [])
+        for child_node in parent_node:
             if not visited[child_node]:
                 if self._detect_cycle(child_node, visited, rec_stack):
                     return True

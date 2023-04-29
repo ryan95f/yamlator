@@ -46,6 +46,8 @@ class TestParseSchema(unittest.TestCase):
             constants.VALID_KEYLESS_DIRECTIVE_SCHEMA, 1),
         ('with_keyless_schema_and_rules',
             constants.VALID_KEYLESS_RULES_SCHEMA, 2),
+        ('with_inheritance',
+            constants.VALID_INHERITANCE_SCHEMA, 3),
     ])
     def test_parse_with_valid_content(self, name: str, schema_path: str,
                                       expected_schema_rule_count: int):

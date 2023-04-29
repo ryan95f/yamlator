@@ -210,6 +210,8 @@ class SchemaTransformer(Transformer):
         name = tokens[0]
         if len(tokens) > 1:
             name = f'{tokens[0]}.{tokens[1]}'
+        else:
+            name = name.value
 
         schema_type = self.seen_constructs.get(name, SchemaTypes.UNKNOWN)
         rule_type = RuleType(schema_type=schema_type, lookup=name)

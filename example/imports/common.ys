@@ -1,7 +1,9 @@
 import Project from "../strict_mode/strict.ys"
 
-enum Values {
+enum Envs {
     TEST = 1
+    DEV = 2
+    PROD = 3
 }
 
 enum Status {
