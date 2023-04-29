@@ -61,7 +61,7 @@
 * Improvements to the loading of rulesets to allow for schema files to be less restrictive in the order resources are defined.
 * Improvements to the grammar file to include new terminals and remove duplicate constructs
 
-## v0.4.1 (TBC)
+## v0.4.1 (29th April 2023)
 
 * Added ruleset inheritance to the Yamlator schema syntax
 * Added dependency management to the ruleset inheritance process

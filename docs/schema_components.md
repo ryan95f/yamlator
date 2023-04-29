@@ -482,7 +482,7 @@ __NOTE__: If an import cycle is detected, Yamlator will exit with a non-zero sta
 
 ## Ruleset Inheritance
 
-In Yamlator version `0.4.1`, rulesets can now inherit other rulesets to reduce duplicating rules. A Ruleset can inherited other rulesets from the current schema or from schemas that has been imported.
+In Yamlator version `0.4.1`, rulesets can now inherit other rulesets to reduce duplicating rules. A ruleset can inherit other rulesets from the current schema or from schemas that have been imported.
 
 __NOTE__: A ruleset can only inherit a single ruleset. Multi-inheritance is currently __NOT__ supported.
 
@@ -539,9 +539,9 @@ In the above case, the ruleset `Request1` will not enforce strict mode. However 
 
 ### Inheritance from imported schemas
 
-Rulesets can be inherited by rulesets from other files that have been imported with/without a namespace. For example:
+Rulesets can be inherited by rulesets from other files that have been imported with or without a namespace. For example:
 
-Given the below ruleset is located in a file called `common.ys`
+The given ruleset is located in a file called `common.ys`
 
 ```text
 ruleset Project {
@@ -551,7 +551,7 @@ ruleset Project {
 }
 ```
 
-This ruleset can then imported with or without a namespace and be inherited:
+This ruleset can then be imported with or without a namespace and be inherited:
 
 ```text
 import Project from "common.ys" as common
